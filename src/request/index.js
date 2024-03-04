@@ -20,7 +20,7 @@ instance.interceptors.request.use(
             // config.headers["Authorization"] = 'ApiToken' + token;
             config.headers.ApiToken = token;
         }
-        console.log('请求带数据', config);
+        // console.log('请求带数据', config, new Date().toLocaleTimeString());
         return config;
     },
     (err) => {
@@ -32,7 +32,9 @@ instance.interceptors.response.use(
     (res) => {
         Loading.changeSpinning(false);
         //个人信息返回缺少tag
-        res.data.Tag == 1 ? console.log('返回的数据', res) : message['error'](res.data.Message);
+        res.data.Tag == 1
+            ? console.log('返回的数据', res, new Date().toLocaleTimeString())
+            : message['error'](res.data.Message);
         return res.data;
     },
     (resError) => {

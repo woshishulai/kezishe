@@ -1,37 +1,30 @@
 let navList = [
     {
         title: '首页',
-        shu: '|',
         router: '/'
     },
     {
-        shu: '|',
         title: '竞买',
         router: '/jingmai'
     },
     {
-        shu: '|',
         title: '委托',
         router: '/weituo'
     },
     {
         title: '中邮商城',
-        shu: '|',
         router: '/zhongyou'
     },
     {
         title: '成交',
-        shu: '|',
         router: '/chengjiao'
     },
     {
         title: '收购',
-        shu: '|',
         router: '/shougou'
     },
     {
         title: '中邮评级',
-        shu: '',
         router: '/pingji'
     }
 ];
@@ -145,32 +138,25 @@ let footerNavList = [
 
 let footerInfoList = [
     {
-        title: '首页',
-        shu: '|'
+        title: '首页'
     },
     {
-        title: '招聘英才',
-        shu: '|'
+        title: '招聘英才'
     },
     {
-        title: '合作及洽谈',
-        shu: '|'
+        title: '合作及洽谈'
     },
     {
-        title: '联系我们',
-        shu: '|'
+        title: '联系我们'
     },
     {
-        title: '关于我们',
-        shu: '|'
+        title: '关于我们'
     },
     {
-        title: '风险提示',
-        shu: '|'
+        title: '风险提示'
     },
     {
-        title: '收藏导航',
-        shu: ''
+        title: '收藏导航'
     }
 ];
 export { navList, cateList, footerNavList, footerInfoList };

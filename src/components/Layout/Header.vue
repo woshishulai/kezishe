@@ -4,7 +4,9 @@ import { useRouter } from 'vue-router';
 import { navList } from '../data';
 import { useUserInfo } from '@/store/store';
 import { getUserNikeNameApi } from '@/request/api';
+import { DownOutlined } from '@ant-design/icons-vue';
 import HeaderInput from './item/HeaderInput.vue';
+import Tabbar from './item/Tabbar.vue';
 const router = useRouter();
 const selector = ref('登录');
 const nikeNameList = ref([]);
@@ -14,6 +16,7 @@ onMounted(async () => {
         let res = await getUserNikeNameApi();
         if (res.Tag == 0) {
             console.log(res);
+            router.push('/login');
             return;
         } else {
             nikeNameList.value = res.Data;
@@ -28,7 +31,6 @@ onMounted(async () => {
 watchEffect(async () => {
     selector.value = user.userNickName.NickName;
 });
-const handleChange = () => {};
 const removeUserInfo = () => {
     user.removeUserInfo();
     user.removeUserTranslate();
@@ -44,35 +46,33 @@ const removeUserInfo = () => {
                 <div class="welcome-login">
                     <h5>您好，欢迎来到壳子社</h5>
                     <a-divider type="vertical" style="background-color: #a2887d" />
-                    <div class="login" v-if="!user.userInfo">
+                    <div class="login" v-if="!user.userInfo.ApiToken">
                         <span class="active" @click="router.push('/login')">登录</span>
                         <a-divider type="vertical" style="background-color: #a2887d" />
                         <span @click="router.push('/register')">注册</span>
                     </div>
-                    <div v-else class="user-name">{{ user.userInfo.RealName }}</div>
+                    <div v-else class="user-name">{{ user.userInfo.UserName }}</div>
                 </div>
                 <div class="user-info">
-                    <a-dropdown>
-                        <a class="ant-dropdown-link" @click.prevent>
-                            {{ selector }}
-                            <DownOutlined />
-                        </a>
+                    <span v-if="!user.userInfo.ApiToken" @click="router.push('/login')" value="登录"
+                        >登录</span
+                    >
+                    <a-dropdown v-else :arrow="true">
+                        <span @click="router.push('/user')">{{ selector }}</span>
                         <template #overlay>
-                            <a-menu @click="onClick">
+                            <a-menu>
                                 <a-menu-item
                                     v-for="(item, index) in nikeNameList"
                                     :key="item.NickName"
                                     :value="item.NickName"
-                                    v-if="user.userInfo?.ApiToken"
-                                    >{{ item.NickName }}</a-menu-item
                                 >
-                                <a-menu-item
-                                    v-if="!user.userInfo?.ApiToken"
-                                    @click="router.push('/login')"
-                                    value="登录"
-                                    >登录</a-menu-item
-                                >
-                                <a-menu-item @click="removeUserInfo" value="退出">退出</a-menu-item>
+                                    <span @click="user.changeUserNickName(item)">{{
+                                        item.NickName
+                                    }}</span>
+                                </a-menu-item>
+                                <a-menu-item>
+                                    <span @click="removeUserInfo()">退出</span>
+                                </a-menu-item>
                             </a-menu>
                         </template>
                     </a-dropdown>
@@ -99,19 +99,7 @@ const removeUserInfo = () => {
                 <img class="code" src="@/assets/img/global/code.png" alt="" />
             </div>
         </div>
-        <div class="header-tabbar-wrap">
-            <div class="con-main-wrap">
-                <li
-                    class="nav-item"
-                    @click="router.push(item.router)"
-                    v-for="item in navList"
-                    :key="item.title"
-                >
-                    <span>{{ item.title }}</span>
-                    <span class="shu">{{ item.shu }}</span>
-                </li>
-            </div>
-        </div>
+        <Tabbar />
     </div>
 </template>
 <style scoped lang="less">
@@ -174,32 +162,11 @@ const removeUserInfo = () => {
             justify-content: space-between;
             gap: 250px;
             padding: 20px 0;
-
+            .logo {
+                cursor: pointer;
+            }
             .reserach {
                 flex: 1;
-            }
-        }
-    }
-
-    .header-tabbar-wrap {
-        background: #9a0000;
-        padding: 15px 0;
-
-        .con-main-wrap {
-            .flex-row;
-            padding-left: 60px;
-            justify-content: flex-start;
-            gap: 40px;
-            color: #fff;
-
-            .nav-item {
-                .flex-row;
-                gap: 40px;
-                cursor: pointer;
-
-                .shu {
-                    color: #c30606;
-                }
             }
         }
     }

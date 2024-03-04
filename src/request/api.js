@@ -1,5 +1,9 @@
 import instance from './index';
 
+//tabbar
+export const getTabbatList = async () => instance.get('/Web/Auction/Columns');
+
+//登录
 export const submitLoginApi = async (data) => instance.post('/Member/Logon/LoginPwd', data);
 
 //用户资料完成度
