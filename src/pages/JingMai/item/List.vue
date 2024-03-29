@@ -1,89 +1,102 @@
 <script setup>
 import { useRouter, useRoute } from 'vue-router';
-import { getImageUrl } from '@/utils';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
+const router = useRouter();
 const props = defineProps({
-    query: {
-        type: Object,
-        default: {}
+    SpecialList: {
+        type: Array,
+        default: []
     }
 });
-const router = useRouter();
-const route = useRoute();
-const list = [
+const value1 = ref(['1', '2']); //筛选条件
+//筛选后的数组
+const list = ref([]);
+const paginations = ref({
+    pageSize: 5, //每页展示多少个
+    total: list.length //总共多少
+});
+const cateList = [
     {
-        img: 'jingmai/list/list1.png',
-        title: '南海画院院长、南海美协主席、广东省美术家协会会员 黎-明-晖 国画专场',
-        time: '时间：09.02 - 09.04',
-        details:
-            '锦上添花书画专场共120余件拍品，作品类别丰富，题材多样，适合收藏和展示，敬请各位藏友喜欢！',
-        btn: '查看详情'
+        value: '1',
+        label: '预展'
     },
     {
-        img: 'jingmai/list/list2.png',
-        title: '郎窑红瓷器专场，一色写尽天下风光',
-        time: '时间：09.02 - 09.04',
-        details:
-            '锦上添花书画专场共120余件拍品，作品类别丰富，题材多样，适合收藏和展示，敬请各位藏友喜欢！',
-        btn: '查看详情'
-    },
-    {
-        img: 'jingmai/list/list3.png',
-        title: '郎窑红瓷器专场，一色写尽天下风光',
-        time: '时间：09.02 - 09.04',
-        details:
-            '锦上添花书画专场共120余件拍品，作品类别丰富，题材多样，适合收藏和展示，敬请各位藏友喜欢！',
-        btn: '查看详情'
-    },
-    {
-        img: 'jingmai/list/list2.png',
-        title: '郎窑红瓷器专场，一色写尽天下风光',
-        time: '时间：09.02 - 09.04',
-        details:
-            '锦上添花书画专场共120余件拍品，作品类别丰富，题材多样，适合收藏和展示，敬请各位藏友喜欢！',
-        btn: '查看详情'
-    },
-    {
-        img: 'jingmai/list/list1.png',
-        title: '郎窑红瓷器专场，一色写尽天下风光',
-        time: '时间：09.02 - 09.04',
-        details:
-            '锦上添花书画专场共120余件拍品，作品类别丰富，题材多样，适合收藏和展示，敬请各位藏友喜欢！',
-        btn: '查看详情'
+        value: '2',
+        label: '竞拍'
     }
 ];
+watch(
+    () => props.SpecialList,
+    (newVal) => {
+        list.value = newVal;
+        paginations.value.total = newVal.length;
+    }
+);
+//筛选发生变化
+const onCheckAllChange = () => {
+    list.value = props.SpecialList.filter((item) => {
+        return value1.value.includes(item.SType);
+    });
+    paginations.value.total = list.value.length;
+    console.log(list.value); //3
+};
+//查看专场详情
+const showGoods = (item) => {
+    console.log(item);
+    router.push({
+        path: '/jingmai/show-goods',
+        query: {}
+    });
+};
 </script>
 
 <template>
     <div class="jinmai-list">
+        <div class="cate-item">
+            <h5 class="cate-title"> 类型: </h5>
+            <a-checkbox-group
+                v-model:value="value1"
+                name="checkboxgrosssfffup"
+                :options="cateList"
+                @change="onCheckAllChange"
+            />
+        </div>
         <h3>开售</h3>
         <div class="goods-list">
             <div
                 class="goods-item"
                 v-for="(item, index) in list"
-                :key="index"
-                @click="router.push(props.query.path)"
+                :key="item.Id"
+                @click="showGoods(item)"
             >
-                <img :src="getImageUrl(item.img)" alt="商品" />
+                <img :src="item.Img" :alt="item.Title" />
                 <div class="right-text">
-                    <h5>{{ item.title }}</h5>
-                    <p class="time">{{ item.time }}</p>
+                    <h5>{{ item.Title }}</h5>
+                    <p class="time">时间：{{ item.Starttime }}- {{ item.Ontime }}</p>
                     <p class="details">
-                        {{ item.details }}
+                        {{ item.SubTitle }}
                     </p>
                     <div class="btn">
-                        <span>{{ item.btn }}</span>
+                        <span>查看详情</span>
                     </div>
                 </div>
             </div>
         </div>
-        <cate-page></cate-page>
+        <cate-page :paginations="paginations"></cate-page>
     </div>
 </template>
 <style lang="less">
 .jinmai-list {
-    margin: 30px 0;
+    margin: 0 0 30px;
+    .cate-item {
+        display: flex;
+        align-items: center;
+        gap: 30px;
+        padding: 20px 0 14px;
+        border-bottom: 1px solid #dbdbdb;
+    }
     h3 {
+        margin-top: 30px;
         text-align: center;
         font-size: 24px;
         color: #000;

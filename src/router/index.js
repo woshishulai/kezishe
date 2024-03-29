@@ -523,7 +523,7 @@ const userRoutes = [
 ];
 const routes = [...baseRoutes, ...addRoutes, ...userRoutes];
 const router = createRouter({
-    history: createWebHistory(),
+    // history: createWebHistory(),
     history: createWebHashHistory(),
     routes,
     // 路由滚动行为定制

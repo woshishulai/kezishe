@@ -1,38 +1,49 @@
 <script setup>
-import { ref, computed, reactive, onMounted } from 'vue';
+import { ref, computed, reactive, onMounted, watchEffect } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { navList } from '@/components/data';
 import { getTabbatList } from '@/request/api';
+import { useInternalMessage } from 'ant-design-vue/es/message/useMessage';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
 const tabbarList = ref([]);
-const active = ref(0);
-onMounted(async () => {
-    try {
-        let res = await getTabbatList();
-        tabbarList.value = res.Data;
-    } catch (err) {
-        console.log(err);
+const active = ref(null);
+onMounted(async () => {});
+watchEffect(async () => {
+    if (route.path == '/jingmai') {
+        try {
+            let res = await getTabbatList();
+            tabbarList.value = res.Data;
+        } catch (err) {
+            console.log(err);
+        }
+    } else {
+        tabbarList.value = [];
     }
 });
+const showNav = (item) => {
+    if (item.router == route.path) {
+        active.value = 0;
+    }
+};
 const changeActive = (index) => {
-    console.log(index);
     active.value = index;
     console.log(tabbarList.value[active.value]);
 };
 const removeActive = () => {
-    active.value = '';
+    active.value = null;
 };
 </script>
 
 <template>
-    <div class="header-tabbar-wrap">
+    <div class="header-tabbar-wrap" @mouseleave="removeActive()">
         <div class="con-main-wrap">
             <li
                 class="nav-item"
                 @click="router.push(item.router)"
                 v-for="item in navList"
+                @mouseover="showNav(item)"
                 :key="item.title"
                 :class="route.path == item.router ? 'active' : ''"
             >
@@ -47,20 +58,24 @@ const removeActive = () => {
             </li>
         </div>
         <!-- //导航 -->
-        <div class="fixed">
+        <div class="fixed" v-if="active != null">
             <div class="con-main-wrap">
                 <!-- //二级 -->
                 <div class="two-item" v-for="(item, index) in tabbarList" :key="item.Id">
-                    <li @mouseover="changeActive(index)"> {{ item.TypeName }}</li>
+                    <li @mouseover="changeActive(index)" :class="active === index ? 'active' : ''">
+                        {{ item.TypeName }}</li
+                    >
                 </div>
             </div>
         </div>
-        <div class="fixed san">
+        <div class="fixed san" v-if="tabbarList[active]?.Children.length">
             <div class="con-main-wrap">
                 <div class="item" v-for="item in tabbarList[active]?.Children">
-                    <span>{{ item.TypeName }}</span>
+                    <span class="san-name">{{ item.TypeName }}</span>
                     <div class="list">
-                        <span></span>
+                        <span v-for="(i, index) in item.Children" :key="index">{{
+                            i.TypeName
+                        }}</span>
                     </div>
                 </div>
             </div>
@@ -93,7 +108,12 @@ const removeActive = () => {
                     display: none;
                 }
             }
-            &:hover,
+            &:hover {
+                background: #c30606;
+                .shu {
+                    display: none;
+                }
+            }
             &.active {
                 background-color: #fff;
                 color: #9a0000;
@@ -139,7 +159,8 @@ const removeActive = () => {
                     font-weight: bold;
                     color: #9a0000;
                     border-bottom: 3px solid transparent;
-                    &:hover {
+                    &:hover,
+                    &.active {
                         border-color: #9a0000;
                     }
                 }
@@ -152,9 +173,40 @@ const removeActive = () => {
         .con-main-wrap {
             display: flex;
             justify-content: space-between;
+            align-items: flex-start;
+            padding: 30px 0;
             .item {
                 flex: 1;
+                .flex-col;
+                align-items: flex-start;
+                gap: 20px;
+                padding: 0 60px;
                 color: #000;
+                border-right: 1px solid #f2f2f2;
+                &:last-child {
+                    border: none;
+                }
+                .san-name {
+                    color: #9a0000;
+                    font-size: 15px;
+                    font-weight: bold;
+                }
+                .list {
+                    .flex-col;
+                    align-items: flex-start;
+                    flex-wrap: wrap;
+                    justify-content: flex-start;
+                    gap: 16px;
+                    height: 140px;
+                    span {
+                        color: #000;
+                        font-weight: 600;
+                        &:hover {
+                            color: #9a0000;
+                            cursor: pointer;
+                        }
+                    }
+                }
             }
         }
     }

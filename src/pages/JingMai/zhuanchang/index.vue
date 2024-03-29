@@ -2,21 +2,27 @@
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
+import { getZhuanChangHomeApi } from '@/request/jingmai';
 import Cen from '../item/Cen.vue';
 import List from '../item/List.vue';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
-onMounted(() => {});
-const query = {
-    path: '/jingmai/show-goods'
-};
+const fetchData = ref([]);
+onMounted(async () => {
+    try {
+        let res = await getZhuanChangHomeApi();
+        fetchData.value = res.Data;
+    } catch (err) {
+        console.log(err);
+    }
+});
 </script>
 
 <template>
     <div class="wrap">
-        <Cen></Cen>
-        <List :query="query"></List>
+        <Cen :banner="fetchData?.BannerList"></Cen>
+        <List :SpecialList="fetchData?.SpecialList"></List>
     </div>
 </template>
 

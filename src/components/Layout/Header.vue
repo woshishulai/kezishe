@@ -16,18 +16,27 @@ onMounted(async () => {
         let res = await getUserNikeNameApi();
         if (res.Tag == 0) {
             console.log(res);
-            router.push('/login');
+            // router.push('/login');
             return;
         } else {
             nikeNameList.value = res.Data;
+            console.log(nikeNameList.value);
             let query = nikeNameList.value.find((item) => item.Default == 1);
-            selector.value = user.userNickName.NickName;
-            user.changeUserNickName(query);
+            if (query) {
+                selector.value = user.userNickName.NickName;
+                user.changeUserNickName(query);
+            } else {
+                user.changeUserNickName(nikeNameList.value[0]);
+                selector.value = user.userNickName.NickName;
+            }
         }
     } catch (error) {
         console.log(error);
     }
 });
+const changeUserName = (item) => {
+    user.changeUserNickName(item);
+};
 watchEffect(async () => {
     selector.value = user.userNickName.NickName;
 });
@@ -48,6 +57,7 @@ const removeUserInfo = () => {
                     <a-divider type="vertical" style="background-color: #a2887d" />
                     <div class="login" v-if="!user.userInfo.ApiToken">
                         <span class="active" @click="router.push('/login')">登录</span>
+                        {{ user.userInfo.ApiToken }}
                         <a-divider type="vertical" style="background-color: #a2887d" />
                         <span @click="router.push('/register')">注册</span>
                     </div>
@@ -65,13 +75,12 @@ const removeUserInfo = () => {
                                     v-for="(item, index) in nikeNameList"
                                     :key="item.NickName"
                                     :value="item.NickName"
+                                    @click="changeUserName(item)"
                                 >
-                                    <span @click="user.changeUserNickName(item)">{{
-                                        item.NickName
-                                    }}</span>
+                                    <span>{{ item.NickName }}</span>
                                 </a-menu-item>
-                                <a-menu-item>
-                                    <span @click="removeUserInfo()">退出</span>
+                                <a-menu-item @click="removeUserInfo()">
+                                    <span>退出</span>
                                 </a-menu-item>
                             </a-menu>
                         </template>

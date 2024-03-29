@@ -4,9 +4,9 @@ import { useLoading, useUserInfo } from '@/store/store';
 const instance = axios.create({
     // axios 的一些配置，baseURL  timeout
     //开发
-    baseURL: '/api',
+    // baseURL: '/api',
     //生产
-    // baseURL: 'http://apikzs.sc798.com',
+    baseURL: 'http://apikzs.sc798.com',
     timeout: 5000
 });
 const Loading = useLoading();
@@ -33,7 +33,7 @@ instance.interceptors.response.use(
         Loading.changeSpinning(false);
         //个人信息返回缺少tag
         res.data.Tag == 1
-            ? console.log('返回的数据', res, new Date().toLocaleTimeString())
+            ? console.log('返回的数据', res.data, new Date().toLocaleTimeString())
             : message['error'](res.data.Message);
         return res.data;
     },

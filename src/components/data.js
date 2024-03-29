@@ -9,7 +9,7 @@ let navList = [
     },
     {
         title: '委托',
-        router: '/weituo'
+        router: '/weituo/online-commission'
     },
     {
         title: '中邮商城',

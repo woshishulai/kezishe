@@ -4,14 +4,25 @@ import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
 const router = useRouter();
 const route = useRoute();
-const props = defineProps({});
+const props = defineProps({
+    paginations: {
+        type: Object,
+        default: {}
+    }
+});
 onMounted(() => {});
 const current = ref(1);
 </script>
 
 <template>
     <div class="cate-page">
-        <a-pagination v-model:current="current" show-quick-jumper :total="500" show-less-items />
+        <a-pagination
+            :showSizeChanger="false"
+            :hideOnSinglePage="true"
+            v-model:current="current"
+            :pageSize="props.paginations.pageSize"
+            :total="props.paginations.total"
+        />
     </div>
 </template>
 <style scoped lang="less">
