@@ -5,14 +5,14 @@ import {
     removeUserBankApi,
     changeUserBankInfo,
     defaultUserBankInfo,
-    addUserBankInfo
+    addUserBankInfo,
+    getCountList
 } from '@/request/api';
+import { info } from '@/hooks/antd/message';
 import { message } from 'ant-design-vue';
-import { countryList } from '@/utils/user/country';
-import { data } from '@/utils/user/data';
 import RemoveTableList from './item/RemoveTableList.vue';
 import { handleFinishFailed } from '@/utils/form/rules.js';
-
+const countList = ref([]);
 const tableDataList = ref([]);
 const params = reactive({
     open: false, //是否打开弹窗
@@ -36,23 +36,34 @@ const changeParams = reactive({
     }
 });
 onMounted(async () => {
-    statusList();
     try {
-        let res = await getUserBankInfo();
+        const res = await getUserBankInfo();
+        if (res.Tag !== 1) {
+            info('error', res.Message);
+            return;
+        }
         tableDataList.value = res.Data;
+        const ress = await getCountList();
+        if (ress.Tag !== 1) {
+            info('error', ress.Message);
+            return;
+        }
+        countList.value = ress.Data;
+        formState.region = countList.value[0].AreaName;
+        formState.statusList = countList.value[0].ChildList;
     } catch (error) {
-        console.log(error);
+        info('error', error);
     }
 });
 const formState = reactive({
-    username: '测试',
-    region: '中国',
+    username: '',
+    region: '',
     statusList: [], //省市数据
     date1: undefined, //选择的省市
-    text: '工资卡', //备注信息
-    bankNmae: '中国银行', //银行名称
-    tel: '回龙观支行', //分行支行
-    phone: '8372749471938492' //银行卡号
+    text: '', //备注信息
+    bankNmae: '', //银行名称
+    tel: '', //分行支行
+    phone: '' //银行卡号
 });
 const columns = [
     {
@@ -84,28 +95,36 @@ const openModel = (biaoti, id) => {
     params.title = biaoti;
     params.id = id;
 };
-const openChangeParamsModel = (biaoti, id, Default) => {
-    console.log(biaoti, id, Default);
-    changeParams.open = true;
+const openChangeParamsModel = (biaoti, item) => {
+    changeParams.id = item.Id;
+    changeParams.username = item.FullName;
+    changeParams.country = item.Address;
+    changeParams.status = item.BankName;
+    changeParams.shi = item.Sheng;
+    changeParams.text = item.Shi;
+    changeParams.postal = item.Branch;
+    changeParams.tel = item.Card;
+    changeParams.phone = item.Memo;
     changeParams.title = biaoti;
-    changeParams.id = id;
-    changeParams.default = Default;
+    changeParams.default = item.Default;
+    changeParams.open = true;
 };
 const closeModel = () => {
-    params.open = false;
-    params.title = '';
-    params.id = '';
     changeParams.open = false;
     changeParams.title = '';
     changeParams.id = '';
+    params.open = false;
+    params.title = '';
+    params.id = '';
 };
 const postAPi = async () => {
     let res = await removeUserBankApi(params.id);
-    console.log(res);
     if (res.Tag == 1) {
         const index = tableDataList.value.findIndex((item) => item.Id === params.id);
         tableDataList.value.splice(index, 1);
         closeModel();
+    } else {
+        info('error', res.Message);
     }
 };
 const changeApi = async (query) => {
@@ -122,6 +141,17 @@ const changeApi = async (query) => {
         Default: changeParams.default
     };
     let res = await changeUserBankInfo(params);
+    let status;
+    if (res.Tag == 1) {
+        status = 'success';
+        const index = tableDataList.value.findIndex((item) => item.Id === params.Id);
+        tableDataList.value.splice(index, 1, params);
+        info(status, res.Message);
+        closeModel();
+    } else {
+        status = 'error';
+        info(status, res.Message);
+    }
 };
 const changeDefault = async (id) => {
     let res = await defaultUserBankInfo(id);
@@ -131,42 +161,41 @@ const changeDefault = async (id) => {
         item.Default = 1;
     }
 };
-const statusList = (country) => {
-    const defaultCountry = country || 'CHN';
-    const getStatusList = (countryCode) => {
-        const provinces = data[countryCode];
-        if (!provinces) {
-            console.error(`Invalid country code: ${countryCode}`);
-            return [];
-        }
+// const statusList = (country) => {
+//     const defaultCountry = country || 'CHN';
+//     const getStatusList = (countryCode) => {
+//         const provinces = data[countryCode];
+//         if (!provinces) {
+//             console.error(`Invalid country code: ${countryCode}`);
+//             return [];
+//         }
 
-        return Object.entries(provinces).map(([provinceCode, provinceName]) => {
-            const cities = data[provinceCode];
+//         return Object.entries(provinces).map(([provinceCode, provinceName]) => {
+//             const cities = data[provinceCode];
 
-            return {
-                value: provinceName,
-                label: provinceName,
-                children: cities
-                    ? Object.entries(cities).map(([cityCode, cityName]) => ({
-                          value: cityName,
-                          label: cityName
-                      }))
-                    : []
-            };
-        });
-    };
-    formState.statusList = getStatusList(defaultCountry);
-    return getStatusList(defaultCountry);
-};
+//             return {
+//                 value: provinceName,
+//                 label: provinceName,
+//                 ChildList: cities
+//                     ? Object.entries(cities).map(([cityCode, cityName]) => ({
+//                           value: cityName,
+//                           label: cityName
+//                       }))
+//                     : []
+//             };
+//         });
+//     };
+//     formState.statusList = getStatusList(defaultCountry);
+//     return getStatusList(defaultCountry);
+// };
 const handleChange = (value, option) => {
-    statusList(option.id);
+    console.log(value);
     formState.region = value;
-    formState.date1 = '';
+    formState.date1 = option.ChildList;
 };
 const handleFinish = async () => {
-    console.log(formState.date1);
     if (!formState.date1) {
-        message['error']('省市地区不能为空');
+        info('error', '信息请填写完整');
         return;
     }
     let params = {
@@ -182,9 +211,14 @@ const handleFinish = async () => {
     };
     try {
         let res = await addUserBankInfo(params);
-        console.log(res);
+        params.Id = res.Data;
+        if (res.Tag == 1) {
+            tableDataList.value.push(params);
+        } else {
+            info('error', res.Message);
+        }
     } catch (error) {
-        console.log(error);
+        info('error', error);
     }
 };
 </script>
@@ -206,20 +240,13 @@ const handleFinish = async () => {
                     </template>
                     <template v-if="column.key === 'status'">
                         <div class="status">
-                            <span
-                                @click="
-                                    openChangeParamsModel(
-                                        '修改银行账户信息',
-                                        record.Id,
-                                        record.Default
-                                    )
-                                "
+                            <span @click="openChangeParamsModel('修改银行账户信息', record)"
                                 >修改</span
                             >
                             <span @click="openModel('确定删除该银行信息吗', record.Id)">删除</span>
                             <span
                                 @click="changeDefault(record.Id)"
-                                :class="record.Default ? 'active' : ''"
+                                :class="record.Default == 1 ? 'active' : ''"
                                 >{{ record.Default ? '默认账号' : '设为默认' }}
                             </span>
                         </div>
@@ -252,9 +279,14 @@ const handleFinish = async () => {
                         label="国家地区"
                     >
                         <a-select
+                            :field-names="{
+                                label: 'AreaName',
+                                value: 'AreaName',
+                                options: 'ChildList'
+                            }"
                             v-model:value="formState.region"
                             show-search
-                            :options="countryList"
+                            :options="countList"
                             @change="handleChange"
                         ></a-select>
                     </a-form-item>
@@ -264,6 +296,11 @@ const handleFinish = async () => {
                         name="username"
                     >
                         <a-cascader
+                            :field-names="{
+                                label: 'AreaName',
+                                value: 'AreaName',
+                                children: 'ChildList'
+                            }"
                             expand-trigger="hover"
                             v-model:value="formState.date1"
                             :options="formState.statusList"

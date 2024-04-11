@@ -7,6 +7,7 @@ import {
     addUserNickName,
     defaultUserNickName
 } from '@/request/api';
+import { info } from '@/hooks/antd/message';
 import RemoveTableList from './item/RemoveTableList.vue';
 import { handleFinishFailed } from '@/utils/form/rules.js';
 import { message } from 'ant-design-vue';
@@ -34,8 +35,19 @@ const shippingColumns = [
 ];
 const nikeNameList = ref([]);
 onMounted(async () => {
-    let res = await getUserNikeNameApi();
-    nikeNameList.value = res.Data;
+    try {
+        let res = await getUserNikeNameApi();
+        let status;
+        if (res.Tag == 1) {
+            status = 'success';
+            nikeNameList.value = res.Data;
+        } else {
+            status = 'error';
+            info(status, res.Message);
+        }
+    } catch (error) {
+        info('error', error);
+    }
 });
 const params = reactive({
     open: false, //是否打开弹窗
@@ -49,10 +61,16 @@ const openModel = (biaoti, id) => {
 };
 const postAPi = async () => {
     let res = await removeNickNameApi(params.id);
+    let status;
     if (res.Tag == 1) {
+        status = 'success';
         const index = nikeNameList.value.findIndex((item) => item.Id === params.id);
         nikeNameList.value.splice(index, 1);
+        info(status, res.Message);
         closeModel();
+    } else {
+        status = 'error';
+        info(status, res.Message);
     }
 };
 const closeModel = () => {
@@ -73,26 +91,41 @@ const changeParams = reactive({
         two: '备注'
     }
 });
-const openChangeParamsModel = (biaoti, id, Default) => {
-    changeParams.open = true;
+const openChangeParamsModel = (biaoti, item) => {
     changeParams.title = biaoti;
-    changeParams.id = id;
-    changeParams.default = Default;
+    changeParams.id = item.Id;
+    changeParams.default = item.Default;
+    changeParams.country = item.Memo;
+    changeParams.username = item.NickName;
+    changeParams.open = true;
 };
 const changeApi = async (query) => {
-    console.log(query);
     let params = {
         Id: changeParams.id,
         NickName: query.username,
         Memo: query.country,
         Default: changeParams.default
     };
-    let res = await changeUserNickName(params);
+    try {
+        let res = await changeUserNickName(params);
+        let status;
+        if (res.Tag == 1) {
+            status = 'success';
+            const index = nikeNameList.value.findIndex((item) => item.Id === params.Id);
+            nikeNameList.value[index].NickName = params.NickName;
+            nikeNameList.value[index].Memo = params.Memo;
+            info(status, res.Message);
+            closeModel();
+        } else {
+            status = 'error';
+            info(status, res.Message);
+        }
+    } catch (error) {}
 };
 
 const formState = reactive({
-    username: '测试的昵称',
-    text: '我是用来测试的昵称' //详细地址
+    username: '',
+    text: '' //详细地址
 });
 const handleFinish = async () => {
     let params = {
@@ -102,7 +135,7 @@ const handleFinish = async () => {
     };
     let isDuplicate = nikeNameList.value.some((item) => item.NickName === params.NickName);
     if (isDuplicate) {
-        message['error']('已经存在该昵称');
+        info('error', '该昵称已存在');
         return;
     }
     try {
@@ -112,8 +145,14 @@ const handleFinish = async () => {
                   formState[key] = '';
               })
             : '';
+        info('success', res.Message);
+        params.Id = res.Data;
+        nikeNameList.value.push(params);
+        Object.keys(formState).forEach((key) => {
+            formState[key] = '';
+        });
     } catch (error) {
-        console.log(error);
+        info('error', error);
     }
 };
 const changeDefault = async (query) => {
@@ -138,17 +177,13 @@ const changeDefault = async (query) => {
                 <template #bodyCell="{ column, record }">
                     <template v-if="column.key === 'status'">
                         <div class="status">
-                            <span
-                                @click="
-                                    openChangeParamsModel('修改昵称', record.Id, record.Default)
-                                "
-                                >修改</span
-                            >
+                            <span @click="openChangeParamsModel('修改昵称', record)">修改</span>
                             <span @click="openModel('确定删除该昵称吗', record.Id)">删除</span>
                             <span
                                 @click="changeDefault(record)"
-                                :class="record.Default ? 'active' : ''"
-                                >{{ record.Default ? '默认账号' : '设为默认' }}
+                                :class="record.Default == 1 ? 'active' : ''"
+                            >
+                                {{ record.Default ? '默认账号' : '设为默认' }}
                             </span>
                         </div>
                     </template>
@@ -193,9 +228,9 @@ const changeDefault = async (query) => {
         </div>
         <RemoveTableList
             @postApi="postAPi"
+            @changeApi="changeApi"
             :params="params"
             :changeParams="changeParams"
-            @changeApi="changeApi"
         ></RemoveTableList>
     </div>
 </template>

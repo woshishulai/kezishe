@@ -5,14 +5,15 @@ import {
     removeUserAddressApi,
     changeUserAddressInfo,
     defaultUserAddressInfo,
-    addUserAddressInfo
+    addUserAddressInfo,
+    getCountList
 } from '@/request/api';
+import { info } from '@/hooks/antd/message';
 import RemoveTableList from './item/RemoveTableList.vue';
 import { shippingColumns } from '../../data';
-import { countryList } from '@/utils/user/country';
-import { data } from '@/utils/user/data';
 import { handleFinishFailed } from '@/utils/form/rules.js';
 import { message } from 'ant-design-vue';
+const countList = ref([]);
 const params = reactive({
     open: false, //是否打开弹窗
     title: '', //标题
@@ -36,30 +37,54 @@ const changeParams = reactive({
 });
 const address = ref([]);
 const formState = reactive({
-    username: 'eeeeee',
+    username: '',
     region: '中国',
     statusList: [], //省市数据
     date1: undefined, //选择的省市
-    text: 'eeee', //详细地址
-    bankNmae: '333333', //邮编
-    tel: '17633732594', //电话
-    phone: '17633732594'
+    text: '', //详细地址
+    bankNmae: '', //邮编
+    tel: '', //电话
+    phone: ''
 });
 onMounted(async () => {
-    statusList();
-    let res = await getUserAddressApi();
-    address.value = res.Data;
+    try {
+        let res = await getUserAddressApi();
+        if (res.Tag !== 1) {
+            info('error', res.Message);
+            return;
+        }
+        address.value = res.Data;
+        const ress = await getCountList();
+        if (ress.Tag !== 1) {
+            info('error', ress.Message);
+            return;
+        }
+        countList.value = ress.Data;
+        formState.region = countList.value[0].AreaName;
+        formState.statusList = countList.value[0].ChildList;
+    } catch (error) {
+        info('error', error);
+    }
 });
 const openModel = (biaoti, id) => {
     params.open = true;
     params.title = biaoti;
     params.id = id;
 };
-const openChangeParamsModel = (biaoti, id, Default) => {
-    changeParams.open = true;
+const openChangeParamsModel = (biaoti, item) => {
+    changeParams.id = item.Id;
     changeParams.title = biaoti;
-    changeParams.id = id;
-    changeParams.default = Default;
+    changeParams.username = item.NickName;
+    changeParams.country = item.State;
+    changeParams.status = item.Sheng;
+    changeParams.shi = item.Shi;
+    changeParams.text = item.Address;
+    changeParams.postal = item.Postal;
+    changeParams.tel = item.Tel;
+    changeParams.phone = item.Phone;
+    changeParams.title = biaoti;
+    changeParams.default = item.Default;
+    changeParams.open = true;
 };
 const closeModel = () => {
     params.open = false;
@@ -71,9 +96,13 @@ const closeModel = () => {
 };
 const postAPi = async () => {
     let res = await removeUserAddressApi(params.id);
-    const index = address.value.findIndex((item) => item.Id === params.id);
-    address.value.splice(index, 1);
-    closeModel();
+    if (res.Tag == 1) {
+        const index = address.value.findIndex((item) => item.Id === params.id);
+        address.value.splice(index, 1);
+        closeModel();
+    } else {
+        info('error', res.Message);
+    }
 };
 const changeApi = async (query) => {
     let params = {
@@ -89,6 +118,17 @@ const changeApi = async (query) => {
         Default: changeParams.default
     };
     let res = await changeUserAddressInfo(params);
+    let status;
+    if (res.Tag == 1) {
+        status = 'success';
+        const index = address.value.findIndex((item) => item.Id === params.Id);
+        address.value.splice(index, 1, params);
+        info(status, res.Message);
+        closeModel();
+    } else {
+        status = 'error';
+        info(status, res.Message);
+    }
 };
 const changeDefault = async (id) => {
     let res = await defaultUserAddressInfo(id);
@@ -98,36 +138,7 @@ const changeDefault = async (id) => {
         item.Default = 1;
     }
 };
-const statusList = (country) => {
-    const defaultCountry = country || 'CHN';
-    const getStatusList = (countryCode) => {
-        const provinces = data[countryCode];
-
-        if (!provinces) {
-            console.error(`Invalid country code: ${countryCode}`);
-            return [];
-        }
-
-        return Object.entries(provinces).map(([provinceCode, provinceName]) => {
-            const cities = data[provinceCode];
-
-            return {
-                value: provinceName,
-                label: provinceName,
-                children: cities
-                    ? Object.entries(cities).map(([cityCode, cityName]) => ({
-                          value: cityName,
-                          label: cityName
-                      }))
-                    : []
-            };
-        });
-    };
-    formState.statusList = getStatusList(defaultCountry);
-    return getStatusList(defaultCountry);
-};
 const handleChange = (value, option) => {
-    statusList(option.id);
     formState.region = value;
     formState.date1 = '';
 };
@@ -149,12 +160,12 @@ const handleFinish = async () => {
     };
     try {
         let res = await addUserAddressInfo(params);
+        params.Id = res.Data;
         if (res.Tag === 1) {
-            Object.keys(formState).forEach((key) => {
-                formState[key] = '';
-            });
+            address.value.push(params);
+        } else {
+            info('error', res.Message);
         }
-        console.log(res);
     } catch (error) {
         console.log(error);
     }
@@ -187,12 +198,7 @@ const handleFinish = async () => {
                     </template>
                     <template v-if="column.key === 'status'">
                         <div class="status">
-                            <span
-                                @click="
-                                    openChangeParamsModel('修改地址', record.Id, record.Default)
-                                "
-                                >修改</span
-                            >
+                            <span @click="openChangeParamsModel('修改地址', record)">修改</span>
                             <span @click="openModel('确定删除该地址吗', record.Id)">删除</span>
                             <span
                                 @click="changeDefault(record.Id)"
@@ -229,9 +235,14 @@ const handleFinish = async () => {
                         label="所在地区"
                     >
                         <a-select
+                            :field-names="{
+                                label: 'AreaName',
+                                value: 'AreaName',
+                                options: 'ChildList'
+                            }"
                             v-model:value="formState.region"
                             show-search
-                            :options="countryList"
+                            :options="countList"
                             @change="handleChange"
                         ></a-select>
                     </a-form-item>
@@ -241,6 +252,11 @@ const handleFinish = async () => {
                         name="username"
                     >
                         <a-cascader
+                            :field-names="{
+                                label: 'AreaName',
+                                value: 'AreaName',
+                                children: 'ChildList'
+                            }"
                             expand-trigger="hover"
                             v-model:value="formState.date1"
                             :options="formState.statusList"

@@ -1,5 +1,5 @@
 <script setup>
-import { reactive } from 'vue';
+import { reactive, watch } from 'vue';
 import { handleFinishFailed } from '@/utils/form/rules';
 const formState = reactive({});
 
@@ -13,7 +13,16 @@ const props = defineProps({
         default: {}
     }
 });
-
+watch(
+    () => props.changeParams,
+    (newParams, oldParams) => {
+        Object.keys(props.changeParams).forEach((key, index) => {
+            formState[key] = props.changeParams[key];
+        });
+        console.log(formState);
+    },
+    { deep: true }
+);
 const emits = defineEmits(['closeModel', 'postApi', 'changeApi']);
 const close = () => {
     emits('closeModel');
@@ -116,7 +125,7 @@ const changeHandleOk = () => {
             >
                 <a-input v-model:value.trim="formState.phone" />
             </a-form-item>
-            <a-form-item :wrapper-col="{ offset: 0, span: 24 }">
+            <a-form-item :wrapper-col="{ offset: 5, span: 20 }">
                 <a-button type="primary" html-type="submit">保存</a-button>
             </a-form-item>
         </a-form>

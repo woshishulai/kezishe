@@ -3,8 +3,9 @@ export const isAddActive = (arr, value) => {
     if (!Array.isArray(arr)) {
         return false;
     }
+
     const result = arr.find((item) => item.Profile === value);
-    return result && result.IsAuth === 1;
+    return result && result.IsAuth == 1;
     //备注 arr是数组，value是关键字
 };
 

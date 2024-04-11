@@ -58,7 +58,7 @@ const Loading = useLoading();
             }"
         >
             <a-spin :spinning="Loading.spinning" tip="Loading...">
-                <RouterView></RouterView>
+                <RouterView key="app"></RouterView>
             </a-spin>
         </a-config-provider>
     </div>

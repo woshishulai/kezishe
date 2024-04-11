@@ -100,3 +100,6 @@ export const getUserContractListApi = async (params) =>
     instance.get(
         `/Member/Goods/List??Status=${params.Status}&TimeRange=${params.TimeRange}&Number=${params.enNumberd}&PageSize=${params.pageSize}&PageIndex=${params.pageIndex}`
     );
+
+// 国家省市
+export const getCountList = async (params) => instance.get(`/Member/Address/AreaList`);

@@ -12,7 +12,11 @@ onMounted(() => {});
 <template>
     <div class="account">
         <UserInfoHeader></UserInfoHeader>
-        <RouterView></RouterView>
+        <router-view v-slot="{ Component }">
+            <keep-alive>
+                <component :is="Component" />
+            </keep-alive>
+        </router-view>
     </div>
 </template>
 

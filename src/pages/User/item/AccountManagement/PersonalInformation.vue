@@ -1,8 +1,12 @@
 <script setup>
+console.log(123);
 import { useRouter, useRoute } from 'vue-router';
 import { reactive, ref, onMounted } from 'vue';
+import { isAddActive } from '@/hooks/user';
 import { getUserInfoApi } from '@/request/api';
+import { getPhone } from '@/utils/form/getCode';
 import { useUserInfo } from '@/store/store';
+import { info } from '@/hooks/antd/message';
 import { changeUserInfo, changeUserCallInfo } from '@/request/api';
 import { userInfoRules, changeUserInfoCallRules } from './rules';
 import { handleFinishFailed } from '@/utils/form/rules.js';
@@ -20,31 +24,28 @@ const formState = ref({
     fileList: ''
 });
 const formState1 = ref({
-    Mobile: '',
+    Mobile: user.userInfo.Mobile || '',
     code: '',
-    email: '',
+    email: user.userInfo.Email || '',
     emailCode: '',
-    TelPhone: ''
+    TelPhone: user.userInfo.TelPhone || ''
 });
 onMounted(async () => {
     try {
         let res = await getUserInfoApi();
-        user.changeUserInfo(res.Data);
-        formState.value = Object.assign({}, user.userInfo);
+        let status;
+        if (res.Tag == 1) {
+            status = 'success';
+            user.changeUserInfo(res.Data);
+            formState.value = Object.assign({}, user.userInfo);
+        } else {
+            status = 'error';
+            info(status, res.Message);
+        }
     } catch (error) {
-        console.error('Error fetching user info:', error);
+        info('error', error);
     }
 });
-const info = (status, msg) => message[status](msg);
-const getPhone = () => {
-    const phoneRegex = /^1[3456789]\d{9}$/;
-    const phoneNumber = formState1.value.Mobile;
-    const isPhoneValid = phoneRegex.test(phoneNumber);
-    if (!isPhoneValid) {
-        info('error', '请输入正确的手机号');
-    }
-    return isPhoneValid;
-};
 const getCode = () => {
     const isPhoneValid = getPhone();
     if (isPhoneValid) {
@@ -88,9 +89,15 @@ const handleFinish = async () => {
     };
     try {
         let res = await changeUserInfo(params);
-        console.log(res);
+        let status;
+        if (res.Tag == 1) {
+            status = 'success';
+        } else {
+            status = 'error';
+        }
+        info(status, res.Message);
     } catch (error) {
-        console.error('Error updating user info:', error);
+        info('error', error);
     }
 };
 const onFinish = async () => {
@@ -100,8 +107,18 @@ const onFinish = async () => {
         Email: formState1.value.email,
         TelPhone: formState1.value.TelPhone
     };
-    let res = await changeUserCallInfo(params);
-    console.log(res);
+    try {
+        let res = await changeUserCallInfo(params);
+        let status;
+        if (res.Tag == 1) {
+            status = 'success';
+        } else {
+            status = 'error';
+        }
+        info(status, res.Message);
+    } catch (error) {
+        info('error', error);
+    }
 };
 </script>
 
@@ -156,7 +173,11 @@ const onFinish = async () => {
                     </a-form-item>
                     <a-form-item label="证件号码" name="IdNumbers">
                         <a-input
-                            :class="user.userTranslate.userProfileInfos?.[0].IsAuth ? 'active' : ''"
+                            :class="
+                                isAddActive(user.userTranslate.userProfileInfos, '身份证件')
+                                    ? ''
+                                    : 'active'
+                            "
                             v-model:value.trim="formState.IdNumbers"
                         />
                     </a-form-item>
@@ -186,9 +207,16 @@ const onFinish = async () => {
                 >
                     <a-form-item hide-required-mark="false" label="手机" name="Mobile">
                         <div class="flex">
-                            <a-input v-model:value="formState1.Mobile" />
+                            <a-input
+                                v-model:value="formState1.TelPhone"
+                                :class="
+                                    isAddActive(user.userTranslate.userProfileInfos, '手机号码')
+                                        ? ''
+                                        : 'active'
+                                "
+                            />
                             <a-button
-                                v-if="user.userTranslate.verifyPhone !== '1'"
+                                v-if="!isAddActive(user.userTranslate.userProfileInfos, '手机号码')"
                                 @click="getCode"
                                 :disabled="countdown > 0"
                             >
@@ -224,8 +252,8 @@ const onFinish = async () => {
                     <a-form-item hide-required-mark="false" label="邮箱验证码" name="emailCode">
                         <a-input v-model:value.trim="formState1.emailCode" />
                     </a-form-item>
-                    <a-form-item label="电话" name="TelPhone">
-                        <a-input v-model:value.trim="formState1.TelPhone" />
+                    <a-form-item label="电话" name="Mobile">
+                        <a-input v-model:value.trim="formState1.Mobile" />
                     </a-form-item>
                     <a-form-item :wrapper-col="{ span: 19, offset: 5 }">
                         <a-button html-type="submit" type="primary">保存基本信息</a-button>
