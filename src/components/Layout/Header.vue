@@ -14,13 +14,8 @@ const user = useUserInfo();
 onMounted(async () => {
     try {
         let res = await getUserNikeNameApi();
-        if (res.Tag == 0) {
-            console.log(res);
-            // router.push('/login');
-            return;
-        } else {
+        if (res.Tag == 1) {
             nikeNameList.value = res.Data;
-            console.log(nikeNameList.value);
             let query = nikeNameList.value.find((item) => item.Default == 1);
             if (query) {
                 selector.value = user.userNickName.NickName;
@@ -29,6 +24,8 @@ onMounted(async () => {
                 user.changeUserNickName(nikeNameList.value[0]);
                 selector.value = user.userNickName.NickName;
             }
+        } else {
+            console.log(res);
         }
     } catch (error) {
         console.log(error);

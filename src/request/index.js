@@ -1,6 +1,7 @@
 import axios from 'axios';
-import { message } from 'ant-design-vue';
+import { info } from '@/hooks/antd/message';
 import { useLoading, useUserInfo } from '@/store/store';
+import { removeUserInfo } from '@/hooks/user/outLoading';
 const instance = axios.create({
     // axios 的一些配置，baseURL  timeout
     //开发
@@ -17,7 +18,6 @@ instance.interceptors.request.use(
         let token = user.userInfo?.ApiToken;
         if (token && config.headers) {
             config.headers = config.headers || {};
-            // config.headers["Authorization"] = 'ApiToken' + token;
             config.headers.ApiToken = token;
         }
         // console.log('请求带数据', config, new Date().toLocaleTimeString());
@@ -34,12 +34,13 @@ instance.interceptors.response.use(
         //个人信息返回缺少tag
         res.data.Tag == 1
             ? console.log('返回的数据', res.data, new Date().toLocaleTimeString())
-            : message['error'](res.data.Message);
+            : res.data.Tag == 2
+              ? removeUserInfo()
+              : info('error', res.data.Message);
         return res.data;
     },
     (resError) => {
         Loading.changeSpinning(false);
-        console.log('返回的错误', resError);
         if (resError && resError.response) {
             switch (resError.response.status) {
                 case 400:
@@ -73,7 +74,7 @@ instance.interceptors.response.use(
                     resError.message = `连接出错(${resError.response.status})!`;
             }
         }
-        message['error'](resError.message);
+        info('errpr', resError.message);
         return Promise.reject(resError);
     }
 );

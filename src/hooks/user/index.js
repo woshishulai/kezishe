@@ -21,7 +21,6 @@ export const rulesPhone = (value) => {
 };
 
 //数据加密
-
 export const encryptionPassword = (passwordObject, codes, id) => {
     let params = {};
     const encrypt = new JSEncrypt(); //创建实例
@@ -30,6 +29,6 @@ export const encryptionPassword = (passwordObject, codes, id) => {
     for (let i in passwordObject) {
         params[i] = encrypt.encrypt(passwordObject[i]);
     }
-    params.Id = id;
+    id ? (params.Id = id) : '';
     return params;
 };

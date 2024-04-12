@@ -28,241 +28,7 @@ const baseRoutes = [
         component: () => import('@/pages/Reset/index.vue')
     }
 ];
-const addRoutes = [
-    {
-        path: '/',
-        meta: {
-            name: '首页'
-        },
-        component: () => import('@/components/Layout/index.vue'),
-        children: [
-            {
-                path: '',
-                component: () => import('@/pages/Home/index.vue')
-            },
-            {
-                path: '/jingmai',
-                meta: {
-                    name: '竞买'
-                },
-                component: () => import('@/pages/JingMai/index.vue'),
-                children: [
-                    {
-                        path: '',
-                        meta: {
-                            name: '专场'
-                        },
-                        component: () => import('@/pages/JingMai/zhuanchang/index.vue')
-                    },
-                    {
-                        path: 'show-goods',
-                        meta: {
-                            name: '藏品展示'
-                        },
-                        component: () => import('@/pages/JingMai/zhuanchang/Item1.vue')
-                    },
-                    {
-                        path: 'goods-details',
-                        meta: {
-                            name: '藏品详情'
-                        },
-                        component: () => import('@/pages/JingMai/zhuanchang/Item2.vue')
-                    },
-                    {
-                        path: 'stamp',
-                        meta: {
-                            name: '邮票'
-                        },
-                        component: () => import('@/pages/JingMai/youpiao/index.vue')
-                    },
-                    {
-                        path: 'show-stamp-goods',
-                        meta: {
-                            name: '藏品展示'
-                        },
-                        component: () => import('@/pages/JingMai/youpiao/Item1.vue')
-                    },
-                    {
-                        path: 'stamp-goods-details',
-                        meta: {
-                            name: '藏品详情'
-                        },
-                        component: () => import('@/pages/JingMai/youpiao/Item2.vue')
-                    }
-                ]
-            },
-            {
-                path: '/weituo',
-                redirect: '/weituo/online-commission',
-                meta: {
-                    name: '委托专栏'
-                },
-                component: () => import('@/pages/Weituo/WeiTuo.vue'),
-                children: [
-                    {
-                        path: 'details',
-                        meta: {
-                            name: '委托'
-                        },
-                        component: () => import('@/pages/Weituo/item/Details.vue')
-                    },
-                    {
-                        path: 'advantages',
-                        meta: {
-                            name: '委托优势与条款'
-                        },
-                        component: () =>
-                            import('@/pages/Weituo/item/AdvantagesAndTermsOfEntrustment.vue')
-                    },
-                    {
-                        path: 'online-commission',
-                        meta: {
-                            name: '线上委托'
-                        },
-                        component: () => import('@/pages/Weituo/item/OnlineCommission.vue')
-                    },
-                    {
-                        path: 'delegation-process',
-                        meta: {
-                            name: '委托流程'
-                        },
-                        component: () => import('@/pages/Weituo/item/DelegationProcess.vue')
-                    },
-                    {
-                        path: 'charges',
-                        meta: {
-                            name: '收费标准'
-                        },
-                        component: () => import('@/pages/Weituo/item/Charges.vue')
-                    },
-                    {
-                        path: 'elegate-feedback',
-                        meta: {
-                            name: '委托回馈'
-                        },
-                        component: () => import('@/pages/Weituo/item/EelegateFeedback.vue')
-                    },
-                    {
-                        path: 'billing-cycle',
-                        meta: {
-                            name: '结算周期'
-                        },
-                        component: () => import('@/pages/Weituo/item/BillingCycle.vue')
-                    },
-                    {
-                        path: 'business-team-information',
-                        meta: {
-                            name: '业务团队信息'
-                        },
-                        component: () => import('@/pages/Weituo/item/BusinessTeamInformation.vue')
-                    },
-                    {
-                        path: 'beware-of-scams',
-                        meta: {
-                            name: '谨防欺诈'
-                        },
-                        component: () => import('@/pages/Weituo/item/BewareOfScams.vue')
-                    }
-                ]
-            },
-            {
-                path: '/zhongyou',
-                meta: {
-                    name: '中邮商城'
-                },
-                component: () => import('@/pages/Zhongyou/index.vue'),
-                children: [
-                    {
-                        path: '',
-                        meta: {
-                            name: '商城首页'
-                        },
-                        component: () => import('@/pages/Zhongyou/Home/index.vue')
-                    },
-                    {
-                        path: 'details',
-                        meta: {
-                            name: '商品详情 '
-                        },
-                        component: () => import('@/pages/Zhongyou/Details/index.vue')
-                    },
-                    {
-                        path: 'list',
-                        meta: {
-                            name: '商城列表页'
-                        },
-                        component: () => import('@/pages/Zhongyou/List/index.vue')
-                    }
-                ]
-            },
-            {
-                path: '/chengjiao',
-                meta: {
-                    name: '成交'
-                },
-                component: () => import('@/pages/Chengjiao/index.vue'),
-                children: [
-                    {
-                        path: '',
-                        meta: {
-                            name: '成交专栏'
-                        },
-                        component: () => import('@/pages/Chengjiao/home/ChengJiao.vue')
-                    },
-                    {
-                        path: 'transaction-session',
-                        meta: {
-                            name: '成交专场'
-                        },
-                        component: () =>
-                            import('@/pages/Chengjiao/zhuanchang/TransactionSession.vue')
-                    },
-                    {
-                        path: 'details',
-                        meta: {
-                            name: '成交详情'
-                        },
-                        component: () => import('@/pages/Chengjiao/details/Details.vue')
-                    }
-                ]
-            },
-            {
-                path: '/shougou',
-                meta: {
-                    name: '收购'
-                },
-                component: () => import('@/pages/Shougou/index.vue'),
-                children: [
-                    {
-                        path: '',
-                        meta: {
-                            name: '收购资讯'
-                        },
-                        component: () => import('@/pages/Shougou/ShouGou.vue')
-                    },
-                    {
-                        path: 'details',
-                        meta: {
-                            name: '收购详情'
-                        },
-                        component: () => import('@/pages/Shougou/Details.vue')
-                    }
-                ]
-            },
-            {
-                path: '/pingji',
-                meta: {
-                    name: '中邮评级'
-                },
-                component: () => import('@/pages/PingJi/index.vue')
-            },
-            {
-                path: '/cart',
-                component: () => import('@/pages/Cart/index.vue')
-            }
-        ]
-    }
-];
+
 const userRoutes = [
     {
         path: '/user',
@@ -517,11 +283,262 @@ const userRoutes = [
                         }
                     }
                 ]
+            },
+            {
+                path: 'mail',
+                component: () => import('@/pages/User/item/Mail/index.vue'),
+                meta: {
+                    name: '信箱',
+                    icon: AppstoreOutlined
+                }
             }
         ]
     }
 ];
-const routes = [...baseRoutes, ...addRoutes, ...userRoutes];
+const addRoutes = [
+    {
+        path: '/',
+        meta: {
+            name: '首页'
+        },
+        component: () => import('@/components/Layout/index.vue'),
+        children: [
+            {
+                path: '',
+                component: () => import('@/pages/Home/index.vue')
+            },
+            {
+                path: '/jingmai',
+                meta: {
+                    name: '竞买'
+                },
+                component: () => import('@/pages/JingMai/index.vue'),
+                children: [
+                    {
+                        path: '',
+                        meta: {
+                            name: '专场'
+                        },
+                        component: () => import('@/pages/JingMai/zhuanchang/index.vue')
+                    },
+                    {
+                        path: 'show-goods',
+                        meta: {
+                            name: '藏品展示'
+                        },
+                        component: () => import('@/pages/JingMai/zhuanchang/Item1.vue')
+                    },
+                    {
+                        path: 'goods-details',
+                        meta: {
+                            name: '藏品详情'
+                        },
+                        component: () => import('@/pages/JingMai/zhuanchang/Item2.vue')
+                    },
+                    {
+                        path: 'stamp',
+                        meta: {
+                            name: '邮票'
+                        },
+                        component: () => import('@/pages/JingMai/youpiao/index.vue')
+                    },
+                    {
+                        path: 'show-stamp-goods',
+                        meta: {
+                            name: '藏品展示'
+                        },
+                        component: () => import('@/pages/JingMai/youpiao/Item1.vue')
+                    },
+                    {
+                        path: 'stamp-goods-details',
+                        meta: {
+                            name: '藏品详情'
+                        },
+                        component: () => import('@/pages/JingMai/youpiao/Item2.vue')
+                    }
+                ]
+            },
+            {
+                path: '/weituo',
+                redirect: '/weituo/online-commission',
+                meta: {
+                    name: '委托专栏'
+                },
+                component: () => import('@/pages/Weituo/WeiTuo.vue'),
+                children: [
+                    {
+                        path: 'details',
+                        meta: {
+                            name: '委托'
+                        },
+                        component: () => import('@/pages/Weituo/item/Details.vue')
+                    },
+                    {
+                        path: 'advantages',
+                        meta: {
+                            name: '委托优势与条款'
+                        },
+                        component: () =>
+                            import('@/pages/Weituo/item/AdvantagesAndTermsOfEntrustment.vue')
+                    },
+                    {
+                        path: 'online-commission',
+                        meta: {
+                            name: '线上委托'
+                        },
+                        component: () => import('@/pages/Weituo/item/OnlineCommission.vue')
+                    },
+                    {
+                        path: 'delegation-process',
+                        meta: {
+                            name: '委托流程'
+                        },
+                        component: () => import('@/pages/Weituo/item/DelegationProcess.vue')
+                    },
+                    {
+                        path: 'charges',
+                        meta: {
+                            name: '收费标准'
+                        },
+                        component: () => import('@/pages/Weituo/item/Charges.vue')
+                    },
+                    {
+                        path: 'elegate-feedback',
+                        meta: {
+                            name: '委托回馈'
+                        },
+                        component: () => import('@/pages/Weituo/item/EelegateFeedback.vue')
+                    },
+                    {
+                        path: 'billing-cycle',
+                        meta: {
+                            name: '结算周期'
+                        },
+                        component: () => import('@/pages/Weituo/item/BillingCycle.vue')
+                    },
+                    {
+                        path: 'business-team-information',
+                        meta: {
+                            name: '业务团队信息'
+                        },
+                        component: () => import('@/pages/Weituo/item/BusinessTeamInformation.vue')
+                    },
+                    {
+                        path: 'beware-of-scams',
+                        meta: {
+                            name: '谨防欺诈'
+                        },
+                        component: () => import('@/pages/Weituo/item/BewareOfScams.vue')
+                    }
+                ]
+            },
+            {
+                path: '/zhongyou',
+                meta: {
+                    name: '中邮商城'
+                },
+                component: () => import('@/pages/Zhongyou/index.vue'),
+                children: [
+                    {
+                        path: '',
+                        meta: {
+                            name: '商城首页'
+                        },
+                        component: () => import('@/pages/Zhongyou/Home/index.vue')
+                    },
+                    {
+                        path: 'details',
+                        meta: {
+                            name: '商品详情 '
+                        },
+                        component: () => import('@/pages/Zhongyou/Details/index.vue')
+                    },
+                    {
+                        path: 'list',
+                        meta: {
+                            name: '商城列表页'
+                        },
+                        component: () => import('@/pages/Zhongyou/List/index.vue')
+                    }
+                ]
+            },
+            {
+                path: '/chengjiao',
+                meta: {
+                    name: '成交'
+                },
+                component: () => import('@/pages/Chengjiao/index.vue'),
+                children: [
+                    {
+                        path: '',
+                        meta: {
+                            name: '成交专栏'
+                        },
+                        component: () => import('@/pages/Chengjiao/home/ChengJiao.vue')
+                    },
+                    {
+                        path: 'transaction-session',
+                        meta: {
+                            name: '成交专场'
+                        },
+                        component: () =>
+                            import('@/pages/Chengjiao/zhuanchang/TransactionSession.vue')
+                    },
+                    {
+                        path: 'details',
+                        meta: {
+                            name: '成交详情'
+                        },
+                        component: () => import('@/pages/Chengjiao/details/Details.vue')
+                    }
+                ]
+            },
+            {
+                path: '/shougou',
+                meta: {
+                    name: '收购'
+                },
+                component: () => import('@/pages/Shougou/index.vue'),
+                children: [
+                    {
+                        path: '',
+                        meta: {
+                            name: '收购资讯'
+                        },
+                        component: () => import('@/pages/Shougou/ShouGou.vue')
+                    },
+                    {
+                        path: 'details',
+                        meta: {
+                            name: '收购详情'
+                        },
+                        component: () => import('@/pages/Shougou/Details.vue')
+                    }
+                ]
+            },
+            {
+                path: '/pingji',
+                meta: {
+                    name: '中邮评级'
+                },
+                component: () => import('@/pages/PingJi/index.vue')
+            },
+            {
+                path: '/cart',
+                component: () => import('@/pages/Cart/index.vue')
+            }
+        ]
+    }
+];
+const routes = [
+    ...baseRoutes,
+    ...addRoutes,
+    ...userRoutes,
+    {
+        path: '/:pathMatch(.*)',
+        redirect: '/'
+    }
+];
 const router = createRouter({
     // history: createWebHistory(),
     history: createWebHashHistory(),

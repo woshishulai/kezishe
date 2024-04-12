@@ -47,7 +47,13 @@ export const useUserInfo = defineStore(
     },
     {
         persist: {
-            enabled: true // true 表示开启持久化保存
+            enabled: true, // true 表示开启持久化保存
+            //配置存储在哪里
+            strategies: [
+                { storage: localStorage, paths: ['userInfo'] },
+                { storage: localStorage, paths: ['userTranslate'] },
+                { storage: localStorage, paths: ['userNickName'] }
+            ]
         }
     }
 );

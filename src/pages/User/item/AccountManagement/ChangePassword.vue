@@ -21,7 +21,7 @@ const formState = reactive({
 onMounted(() => {
     const codeTime = newCodeParams.codePasswords.ExpireTime;
     const currentTime = Date.now();
-    if (!currentTime || currentTime > codeTime) {
+    if (!codeTime || currentTime > codeTime) {
         Promise.all([getPasswordStatus(), getCodeParamsApi()]);
     } else {
         getPasswordStatus();

@@ -1,12 +1,15 @@
 <script setup>
-import { reactive, ref } from 'vue';
+import { reactive, ref, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { handleFinishFailed } from '@/utils/form/rules.js';
 import { UserOutlined, LockOutlined, CheckCircleOutlined, CloseOutlined } from '@/utils/icon/icon';
 import { submitLoginApi } from '@/request/api';
 import { accountRules } from './rules';
-import { useUserInfo } from '@/store/store';
+import { useUserInfo, usePassword } from '@/store/store';
+import { getCodeParams } from '@/request/api';
+import { encryptionPassword } from '@/hooks/user';
 const user = useUserInfo();
+const newCodeParams = usePassword();
 const router = useRouter();
 const formState = reactive({
     username: 'xiaoyu',
@@ -14,6 +17,24 @@ const formState = reactive({
     code: '',
     remember: true
 });
+onMounted(() => {
+    const codeTime = newCodeParams.codePasswords.ExpireTime;
+    const currentTime = Date.now();
+    if (!codeTime || currentTime > codeTime) {
+        getCodeParamsApi();
+    }
+});
+const getCodeParamsApi = async () => {
+    try {
+        let res = await getCodeParams();
+        if (res.Tag == 1) {
+            console.log(res);
+            newCodeParams.changeCodePasswords(res.Data);
+        }
+    } catch (error) {
+        info('error', error);
+    }
+};
 function getUuid() {
     return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
         var r = (Math.random() * 10) | 0;
@@ -30,12 +51,13 @@ const changeCodeImg = () => {
 const visible = ref(false);
 const handleFinish = async () => {
     let params = {
-        UserName: formState.username,
-        Password: formState.password,
-        CaptchaCode: formState.code,
-        Uuid: uuid.value
+        Password: formState.password
     };
-    let res = await submitLoginApi(params);
+    let query = encryptionPassword(params, newCodeParams.codePasswords.PublicKey);
+    query.Uuid = uuid.value;
+    query.CaptchaCode = formState.code;
+    query.UserName = formState.username;
+    let res = await submitLoginApi(query);
     if (res.Tag == 1) {
         user.changeUserInfo(res.Data);
         router.push('/');

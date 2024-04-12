@@ -10,18 +10,15 @@ const props = defineProps({
         default: null
     }
 });
-console.log(props?.statusList);
 const params = reactive({
     titleCate: props.titleList ? props.titleList[0].cate : null,
     statusCate: JSON.parse(props.statusList ? props.statusList[0].cate : null)
 });
 watchEffect(() => {
     params.statusCate = props.statusList;
-    console.log(params.statusCate);
 });
 const changeTitleCate = (item) => {
     params.titleCate = item.cate;
-    console.log(item);
 };
 const changeStatusCate = (item) => {
     params.statusCate = item.cate;
