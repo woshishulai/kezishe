@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { info } from '@/hooks/antd/message';
 import { getImageUrl } from '@/utils';
 const router = useRouter();
 const route = useRoute();
@@ -8,19 +9,33 @@ const props = defineProps({
     paginations: {
         type: Object,
         default: {}
+    },
+    pageSizeOptions: {
+        type: Array,
+        default: ['10', '15', '20', '30']
     }
 });
+const emits = defineEmits(['fetchList']);
 onMounted(() => {});
-const current = ref(1);
+const page = ref(1);
+const pageSize = ref(10);
+const onChange = () => {
+    if (page.value * pageSize.value >= props.paginations?.total) {
+        info('error', '当前已是最后一页');
+        return;
+    }
+    emits('fetchList', page.value, pageSize.value);
+};
 </script>
-
+<!-- :hideOnSinglePage="true" -->
 <template>
     <div class="cate-page">
         <a-pagination
-            :showSizeChanger="false"
-            :hideOnSinglePage="true"
-            v-model:current="current"
-            :pageSize="props.paginations.pageSize"
+            @change="onChange"
+            :showSizeChanger="true"
+            v-model:pageSize="pageSize"
+            v-model:current="page"
+            :page-size-options="pageSizeOptions"
             :total="props.paginations.total"
         />
     </div>

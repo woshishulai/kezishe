@@ -106,3 +106,12 @@ export const getCountList = async (params) => instance.get(`/Member/Address/Area
 
 //加密
 export const getCodeParams = async (params) => instance.get(`/Web/Common/GetPublicKey`);
+
+//获取邮件
+export const getMailApi = async (params) =>
+    instance.get(
+        `Member/Mail/GetMailReceiveList?PageIndex=${params.page}&PageSize=${params.pageSize}`
+    );
+//查看邮件详情
+export const getMailDetailsApi = async (params) =>
+    instance.get(`Member/Mail/GetMailInfo?Id=${params.id}&FormType=1`);

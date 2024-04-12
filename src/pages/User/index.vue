@@ -17,7 +17,11 @@ onMounted(() => {});
             <div class="cen-wrap">
                 <UserMenu paths="/user"></UserMenu>
                 <div class="user-item">
-                    <RouterView></RouterView>
+                    <router-view v-slot="{ Component }">
+                        <keep-alive>
+                            <component :is="Component" />
+                        </keep-alive>
+                    </router-view>
                 </div>
             </div>
         </div>

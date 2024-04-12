@@ -7,25 +7,26 @@ import { getUserNikeNameApi } from '@/request/api';
 import { DownOutlined } from '@ant-design/icons-vue';
 import HeaderInput from './item/HeaderInput.vue';
 import Tabbar from './item/Tabbar.vue';
+import { removeUserInfo } from '@/hooks/user/outLoading';
 const router = useRouter();
 const selector = ref('登录');
 const nikeNameList = ref([]);
 const user = useUserInfo();
 onMounted(async () => {
     try {
-        let res = await getUserNikeNameApi();
-        if (res.Tag == 1) {
-            nikeNameList.value = res.Data;
-            let query = nikeNameList.value.find((item) => item.Default == 1);
-            if (query) {
-                selector.value = user.userNickName.NickName;
-                user.changeUserNickName(query);
-            } else {
-                user.changeUserNickName(nikeNameList.value[0]);
-                selector.value = user.userNickName.NickName;
+        if (user.userInfo.UserId) {
+            let res = await getUserNikeNameApi();
+            if (res.Tag == 1) {
+                nikeNameList.value = res.Data;
+                let query = nikeNameList.value.find((item) => item.Default == 1);
+                if (query) {
+                    selector.value = user.userNickName.NickName;
+                    user.changeUserNickName(query);
+                } else {
+                    user.changeUserNickName(nikeNameList.value[0]);
+                    selector.value = user.userNickName.NickName;
+                }
             }
-        } else {
-            console.log(res);
         }
     } catch (error) {
         console.log(error);
@@ -37,12 +38,12 @@ const changeUserName = (item) => {
 watchEffect(async () => {
     selector.value = user.userNickName.NickName;
 });
-const removeUserInfo = () => {
-    user.removeUserInfo();
-    user.removeUserTranslate();
-    user.removeUserNickName();
-    router.push('/login');
-};
+// const removeUserInfo = () => {
+//     user.removeUserInfo();
+//     user.removeUserTranslate();
+//     user.removeUserNickName();
+//     router.push('/login');
+// };
 </script>
 
 <template>
