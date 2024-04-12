@@ -3,27 +3,51 @@ import { ref, computed, reactive, onMounted } from 'vue';
 import { handleFinishFailed } from '@/utils/form/rules';
 import { getPassWord, changeLoginPassWord, changePayPassWord } from '@/request/api';
 import { message } from 'ant-design-vue';
-import { useUserInfo } from '@/store/store';
+import { info } from '@/hooks/antd/message';
+import { useUserInfo, usePassword } from '@/store/store';
+import { getCodeParams } from '@/request/api';
+import { encryptionPassword } from '@/hooks/user';
 const user = useUserInfo();
+const newCodeParams = usePassword();
 let status = reactive({});
 const formState = reactive({
-    oldLoginPassword: '',
-    newLoginPassword: '1234567',
-    confirmLoginPassword: '',
-    payPassword: '',
-    newPayPassword: '12345678',
-    confirmPayPassword: ''
+    oldLoginPassword: '1234567',
+    newLoginPassword: '12345678',
+    confirmLoginPassword: '12345678',
+    payPassword: '123456723',
+    newPayPassword: '1234567823',
+    confirmPayPassword: '1234567823'
 });
-onMounted(async () => {
-    try {
-        let res = await getPassWord();
-        Object.assign(status, res.Data);
-        console.log(status);
-    } catch (error) {
-        console.log(error);
+onMounted(() => {
+    const codeTime = newCodeParams.codePasswords.ExpireTime;
+    const currentTime = Date.now();
+    if (!currentTime || currentTime > codeTime) {
+        Promise.all([getPasswordStatus(), getCodeParamsApi()]);
+    } else {
+        getPasswordStatus();
     }
 });
-
+const getPasswordStatus = async () => {
+    try {
+        let res = await getPassWord();
+        if (res.Tag == 1) {
+            Object.assign(status, res.Data);
+        }
+    } catch (error) {
+        info('error', error);
+    }
+};
+const getCodeParamsApi = async () => {
+    try {
+        let res = await getCodeParams();
+        if (res.Tag == 1) {
+            console.log(res);
+            newCodeParams.changeCodePasswords(res.Data);
+        }
+    } catch (error) {
+        info('error', error);
+    }
+};
 const repasswords = (rule, value) => {
     return new Promise((resolve, reject) => {
         if (value === '') {
@@ -72,49 +96,39 @@ const payPasswordRules = {
     ],
     confirmPayPassword: [{ required: true, validator: payPasswords, trigger: ['change', 'blur'] }]
 };
-const onFinish = async () => {
-    if (formState.newLoginPassword == formState.oldLoginPassword) {
-        message['error']('新旧密码不能相同');
+const changePassword = async (formState, passwordKey, newPasswordKey) => {
+    if (formState[newPasswordKey] == formState[passwordKey]) {
+        info('error', '新旧密码不能相同');
         return;
     } else {
         try {
             let params = {
-                Id: user.userInfo.UserId,
-                Password: formState.oldLoginPassword,
-                NewPassword: formState.newLoginPassword
+                Password: formState[passwordKey],
+                NewPassword: formState[newPasswordKey]
             };
-            let res = await changeLoginPassWord(params);
-            if ((res.Total = 1)) {
+            const query = encryptionPassword(
+                params,
+                newCodeParams.codePasswords.PublicKey,
+                user.userInfo.UserId
+            );
+            let res = await changeLoginPassWord(query);
+            if (res.Tag == 1) {
                 Object.keys(formState).forEach((key) => {
                     formState[key] = '';
                 });
             }
         } catch (error) {
-            console.log(error);
+            info('error', error);
         }
     }
 };
+
+const onFinish = async () => {
+    changePassword(formState, 'oldLoginPassword', 'newLoginPassword');
+};
+
 const onPayFinish = async () => {
-    if (formState.newPayPassword == formState.payPassword) {
-        message['error']('新旧密码不能相同');
-        return;
-    } else {
-        try {
-            let params = {
-                Id: user.userInfo.UserId,
-                Password: formState.payPassword,
-                NewPassword: formState.newPayPassword
-            };
-            let res = await changePayPassWord(params);
-            if (res.Total) {
-                Object.keys(formState).forEach((key) => {
-                    formState[key] = '';
-                });
-            }
-        } catch (error) {
-            console.log(error);
-        }
-    }
+    changePassword(formState, 'payPassword', 'newPayPassword');
 };
 </script>
 

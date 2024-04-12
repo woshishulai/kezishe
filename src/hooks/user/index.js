@@ -1,4 +1,5 @@
 import { info } from '../antd/message';
+import JSEncrypt from 'jsencrypt/bin/jsencrypt';
 export const isAddActive = (arr, value) => {
     if (!Array.isArray(arr)) {
         return false;
@@ -17,4 +18,18 @@ export const rulesPhone = (value) => {
         info('error', '请输入正确的手机号');
     }
     return isPhoneValid;
+};
+
+//数据加密
+
+export const encryptionPassword = (passwordObject, codes, id) => {
+    let params = {};
+    const encrypt = new JSEncrypt(); //创建实例
+    const pubKey = codes; //密钥
+    encrypt.setPublicKey(pubKey); //添加密钥
+    for (let i in passwordObject) {
+        params[i] = encrypt.encrypt(passwordObject[i]);
+    }
+    params.Id = id;
+    return params;
 };

@@ -50,7 +50,6 @@ onMounted(async () => {
     try {
         let res = await getUserAddressApi();
         if (res.Tag !== 1) {
-            info('error', res.Message);
             return;
         }
         address.value = res.Data;
@@ -100,8 +99,6 @@ const postAPi = async () => {
         const index = address.value.findIndex((item) => item.Id === params.id);
         address.value.splice(index, 1);
         closeModel();
-    } else {
-        info('error', res.Message);
     }
 };
 const changeApi = async (query) => {
@@ -163,8 +160,6 @@ const handleFinish = async () => {
         params.Id = res.Data;
         if (res.Tag === 1) {
             address.value.push(params);
-        } else {
-            info('error', res.Message);
         }
     } catch (error) {
         console.log(error);

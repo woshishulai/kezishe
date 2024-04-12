@@ -1,3 +1,4 @@
 import { useLoading } from './module/loading';
 import { useUserInfo } from './module/user';
-export { useUserInfo, useLoading };
+import { usePassword } from './module/password';
+export { useUserInfo, useLoading, usePassword };

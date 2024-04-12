@@ -103,3 +103,6 @@ export const getUserContractListApi = async (params) =>
 
 // 国家省市
 export const getCountList = async (params) => instance.get(`/Member/Address/AreaList`);
+
+//加密
+export const getCodeParams = async (params) => instance.get(`/Web/Common/GetPublicKey`);
