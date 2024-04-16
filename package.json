@@ -10,6 +10,8 @@
         "lint:script": "eslint --ext .js,.jsx,.ts,.tsx --fix --quiet ./"
     },
     "dependencies": {
+        "@wangeditor/editor": "^5.1.23",
+        "@wangeditor/editor-for-vue": "^5.1.12",
         "ant-design-vue": "4.x",
         "axios": "^1.6.2",
         "jsencrypt": "^3.3.2",

@@ -87,4 +87,19 @@ const handleClick = (e) => {
         padding-left: 50px;
     }
 }
+:deep(.ant-menu-submenu-title) {
+    font-size: 18px;
+}
+:deep(.ant-menu-sub) {
+    .ant-menu-title-content {
+        font-size: 16px;
+        // color: #4a4a4a;
+        // &:hover {
+        //     color: #fff;
+        // }
+    }
+}
+:deep(.ant-menu-item) {
+    font-size: 18px;
+}
 </style>

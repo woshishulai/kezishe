@@ -132,7 +132,7 @@ defineExpose({
         border-radius: 6px;
         width: 120px;
         .flex-row;
-        background-color: #566777;
+        // background-color: #566777;
         color: #fff;
         .anticon svg {
             color: #fff;

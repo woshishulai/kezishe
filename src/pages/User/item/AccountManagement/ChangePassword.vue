@@ -11,12 +11,12 @@ const user = useUserInfo();
 const newCodeParams = usePassword();
 let status = reactive({});
 const formState = reactive({
-    oldLoginPassword: '1234567',
-    newLoginPassword: '12345678',
-    confirmLoginPassword: '12345678',
-    payPassword: '123456723',
-    newPayPassword: '1234567823',
-    confirmPayPassword: '1234567823'
+    oldLoginPassword: '',
+    newLoginPassword: '',
+    confirmLoginPassword: '',
+    payPassword: '',
+    newPayPassword: '',
+    confirmPayPassword: ''
 });
 onMounted(() => {
     const codeTime = newCodeParams.codePasswords.ExpireTime;
@@ -159,10 +159,16 @@ const onPayFinish = async () => {
                         </a-form-item>
 
                         <a-form-item label="新登陆密码" name="newLoginPassword">
-                            <a-input-password v-model:value="formState.newLoginPassword" />
+                            <a-input-password
+                                :visibility-toggle="false"
+                                v-model:value="formState.newLoginPassword"
+                            />
                         </a-form-item>
                         <a-form-item label="再次确认登录密码" name="confirmLoginPassword">
-                            <a-input-password v-model:value="formState.confirmLoginPassword" />
+                            <a-input-password
+                                :visibility-toggle="false"
+                                v-model:value="formState.confirmLoginPassword"
+                            />
                         </a-form-item>
                         <a-form-item :wrapper-col="{ offset: 7, span: 15 }">
                             <a-button type="primary" html-type="submit">确认</a-button>
@@ -191,10 +197,16 @@ const onPayFinish = async () => {
                         </a-form-item>
 
                         <a-form-item label="新支付密码" name="newPayPassword">
-                            <a-input-password v-model:value="formState.newPayPassword" />
+                            <a-input-password
+                                :visibility-toggle="false"
+                                v-model:value="formState.newPayPassword"
+                            />
                         </a-form-item>
                         <a-form-item label="再次确认支付密码" name="confirmPayPassword">
-                            <a-input-password v-model:value="formState.confirmPayPassword" />
+                            <a-input-password
+                                :visibility-toggle="false"
+                                v-model:value="formState.confirmPayPassword"
+                            />
                         </a-form-item>
                         <a-form-item :wrapper-col="{ offset: 7, span: 15 }">
                             <a-button type="primary" html-type="submit">确认</a-button>

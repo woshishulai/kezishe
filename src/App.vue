@@ -32,13 +32,14 @@ const Loading = useLoading();
                     //输入框提示文本
                     colorTextPlaceholder: '#000',
                     //被选中的
-                    controlItemBgActive: '#fff'
+                    controlItemBgActive: '#fff',
                     //边框粗细
                     // lineWidth:'2'
                     //用于配置动画效果，为 `false` 时则关闭动画
                     // motion: true
                     // 字体
-                    // fontFamily: 'Arial,sans-serif'
+                    fontSize: 16,
+                    fontFamily: '微软雅黑'
                     // colorIcon: '#9a0000'
                     // colorIconHover: '#9a0000'
                     // colorBgBase: '#9a0000',

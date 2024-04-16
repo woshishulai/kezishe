@@ -1,21 +1,13 @@
 <script setup>
-import { ref, computed, reactive, onMounted } from 'vue';
+import { ref, computed, reactive, onMounted, watchEffect } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getMailApi, getMailDetailsApi } from '@/request/api';
 import { getImageUrl } from '@/utils';
 import { info } from '@/hooks/antd/message';
 const router = useRouter();
 const route = useRoute();
-const props = defineProps({});
 const list = ref([]);
 const details = ref({});
-const isShowDetails = ref(false);
-const params = reactive({
-    total: 1
-});
-onMounted(() => {
-    getMailList(1, 10);
-});
 const getMailList = async (page, pageSize) => {
     try {
         params.page = page;
@@ -27,48 +19,100 @@ const getMailList = async (page, pageSize) => {
         info('error', error);
     }
 };
-const showDetails = async (id) => {
+const isShowDetails = ref(false);
+const props = defineProps({
+    params: {
+        type: Object,
+        default: {}
+    }
+});
+const params = reactive({
+    total: 1
+});
+watchEffect(() => {
+    props.params.titleCate == '收件' ? getMailList(1, 10) : '';
+});
+const emits = defineEmits(['changePage']);
+
+const columns = [
+    {
+        title: '主题',
+        dataIndex: 'Title',
+        key: 'Title'
+        // align: 'left'
+    },
+    {
+        title: '时间',
+        dataIndex: 'BaseCreateTime',
+        key: 'BaseCreateTime',
+        align: 'center'
+    }
+];
+const showDetails = async (record) => {
     try {
-        let query = {
-            id: id
-        };
-        let res = await getMailDetailsApi(query);
+        let res = await getMailDetailsApi({ id: record.Id, FormType: record.FormType });
         if (res.Tag == 1) {
             details.value = res.Data[0];
+            isShowDetails.value = true;
         }
     } catch (error) {
         info('error', error);
     }
-    isShowDetails.value = true;
+};
+
+const showXin = () => {
+    const query = {
+        Types: '3',
+        ReplayId: details.value.Id,
+        MsgTab: '0',
+        // page: '写信',
+        Contents: details.value.Contents
+    };
+    router.push({
+        path: '/user/mail?',
+        query: {
+            tab: 'write'
+        }
+    });
+    emits('changePage', query);
 };
 </script>
 
 <template>
     <div class="receiving" v-if="!isShowDetails">
-        <div class="titles">
-            <div class="label max-width">主题</div>
-            <div class="time">时间</div>
-        </div>
-        <div class="mail-list">
-            <div
-                class="mail-item"
-                v-for="item in list"
-                :key="item.id"
-                @click="showDetails(item.Id)"
-            >
-                <div class="label">
-                    <span v-if="item.IsRead == 0">news</span>
-                    {{ item.Title }}</div
-                >
-                <div class="time">{{ item.BaseCreateTime }}</div>
-            </div>
-        </div>
+        <a-table
+            :pagination="false"
+            :columns="columns"
+            :data-source="list"
+            :custom-row="
+                (record) => {
+                    return {
+                        onClick: (event) => {
+                            showDetails(record);
+                        }
+                    };
+                }
+            "
+        >
+            <template #bodyCell="{ column, record }">
+                <template v-if="column.key === 'Title'">
+                    <div class="title-item">
+                        <!-- <img src="" alt=""> -->
+                        {{ record.Title }}
+                    </div>
+                </template>
+            </template>
+        </a-table>
         <CatePage :paginations="params" @fetchList="getMailList"></CatePage>
     </div>
     <div class="receiving" v-else>
         <div class="change-status">
-            <a-button @click="isShowDetails = false">返回</a-button>
-            <a-button>回复</a-button>
+            <a-button
+                style="background-color: #d9e1e7; color: #4a4a4a"
+                @click="isShowDetails = false"
+                >返回</a-button
+            >
+            <a-button style="background-color: #e2332a" @click="showXin">回复</a-button>
         </div>
         <div class="cen-text-wrap">
             <h5>{{ details.Title }}</h5>
@@ -83,38 +127,7 @@ const showDetails = async (id) => {
 .receiving {
     padding-bottom: 40px;
     min-height: 600px;
-    .label {
-        flex: 1;
-    }
-    .time {
-        text-align: left;
-        width: 150px;
-    }
-    .titles {
-        .flex-row;
-        text-align: center;
-        justify-content: space-between;
-        padding: 20px 16px;
-        border-bottom: 1px solid #e8e8e8;
-        .max-width {
-            max-width: 600px;
-        }
-        .time {
-            text-align: center;
-        }
-    }
-    .mail-list {
-        .mail-item {
-            .flex-row;
-            justify-content: space-between;
-            padding: 20px 16px;
-            cursor: pointer;
-            border-bottom: 1px solid #e8e8e8;
-            &:hover {
-                background-color: #f4f4f4;
-            }
-        }
-    }
+
     .change-status {
         display: flex;
         justify-content: flex-end;
@@ -122,15 +135,16 @@ const showDetails = async (id) => {
         margin-top: 30px;
     }
     .cen-text-wrap {
-        margin-top: 50px;
-        padding-left: 100px;
+        margin-top: 30px;
+        padding-left: 60px;
         h5 {
-            font-size: 20px;
+            font-size: 18px;
             margin-bottom: 20px;
+            color: #101010;
         }
         .form,
         .times {
-            color: #666;
+            color: #303030;
             font-size: 16px;
             line-height: 24px;
         }
@@ -138,14 +152,14 @@ const showDetails = async (id) => {
             margin-top: 20px;
             :deep(p) {
                 font-size: 16px !important;
-                color: #666 !important;
+                color: #303030 !important;
                 background-color: #fff !important;
                 line-height: 30px !important;
                 text-align: left !important;
             }
             :deep(span) {
                 font-size: 16px !important;
-                color: #666 !important;
+                color: #303030 !important;
                 background-color: #fff !important;
                 line-height: 30px !important;
                 text-align: left !important;

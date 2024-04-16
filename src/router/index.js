@@ -116,6 +116,14 @@ const userRoutes = [
                 ]
             },
             {
+                path: 'mail',
+                component: () => import('@/pages/User/item/Mail/index.vue'),
+                meta: {
+                    name: '信箱',
+                    icon: AppstoreOutlined
+                }
+            },
+            {
                 path: 'my-following',
                 component: () => import('@/pages/User/item/MyFollowing.vue'),
                 meta: {
@@ -283,14 +291,6 @@ const userRoutes = [
                         }
                     }
                 ]
-            },
-            {
-                path: 'mail',
-                component: () => import('@/pages/User/item/Mail/index.vue'),
-                meta: {
-                    name: '信箱',
-                    icon: AppstoreOutlined
-                }
             }
         ]
     }
