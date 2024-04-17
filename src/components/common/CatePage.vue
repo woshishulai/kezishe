@@ -20,10 +20,12 @@ onMounted(() => {});
 const page = ref(1);
 const pageSize = ref(10);
 const onChange = () => {
-    if (page.value * pageSize.value >= props.paginations?.total) {
-        info('error', '当前已是最后一页');
-        return;
-    }
+    // console.log(page.value, pageSize.value);
+    // return;
+    // if (page.value * pageSize.value >= props.paginations?.total) {
+    //     info('error', '当前已是最后一页');
+    //     return;
+    // }
     emits('fetchList', page.value, pageSize.value);
 };
 </script>
@@ -44,11 +46,17 @@ const onChange = () => {
 <style scoped lang="less">
 .cate-page {
     .flex-row;
-    padding: 20px 0;
+    padding: 25px 0;
     :deep(.ant-pagination .ant-pagination-options-quick-jumper input) {
         width: 120px;
         text-align: center;
         background-color: #fff;
+    }
+    :deep(.ant-pagination .ant-pagination-prev) {
+        display: none;
+    }
+    :deep(.ant-pagination .ant-pagination-next) {
+        display: none;
     }
 }
 </style>

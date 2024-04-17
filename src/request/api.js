@@ -118,13 +118,18 @@ export const getMailDetailsApi = async (params) =>
 
 //写信
 export const addMailTo = async (data) => instance.post(`Member/Mail/Save`, data);
+
 //获取草稿箱
 export const getCaoGaoApi = async (params) =>
     instance.get(
         `Member/Mail/GetMailDrafList?PageIndex=${params.PageIndex}&PageSize=${params.PageSize}`
     );
+
 //获取发件箱
 export const getFaSongApi = async (params) =>
     instance.get(
         `Member/Mail/GetMailSentList?PageIndex=${params.PageIndex}&PageSize=${params.PageSize}`
     );
+
+//获取发件箱
+export const removeMail = async (data) => instance.post(`Member/Mail/Delete`, data);

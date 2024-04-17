@@ -9,6 +9,14 @@ import { watchEffect } from 'vue';
 const [api, contextHolder] = notification.useNotification();
 const router = useRouter();
 const route = useRoute();
+const formState = ref({
+    Types: '3', //2草稿，3发件(写信和回复用)
+    Id: '', //邮件id 草稿箱编辑邮件ID不为0，其他回复和写信默认0即可
+    Title: '', //标题
+    Contents: '', //内容
+    ReplayId: '0', //回复原邮件Id,草稿和写信默认0即可
+    MsgTab: '1' //1意见反馈 2藏品咨询 3品相咨询
+});
 const props = defineProps({
     params: {
         type: Object,
@@ -17,17 +25,16 @@ const props = defineProps({
 });
 watchEffect(() => {
     if (props.params.ReplayId) {
+        console.log(23234);
+        let str = '<br/>';
+        formState.value.Contents = str + str + str + props.params.Contents;
+    } else if (props.params.Id) {
         let str = '<br/>';
         formState.value.Contents = str + str + str + props.params.Contents;
     }
-});
-const formState = ref({
-    Types: '3', //2草稿，3发件(写信和回复用)
-    Id: '', //邮件id 草稿箱编辑邮件ID不为0，其他回复和写信默认0即可
-    Title: '', //标题
-    Contents: '', //内容
-    ReplayId: '0', //回复原邮件Id,草稿和写信默认0即可
-    MsgTab: '1' //1意见反馈 2藏品咨询 3品相咨询
+    {
+        console.log(123456);
+    }
 });
 onMounted(() => {});
 const emits = defineEmits(['changePage']);

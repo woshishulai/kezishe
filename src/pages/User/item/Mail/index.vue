@@ -193,4 +193,17 @@ const changePage = (paramss) => {
         font-size: 18px;
     }
 }
+:deep(.ant-checkbox .ant-checkbox-inner) {
+    background-color: #eef3f8;
+    border-radius: 4px;
+}
+:deep(.ant-checkbox-checked .ant-checkbox-inner) {
+    background-color: #949ca6;
+    border: none;
+}
+:deep(.footer) {
+    height: 58.67px;
+    line-height: 58.67px;
+    border-bottom: 1px solid #f0f0f0;
+}
 </style>
