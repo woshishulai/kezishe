@@ -30,6 +30,7 @@ const params = reactive({
     total: 1
 });
 watchEffect(() => {
+    console.log(props.params.titleCate);
     props.params.titleCate == '收件' ? getMailList(1, 10) : '';
 });
 const emits = defineEmits(['changePage']);
@@ -49,6 +50,7 @@ const columns = [
     }
 ];
 const showDetails = async (record) => {
+    console.log('我是第一个执行； ');
     try {
         let res = await getMailDetailsApi({ id: record.Id, FormType: record.FormType });
         if (res.Tag == 1) {
@@ -65,7 +67,7 @@ const showXin = () => {
         Types: '3',
         ReplayId: details.value.Id,
         MsgTab: '0',
-        // page: '写信',
+        page: '写信',
         Contents: details.value.Contents
     };
     router.push({

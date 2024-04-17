@@ -16,9 +16,6 @@ const list = ref([]);
 const params = reactive({
     total: 1
 });
-watchEffect(() => {
-    props.params?.titleCate == '发件' ? getMailList(1, 10) : '';
-});
 const getMailList = async (page, pageSize) => {
     try {
         params.PageIndex = page;
@@ -31,6 +28,10 @@ const getMailList = async (page, pageSize) => {
         info('error', error);
     }
 };
+watchEffect(() => {
+    props.params?.titleCate == '发件' ? getMailList(1, 10) : '';
+});
+
 const columns = [
     {
         title: '主题',

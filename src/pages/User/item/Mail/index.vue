@@ -27,21 +27,64 @@ const list = [
 const params = ref({
     titleCate: list[0].cate
 });
+onMounted(() => {
+    if (!route.query) {
+        console.log('调用了');
+        active.value = 0;
+        params.value.titleCate = '收件';
+        if (showModals.value?.params) {
+            console.log((showModals.value.params.titleCate = '收件'));
+        }
+    } else if (route.query.tab === 'write') {
+        active.value = 1;
+        params.value.titleCate = '写信';
+        if (showModals.value?.params) {
+            console.log((showModals.value.params.titleCate = '写信'));
+        }
+        console.log(params.value.titleCate);
+    } else if (route.query.tab === 'draft') {
+        active.value = 2;
+        params.value.titleCate = '草稿';
+        if (showModals.value?.params) {
+            console.log((showModals.value.params.titleCate = '草稿'));
+        }
+    } else if (route.query.tab === 'send') {
+        active.value = 3;
+        params.value.titleCate = '发件';
+        if (showModals.value?.params) {
+            console.log((showModals.value.params.titleCate = '发件'));
+        }
+    }
+});
 watch(
     () => route.query, // 监听 route.query 的变化
     (newQuery, oldQuery) => {
         if (!route.query) {
+            console.log('调用了');
             active.value = 0;
             params.value.titleCate = '收件';
+            if (showModals.value?.params) {
+                console.log((showModals.value.params.titleCate = '收件'));
+            }
         } else if (newQuery.tab === 'write') {
             active.value = 1;
             params.value.titleCate = '写信';
+            if (showModals.value?.params) {
+                console.log((showModals.value.params.titleCate = '写信'));
+            }
+            console.log(params.value.titleCate);
         } else if (newQuery.tab === 'draft') {
             active.value = 2;
             params.value.titleCate = '草稿';
+            if (showModals.value?.params) {
+                console.log((showModals.value.params.titleCate = '草稿'));
+            }
         } else if (newQuery.tab === 'send') {
             active.value = 3;
             params.value.titleCate = '发件';
+            if (showModals.value?.params) {
+                console.log((showModals.value.params.titleCate = '发件'));
+            }
         }
     },
     { immediate: true, deep: true } // 开启深度监听
@@ -49,15 +92,21 @@ watch(
 const props = defineProps();
 onMounted(() => {});
 watchEffect(() => {
-    if (showModals.value?.params && showModals.value?.params.titleCate) {
+    if (
+        route.path == '/user/mail' &&
+        showModals.value?.params &&
+        showModals.value?.params.titleCate
+    ) {
         if (showModals.value.params.titleCate == '收件') {
             active.value = 0;
+            params.value.titleCate = '收件';
             router.push({
                 path: '/user/mail?',
                 query: {}
             });
         } else if (showModals.value.params.titleCate == '写信') {
             active.value = 1;
+            console.log(1);
             router.push({
                 path: '/user/mail?',
                 query: {
@@ -66,6 +115,7 @@ watchEffect(() => {
             });
         } else if (showModals.value.params.titleCate == '草稿') {
             active.value = 2;
+            console.log(2);
             router.push({
                 path: '/user/mail?',
                 query: {
@@ -74,6 +124,7 @@ watchEffect(() => {
             });
         } else if (showModals.value.params.titleCate == '发件') {
             active.value = 3;
+            console.log(3);
             router.push({
                 path: '/user/mail?',
                 query: {
@@ -85,7 +136,7 @@ watchEffect(() => {
     console.log(showModals.value?.params);
 });
 const changePage = (paramss) => {
-    // params.value.titleCate = paramss.page;
+    params.value.titleCate = paramss.page;
     params.value.Types = paramss.Types;
     details.value.Id = paramss.ID || '';
     params.value.ReplayId = paramss.ReplayId || 0;

@@ -19,9 +19,6 @@ const removeList = ref([]);
 const params = reactive({
     total: 1
 });
-watchEffect(() => {
-    props.params.titleCate == '草稿' ? getMailList(1, 10) : '';
-});
 const getMailList = async (page, pageSize) => {
     try {
         params.PageIndex = page;
@@ -34,6 +31,9 @@ const getMailList = async (page, pageSize) => {
         info('error', error);
     }
 };
+watchEffect(() => {
+    props.params.titleCate == '草稿' ? getMailList(1, 10) : '';
+});
 const columns = [
     {
         title: '主题',
@@ -48,44 +48,61 @@ const columns = [
         width: 328
     }
 ];
-const onSelectChange = (selectedRowKeys) => {
-    console.log(selectedRowKeys);
-    removeList.value = selectedRowKeys;
-    console.log(removeList.value);
+const checkList = ref({
+    Types: '2',
+    DelList: []
+});
+const showCheck = (e) => {
+    if (getChecked(e.Id)) {
+        checkList.value.DelList = checkList.value.DelList.filter((item) => item.Id !== e.Id);
+    } else {
+        let query = {
+            Id: e.Id,
+            FormType: e.FormType
+        };
+        checkList.value.DelList.push(query);
+    }
+    console.log(checkList.value);
 };
-const hasSelected = computed(() => removeList.value.length > 0);
-const start = () => {
-    loading.value = true;
+
+function getChecked(id) {
+    const item = checkList.value.DelList.find((item) => item.Id === id);
+    return item !== undefined;
+}
+const all = ref(false);
+const getAll = () => {
+    if (all) {
+        checkList.value = list.value.map((item) => {
+            let query = {
+                Id: item.Id,
+                FormType: item.FormType
+            };
+            return query;
+        });
+    } else {
+        checkList.value.DelList = [];
+    }
 };
 </script>
 
 <template>
     <div class="draft">
-        <a-table
-            :row-selection="{
-                selectedRowKeys: removeList,
-                onChange: onSelectChange
-            }"
-            :pagination="false"
-            :columns="columns"
-            :data-source="list"
-        >
+        <a-table :pagination="false" :columns="columns" :data-source="list">
             <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'Title'">
                     <div class="title-item">
-                        <!-- <img src="" alt=""> -->
+                        <a-checkbox
+                            @change="showCheck(record)"
+                            style="margin-right: 15px"
+                            :checked="getChecked(record.Id)"
+                        ></a-checkbox>
                         {{ record.Title }}
                     </div>
                 </template>
             </template>
         </a-table>
-        <div class="add-array">
-            <a-button type="primary" :loading="loading" @click="start"> 选择 </a-button>
-            <span style="margin-left: 8px">
-                <template v-if="hasSelected">
-                    {{ `总计 ${list.length} 项 已选 ${removeList.length} 项` }}
-                </template>
-            </span>
+        <div class="div">
+            <a-checkbox @change="getAll()" style="margin-right: 15px" :checked="all"></a-checkbox>
         </div>
         <CatePage :paginations="params" @fetchList="getCaoGaoApi"></CatePage>
     </div>

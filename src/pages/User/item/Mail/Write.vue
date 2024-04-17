@@ -132,7 +132,11 @@ const handleFinish = async (bool) => {
                         <a-button type="primary" html-type="submit">提交</a-button>
                     </a-col>
                     <a-col class="gutter-row" :span="5">
-                        <a-button type="primary" @click="handleFinish(true)">存草稿</a-button>
+                        <a-button
+                            style="background-color: #d9e1e7; color: #4a4a4a"
+                            @click="handleFinish(true)"
+                            >存草稿</a-button
+                        >
                     </a-col>
                 </a-row>
             </a-form-item>
