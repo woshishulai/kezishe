@@ -2,11 +2,15 @@
 import { ref, computed, reactive, onMounted, toRaw, watchEffect } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
+import Tables from './item/tables.vue';
+import TableDetails from './item/tableDetails.vue';
+import { list, list2, labelCol } from './data.js';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
 const showModals = ref(null);
 const params = ref();
+const comInfo = ref({});
 onMounted(() => {
     params.value = showModals.value?.params;
     console.log(params.value?.titleCate);
@@ -22,36 +26,28 @@ const formState = reactive({
 const onSubmit = () => {
     console.log('submit!', toRaw(formState));
 };
-const labelCol = {
-    style: {
-        width: '150px'
+const isDraweComponent = ref(false);
+const isDraweTableList = ref(false);
+// const isDraweComponent = ref(false);
+//切换线下汇款的
+const changeShowPage = (index) => {
+    if (index == 1) {
+        comInfo.value.title = '填写汇款告知';
+        isDraweComponent.value = true;
+        return;
+    }
+    if (index == 2) {
+        comInfo.value.title = '汇款告知记录';
+        isDraweTableList.value = true;
+        return;
     }
 };
-const wrapperCol = {
-    span: 14
+const afterOpenChange = (bool) => {
+    isDraweComponent.value = bool;
 };
-const list = [
-    {
-        cate: '网上充值'
-    },
-    {
-        cate: '线下汇款'
-    }
-];
-const list2 = [
-    {
-        img: 'user/caiwu/icon1.png',
-        text: '汇款银行&邮政信息'
-    },
-    {
-        img: 'user/caiwu/icon2.png',
-        text: '填写汇款告知单'
-    },
-    {
-        img: 'user/caiwu/icon3.png',
-        text: '汇款告知记录'
-    }
-];
+const afterOpenChanges = (bool) => {
+    isDraweTableList.value = bool;
+};
 </script>
 
 <template>
@@ -102,7 +98,12 @@ const list2 = [
                 </template>
                 <template v-slot:active2 v-else>
                     <div class="img-list">
-                        <div class="img-item" v-for="(item, index) in list2" :key="index">
+                        <div
+                            class="img-item"
+                            v-for="(item, index) in list2"
+                            :key="index"
+                            @click="changeShowPage(index)"
+                        >
                             <img :src="getImageUrl(item.img)" alt="icon" />
                             <p>{{ item.text }}</p>
                         </div>
@@ -110,6 +111,24 @@ const list2 = [
                 </template>
             </showModal>
         </div>
+        <a-drawer
+            width="520"
+            v-model:open="isDraweComponent"
+            :title="comInfo.title"
+            placement="right"
+            @after-open-change="afterOpenChange"
+        >
+            <Tables @close="afterOpenChange"></Tables>
+        </a-drawer>
+        <a-drawer
+            width="1220"
+            v-model:open="isDraweTableList"
+            :title="comInfo.title"
+            placement="right"
+            @after-open-change="afterOpenChanges"
+        >
+            <TableDetails @close="afterOpenChanges"></TableDetails>
+        </a-drawer>
     </div>
 </template>
 
@@ -190,6 +209,7 @@ const list2 = [
                 width: 235px;
                 height: 110px;
                 border-radius: 6px;
+                cursor: pointer;
                 background: linear-gradient(to bottom, #fdf3e1, #fee6c0);
 
                 img {

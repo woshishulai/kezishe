@@ -7,14 +7,17 @@ const selectRouter = router.currentRoute._rawValue.fullPath;
 const segments = selectRouter.split('/');
 let desiredPath = '';
 
+// 函数来获取不包含参数的路径
+const getPathWithoutParams = (path) => path.split('?')[0];
+
 if (segments.length >= 3) {
     desiredPath = `/${segments[1]}/${segments[2]}`;
 }
-const openKeys = ref([desiredPath]);
+const openKeys = ref([getPathWithoutParams(desiredPath)]); // 忽略参数部分
 
-const selectedKeys = ref([selectRouter]);
+const selectedKeys = ref([getPathWithoutParams(selectRouter)]); // 忽略参数部分
 watch(router.currentRoute, (to, from) => {
-    selectedKeys.value = [router.currentRoute._rawValue.fullPath];
+    selectedKeys.value = [getPathWithoutParams(router.currentRoute._rawValue.fullPath)]; // 忽略参数部分
 });
 const generateMenuItems = (routes, parentRoutePath = '/user/') => {
     const userRoutes = routes.find((route) => route.path === '/user');
@@ -27,7 +30,7 @@ const generateMenuItems = (routes, parentRoutePath = '/user/') => {
                 }
 
                 const childMenuItem = {
-                    key: parentPath + childRoute.path,
+                    key: getPathWithoutParams(parentPath + childRoute.path), // 忽略参数部分
                     label: childRoute.meta.name,
                     router: childRoute.path,
                     icon: () => (childRoute.meta.icon ? h(childRoute.meta.icon) : null)
@@ -59,6 +62,7 @@ const handleClick = (e) => {
     router.push(routePath);
 };
 </script>
+
 <template>
     <div class="user-nav-list">
         <div class="nav-title" @click="router.push('/user/userinfo')"> 个人中心 </div>
