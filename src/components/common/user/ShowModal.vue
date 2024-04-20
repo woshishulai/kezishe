@@ -1,5 +1,6 @@
 <script setup>
 import { ref, computed, reactive, onMounted, watchEffect } from 'vue';
+
 const props = defineProps({
     titleList: {
         type: Array,
@@ -18,6 +19,12 @@ watchEffect(() => {
     params.statusCate = props.statusList;
 });
 const changeTitleCate = (item) => {
+    if (params.titleCate == item.cate) {
+        params.reload = 1;
+        params.reload += 1;
+    } else {
+        delete params.reload;
+    }
     params.titleCate = item.cate;
 };
 const changeStatusCate = (item) => {

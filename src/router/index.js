@@ -535,6 +535,10 @@ const routes = [
     ...addRoutes,
     ...userRoutes,
     {
+        path: '/user/Required',
+        component: () => import('@/pages/Required/index.vue')
+    },
+    {
         path: '/:pathMatch(.*)',
         redirect: '/'
     }

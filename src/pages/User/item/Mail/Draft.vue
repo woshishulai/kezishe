@@ -15,7 +15,6 @@ const props = defineProps({
     }
 });
 const list = ref([]);
-const removeList = ref([]);
 
 const params = reactive({
     total: 1
@@ -103,7 +102,6 @@ const removeMailsList = async () => {
     }
 };
 const showDetails = async (record) => {
-    console.log(record);
     const query = {
         Types: '2',
         Id: record.Id,
@@ -111,6 +109,7 @@ const showDetails = async (record) => {
         ReplayId: 0,
         MsgTab: '0',
         Contents: record.Contents,
+        FormType: record.FormType,
         page: '写信'
     };
     emits('changePage', query);
@@ -125,30 +124,20 @@ const showDetails = async (record) => {
 
 <template>
     <div class="draft">
-        <a-table
-            :pagination="false"
-            :columns="columns"
-            :data-source="list"
-            :custom-row="
-                (record) => {
-                    return {
-                        onClick: (event) => {
-                            showDetails(record);
-                        }
-                    };
-                }
-            "
-        >
+        <a-table :pagination="false" :columns="columns" :data-source="list">
             <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'Title'">
                     <div class="title-item">
                         <a-checkbox
-                            @change="showCheck(record)"
+                            @change.stop="showCheck(record)"
                             style="margin-right: 15px"
                             :checked="getChecked(record.Id)"
                         ></a-checkbox>
-                        {{ record.Title }}
+                        <p @click="showDetails(record)"> {{ record.Title }}</p>
                     </div>
+                </template>
+                <template v-if="column.key === 'BaseCreateTime'">
+                    <p @click="showDetails(record)"> {{ record.BaseCreateTime }}</p>
                 </template>
             </template>
         </a-table>

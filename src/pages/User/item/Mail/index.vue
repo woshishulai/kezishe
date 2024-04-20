@@ -6,10 +6,10 @@ import Write from './Write.vue';
 import Draft from './Draft.vue';
 import SendingDocuments from './SendingDocuments.vue';
 const showModals = ref(null);
-const details = ref({});
 const router = useRouter();
 const route = useRoute();
 const active = ref(0);
+const active1 = ref(0);
 const list = [
     {
         cate: '收件'
@@ -25,18 +25,16 @@ const list = [
     }
 ];
 const params = ref({
-    titleCate: list[0].cate
+    titleCate: ''
 });
 onMounted(() => {
     if (!route.query) {
-        console.log('调用了');
         active.value = 0;
         params.value.titleCate = '收件';
         if (showModals.value?.params) {
             console.log((showModals.value.params.titleCate = '收件'));
         }
     } else if (route.query.tab === 'write') {
-        active.value = 1;
         params.value.titleCate = '写信';
         if (showModals.value?.params) {
             console.log((showModals.value.params.titleCate = '写信'));
@@ -91,54 +89,63 @@ watch(
 );
 const props = defineProps();
 onMounted(() => {});
+//监听路由
 watchEffect(() => {
     if (
         route.path == '/user/mail' &&
         showModals.value?.params &&
         showModals.value?.params.titleCate
     ) {
-        if (showModals.value.params.titleCate == '收件') {
-            active.value = 0;
-            params.value.titleCate = '收件';
-            router.push({
-                path: '/user/mail?',
-                query: {}
-            });
-        } else if (showModals.value.params.titleCate == '写信') {
-            active.value = 1;
-            console.log(1);
-            router.push({
-                path: '/user/mail?',
-                query: {
-                    tab: 'write'
-                }
-            });
-        } else if (showModals.value.params.titleCate == '草稿') {
-            active.value = 2;
-            console.log(2);
-            router.push({
-                path: '/user/mail?',
-                query: {
-                    tab: 'draft'
-                }
-            });
-        } else if (showModals.value.params.titleCate == '发件') {
-            active.value = 3;
-            console.log(3);
-            router.push({
-                path: '/user/mail?',
-                query: {
-                    tab: 'send'
-                }
-            });
+        console.log(showModals.value?.params.reload);
+        if (showModals.value?.params.reload) {
+            active1.value = active1.value + 1;
+            console.log('重新');
+        } else {
+            if (showModals.value.params.titleCate == '收件') {
+                active.value = 0;
+                params.value.titleCate = '收件';
+                router.push({
+                    path: '/user/mail?',
+                    query: {}
+                });
+            } else if (showModals.value.params.titleCate == '写信') {
+                active.value = 1;
+                console.log(1);
+                router.push({
+                    path: '/user/mail?',
+                    query: {
+                        tab: 'write'
+                    }
+                });
+            } else if (showModals.value.params.titleCate == '草稿') {
+                active.value = 2;
+                console.log(2);
+                router.push({
+                    path: '/user/mail?',
+                    query: {
+                        tab: 'draft'
+                    }
+                });
+            } else if (showModals.value.params.titleCate == '发件') {
+                active.value = 3;
+                console.log(3);
+                router.push({
+                    path: '/user/mail?',
+                    query: {
+                        tab: 'send'
+                    }
+                });
+            }
         }
     }
     console.log(showModals.value?.params);
 });
 const changePage = (paramss) => {
+    console.log(paramss);
     params.value.titleCate = paramss.page;
+    params.value.FormType = paramss.FormType;
     params.value.Types = paramss.Types;
-    details.value.Id = paramss.ID || '';
+    params.value.Id = paramss.Id || '';
     params.value.ReplayId = paramss.ReplayId || 0;
     params.value.MsgTab = paramss.MsgTab || 0;
     params.value.Title = paramss.Title || '';
@@ -154,13 +161,29 @@ const changePage = (paramss) => {
             <show-modal ref="showModals" :titleList="list">
                 <template v-slot:active2>
                     <Receiving
+                        :key="active1"
                         :params="params"
                         @changePage="changePage"
                         v-show="active == 0"
                     ></Receiving>
-                    <Write @changePage="changePage" :params="params" v-show="active == 1"></Write>
-                    <Draft :params="params" v-show="active == 2"></Draft>
-                    <SendingDocuments :params="params" v-show="active == 3"></SendingDocuments>
+                    <Write
+                        @changePage="changePage"
+                        :key="active1"
+                        :params="params"
+                        v-show="active == 1"
+                    ></Write>
+                    <Draft
+                        @changePage="changePage"
+                        :key="active1"
+                        :params="params"
+                        v-show="active == 2"
+                    ></Draft>
+                    <SendingDocuments
+                        @changePage="changePage"
+                        :params="params"
+                        :key="active1"
+                        v-show="active == 3"
+                    ></SendingDocuments>
                 </template>
             </show-modal>
         </div>
@@ -205,5 +228,12 @@ const changePage = (paramss) => {
     height: 58.67px;
     line-height: 58.67px;
     border-bottom: 1px solid #f0f0f0;
+}
+:deep(.title-item) {
+    .flex-row;
+    justify-content: flex-start;
+    p {
+        flex: 1;
+    }
 }
 </style>

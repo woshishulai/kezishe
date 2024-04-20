@@ -3,7 +3,7 @@ import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import WangEdior from '@/components/WangEdior/WangEdior.vue';
 import { handleFinishFailed } from '@/utils/form/rules';
-import { addMailTo } from '@/request/api';
+import { addMailTo, getMailDetailsApi } from '@/request/api';
 import { notification } from 'ant-design-vue';
 import { watchEffect } from 'vue';
 const [api, contextHolder] = notification.useNotification();
@@ -23,21 +23,28 @@ const props = defineProps({
         default: {}
     }
 });
+const getDetailsInfo = async (query) => {
+    let res = await getMailDetailsApi(query);
+    formState.value = res.Data[0];
+    console.log(formState.value);
+};
 watchEffect(() => {
     if (props.params.ReplayId) {
-        console.log(23234);
         let str = '<br/>';
+        formState.value.Title = 'Re：' + props.params.Title;
         formState.value.Contents = str + str + str + props.params.Contents;
     } else if (props.params.Id) {
-        let str = '<br/>';
-        formState.value.Contents = str + str + str + props.params.Contents;
-    }
-    {
-        console.log(123456);
+        let query = {
+            id: props.params.Id,
+            FormType: props.params.FormType
+        };
+        getDetailsInfo(query);
     }
 });
+
 onMounted(() => {});
 const emits = defineEmits(['changePage']);
+//提交
 const handleFinish = async (bool) => {
     //如果是草稿
     if (bool) {

@@ -36,7 +36,6 @@ const onChange = () => {
             @change="onChange"
             :showSizeChanger="true"
             v-model:pageSize="pageSize"
-            :hideOnSinglePage="true"
             v-model:current="page"
             :page-size-options="pageSizeOptions"
             :total="props.paginations.total"

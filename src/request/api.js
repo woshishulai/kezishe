@@ -133,3 +133,10 @@ export const getFaSongApi = async (params) =>
 
 //获取发件箱
 export const removeMail = async (data) => instance.post(`Member/Mail/Delete`, data);
+
+//获取确认合同详情
+export const getConfirmDetails = async (params) =>
+    instance.get(`Member/Mail/ContractConfirm?ConfirmId=${params.id}`);
+//确认合同
+export const confirmOrder = async (params) =>
+    instance.post(`Member/Mail/SaveContractConfirm?ConfirmId=${params.id}`);
