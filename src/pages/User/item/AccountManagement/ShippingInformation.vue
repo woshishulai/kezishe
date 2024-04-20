@@ -71,14 +71,14 @@ const openModel = (biaoti, id) => {
     params.id = id;
 };
 const openChangeParamsModel = (biaoti, item) => {
+    console.log(item);
     changeParams.id = item.Id;
     changeParams.title = biaoti;
     changeParams.username = item.NickName;
-    changeParams.country = item.State;
-    changeParams.status = item.Sheng;
-    changeParams.shi = item.Shi;
+    changeParams.region = item.State;
+    changeParams.date1 = [item.Sheng, item.Shi];
     changeParams.text = item.Address;
-    changeParams.postal = item.Postal;
+    changeParams.Postal = item.Postal;
     changeParams.tel = item.Tel;
     changeParams.phone = item.Phone;
     changeParams.title = biaoti;
@@ -137,7 +137,13 @@ const changeDefault = async (id) => {
 };
 const handleChange = (value, option) => {
     formState.region = value;
-    formState.date1 = '';
+    formState.statusList = option.ChildList;
+    formState.date1 = [];
+};
+const handleChanges = (value, option) => {
+    changeParams.region = value;
+    changeParams.statusList = option.ChildList;
+    changeParams.date1 = [];
 };
 const handleFinish = async () => {
     if (!formState.date1) {
@@ -156,13 +162,52 @@ const handleFinish = async () => {
         Default: '0'
     };
     try {
-        let res = await addUserAddressInfo(params);
+        let res = await changeUserAddressInfo(params);
         params.Id = res.Data;
         if (res.Tag === 1) {
             address.value.push(params);
+            formState.username = '';
+            // formState.region = '';
+            formState.bankNmae = '';
+            formState.tel = '';
+            formState.phone = '';
+            formState.text = '';
+            formState.date1 = [];
+            info('success', res.Message);
         }
     } catch (error) {
-        console.log(error);
+        info('error', error);
+    }
+};
+const handleFinishs = async () => {
+    if (!changeParams.date1) {
+        info('error', '信息请填写完整');
+        return;
+    }
+    let params = {
+        Id: changeParams.id,
+        NickName: changeParams.username, //昵称
+        State: changeParams.region, //国家
+        Sheng: changeParams.date1[0], //省市
+        Shi: changeParams.date1[1], //省市
+        Address: changeParams.text,
+        Postal: changeParams.Postal,
+        Tel: changeParams.tel,
+        Phone: changeParams.phone,
+        Default: changeParams.default
+    };
+    try {
+        let res = await addUserAddressInfo(params);
+        let status;
+        if (res.Tag == 1) {
+            status = 'success';
+            const index = address.value.findIndex((item) => item.Id === params.Id);
+            address.value.splice(index, 1, params);
+            info(status, res.Message);
+            closeModel();
+        }
+    } catch (error) {
+        info('error', error);
     }
 };
 </script>
@@ -232,8 +277,7 @@ const handleFinish = async () => {
                         <a-select
                             :field-names="{
                                 label: 'AreaName',
-                                value: 'AreaName',
-                                options: 'ChildList'
+                                value: 'AreaName'
                             }"
                             v-model:value="formState.region"
                             show-search
@@ -244,7 +288,7 @@ const handleFinish = async () => {
                     <a-form-item
                         :rules="[{ required: true, message: '省市不能为空' }]"
                         label="省市地址"
-                        name="username"
+                        name="date1"
                     >
                         <a-cascader
                             :field-names="{
@@ -260,7 +304,7 @@ const handleFinish = async () => {
                     <a-form-item
                         :rules="[{ required: true, message: '详细地址不能为空' }]"
                         label="详细地址"
-                        name="username"
+                        name="text"
                     >
                         <a-textarea
                             v-model:value="formState.text"
@@ -282,7 +326,7 @@ const handleFinish = async () => {
                             { required: true, message: '收货手机号不能为空' },
                             { pattern: /^[0-9]{11}$/, message: '手机号格式不正确' }
                         ]"
-                        label="'收货手机号"
+                        label="收货手机号"
                         name="tel"
                     >
                         <a-input v-model:value="formState.tel" />
@@ -300,12 +344,101 @@ const handleFinish = async () => {
                 </a-form>
             </div>
         </div>
+        <a-modal :title="changeParams.title" :footer="null" v-model:open="changeParams.open">
+            <a-form
+                labelAlign="left"
+                :model="changeParams"
+                name="basicsss"
+                :label-col="{ span: 6 }"
+                :wrapper-col="{ span: 18 }"
+                autocomplete="off"
+                @finish="handleFinishs"
+                @finishFailed="handleFinishFailed"
+            >
+                <a-form-item
+                    :rules="[{ required: true, message: '姓名不能为空' }]"
+                    label="姓名"
+                    name="username"
+                >
+                    <a-input v-model:value.trim="changeParams.username" />
+                </a-form-item>
+                <a-form-item
+                    :rules="[{ required: true, message: '国家不能为空' }]"
+                    label="所在地区"
+                >
+                    <a-select
+                        :field-names="{
+                            label: 'AreaName',
+                            value: 'AreaName'
+                        }"
+                        v-model:value="changeParams.region"
+                        show-search
+                        :options="countList"
+                        @change="handleChanges"
+                    ></a-select>
+                </a-form-item>
+                <a-form-item
+                    :rules="[{ required: true, message: '省市不能为空' }]"
+                    label="省市地址"
+                    name="date1"
+                >
+                    <a-cascader
+                        :field-names="{
+                            label: 'AreaName',
+                            value: 'AreaName',
+                            children: 'ChildList'
+                        }"
+                        expand-trigger="hover"
+                        v-model:value="changeParams.date1"
+                        :options="formState.statusList"
+                    />
+                </a-form-item>
+                <a-form-item
+                    :rules="[{ required: true, message: '详细地址不能为空' }]"
+                    label="详细地址"
+                    name="text"
+                >
+                    <a-textarea
+                        v-model:value="changeParams.text"
+                        :auto-size="{ minRows: 2, maxRows: 5 }"
+                    />
+                </a-form-item>
+                <a-form-item
+                    :rules="[
+                        { required: true, message: '邮编不能为空' },
+                        { pattern: /^[0-9]{6}$/, message: '邮编格式不正确' }
+                    ]"
+                    label="邮编"
+                    name="Postal"
+                >
+                    <a-input v-model:value="changeParams.Postal" />
+                </a-form-item>
+                <a-form-item
+                    :rules="[
+                        { required: true, message: '收货手机号不能为空' },
+                        { pattern: /^[0-9]{11}$/, message: '手机号格式不正确' }
+                    ]"
+                    label="收货手机号"
+                    name="tel"
+                >
+                    <a-input v-model:value="changeParams.tel" />
+                </a-form-item>
+                <a-form-item
+                    :rules="[{ required: true, message: '联系电话不能为空' }]"
+                    label="联系电话"
+                    name="phone"
+                >
+                    <a-input v-model:value="changeParams.phone" />
+                </a-form-item>
+                <a-form-item :wrapper-col="{ offset: 6, span: 18 }">
+                    <a-button type="primary" html-type="submit">保存</a-button>
+                </a-form-item>
+            </a-form>
+        </a-modal>
         <RemoveTableList
             @closeModel="closeModel"
             @postApi="postAPi"
             :params="params"
-            :changeParams="changeParams"
-            @changeApi="changeApi"
         ></RemoveTableList>
     </div>
 </template>

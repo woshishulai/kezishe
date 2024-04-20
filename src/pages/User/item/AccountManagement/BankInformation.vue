@@ -175,9 +175,14 @@ const changeDefault = async (id) => {
 //     return getStatusList(defaultCountry);
 // };
 const handleChange = (value, option) => {
-    console.log(value);
     formState.region = value;
-    formState.date1 = option.ChildList;
+    formState.statusList = option.ChildList;
+    formState.date1 = [];
+};
+const handleChanges = (value, option) => {
+    changeParams.region = value;
+    changeParams.statusList = option.ChildList;
+    changeParams.date1 = [];
 };
 const handleFinish = async () => {
     if (!formState.date1) {
@@ -189,23 +194,29 @@ const handleFinish = async () => {
         Address: formState.region,
         BankName: formState.bankNmae,
         Sheng: formState.date1[0],
-        Shi: formState.date1[1],
         Branch: formState.tel,
         Card: formState.phone,
         Memo: formState.text,
         Default: '0'
     };
+    if (formState.date1.length == 1) {
+        params.Shi = formState.date1[0];
+    } else {
+        params.Shi = formState.date1[1];
+    }
     try {
         let res = await addUserBankInfo(params);
         params.Id = res.Data;
         if (res.Tag == 1) {
             tableDataList.value.push(params);
             formState.username = '';
-            formState.region = '';
+            // formState.region = '';
             formState.bankNmae = '';
             formState.tel = '';
             formState.phone = '';
             formState.text = '';
+            formState.date1 = [];
+            info('success', res.Message);
         }
     } catch (error) {
         info('error', error);
@@ -222,12 +233,17 @@ const handleFinishs = async () => {
         Address: changeParams.region,
         BankName: changeParams.bankNmae,
         Sheng: changeParams.date1[0],
-        Shi: changeParams.date1[1],
         Branch: changeParams.tel,
         Card: changeParams.phone,
         Memo: changeParams.text,
         Default: changeParams.default
     };
+    if (changeParams.date1.length == 1) {
+        params.Shi = changeParams.date1[0];
+    } else {
+        params.Shi = changeParams.date1[1];
+    }
+
     try {
         let res = await changeUserBankInfo(params);
         if (res.Tag == 1) {
@@ -299,8 +315,7 @@ const handleFinishs = async () => {
                         <a-select
                             :field-names="{
                                 label: 'AreaName',
-                                value: 'AreaName',
-                                options: 'ChildList'
+                                value: 'AreaName'
                             }"
                             v-model:value="formState.region"
                             show-search
@@ -311,7 +326,7 @@ const handleFinishs = async () => {
                     <a-form-item
                         :rules="[{ required: true, message: '省市不能为空' }]"
                         label="省市地址"
-                        name="username"
+                        name="date1"
                     >
                         <a-cascader
                             :field-names="{
@@ -334,7 +349,7 @@ const handleFinishs = async () => {
                     </a-form-item>
                     <a-form-item
                         :rules="[{ required: true, message: '分行支行' }]"
-                        label="'分行支行"
+                        label="分行支行"
                         name="tel"
                     >
                         <a-input v-model:value="formState.tel" />
@@ -387,13 +402,12 @@ const handleFinishs = async () => {
                     <a-select
                         :field-names="{
                             label: 'AreaName',
-                            value: 'AreaName',
-                            options: 'ChildList'
+                            value: 'AreaName'
                         }"
                         v-model:value="changeParams.region"
                         show-search
                         :options="countList"
-                        @change="handleChange"
+                        @change="handleChanges"
                     ></a-select>
                 </a-form-item>
                 <a-form-item
@@ -409,7 +423,7 @@ const handleFinishs = async () => {
                         }"
                         expand-trigger="hover"
                         v-model:value="changeParams.date1"
-                        :options="formState.statusList"
+                        :options="changeParams.statusList"
                     />
                 </a-form-item>
 
@@ -422,7 +436,7 @@ const handleFinishs = async () => {
                 </a-form-item>
                 <a-form-item
                     :rules="[{ required: true, message: '分行支行' }]"
-                    label="'分行支行"
+                    label="分行支行"
                     name="tel"
                 >
                     <a-input v-model:value="changeParams.tel" />
