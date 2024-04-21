@@ -13,7 +13,6 @@ const params = ref();
 const comInfo = ref({});
 onMounted(() => {
     params.value = showModals.value?.params;
-    console.log(params.value?.titleCate);
 });
 watchEffect(() => {});
 const formState = reactive({

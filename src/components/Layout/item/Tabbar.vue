@@ -9,18 +9,25 @@ const route = useRoute();
 const props = defineProps({});
 const tabbarList = ref([]);
 const active = ref(null);
-onMounted(async () => {});
-watchEffect(async () => {
-    if (route.path == '/jingmai') {
-        try {
-            let res = await getTabbatList();
-            tabbarList.value = res.Data;
-        } catch (err) {
-            console.log(err);
-        }
-    } else {
-        tabbarList.value = [];
+onMounted(async () => {
+    try {
+        let res = await getTabbatList();
+        tabbarList.value = res.Data;
+    } catch (err) {
+        console.log(err);
     }
+});
+watchEffect(async () => {
+    // if (route.path == '/jingmai') {
+    //     try {
+    //         let res = await getTabbatList();
+    //         tabbarList.value = res.Data;
+    //     } catch (err) {
+    //         console.log(err);
+    //     }
+    // } else {
+    //     tabbarList.value = [];
+    // }
 });
 const showNav = (item) => {
     if (item.router == route.path) {

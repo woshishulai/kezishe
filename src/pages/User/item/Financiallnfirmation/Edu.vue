@@ -1,11 +1,25 @@
 <script setup>
-import { ref, computed, reactive, onMounted } from 'vue';
+import { ref, watch, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
+import { handleFinishFailed } from '@/utils/form/rules';
+import {
+    yuEZhuanEDu,
+    BalanceToQuotaInfo,
+    eDuZhuanYUE,
+    QuotaToBalanceFrom
+} from '@/request/user/api';
+import { info } from '@/hooks/antd/message';
 const router = useRouter();
 const route = useRoute();
+const showModals = ref(null);
 const props = defineProps({});
-onMounted(() => {});
+const params = ref();
+const formState = reactive({});
+const infos = ref({
+    details1: {},
+    details2: {}
+});
 const list = [
     {
         cate: '余额转额度'
@@ -17,9 +31,76 @@ const list = [
         cate: '额度充值'
     }
 ];
-const query = ref('余额转额度');
-const query1 = ref('额度转余额');
-const query2 = ref('额度充值');
+onMounted(() => {
+    params.value = showModals.value?.params;
+});
+const detailsInfo1 = async () => {
+    try {
+        let res = await yuEZhuanEDu();
+        infos.value.details1 = res.Data;
+        console.log(res);
+    } catch (error) {
+        info('error', error);
+    }
+};
+const detailsInfo2 = async () => {
+    try {
+        let res = await eDuZhuanYUE();
+        console.log(res);
+        infos.value.details2 = res.Data;
+    } catch (error) {
+        info('error', error);
+    }
+};
+watch(
+    () => showModals.value?.params.titleCate,
+    (news) => {
+        params.value = news;
+        if (news == list[0].cate) {
+            params.value = showModals.value?.params;
+            detailsInfo1();
+        } else if (news == list[1].cate) {
+            params.value = showModals.value?.params;
+            detailsInfo2();
+        } else if (news == list[2].cate) {
+            params.value = showModals.value?.params;
+        }
+    }
+);
+
+const handleFinish = async () => {
+    try {
+        let res = await BalanceToQuotaInfo(formState.AdjustQuota);
+        console.log(res);
+        if (res.Tag == 1) {
+            info('success', res.Message);
+        }
+    } catch (error) {
+        info('error', error);
+    }
+};
+const handleFinishs = async () => {
+    try {
+        let res = await QuotaToBalanceFrom(formState.ReduceQuota);
+        console.log(res);
+        if (res.Tag == 1) {
+            info('success', res.Message);
+        }
+    } catch (error) {
+        info('error', error);
+    }
+};
+const handleFinishss = async () => {
+    try {
+        let res = await QuotaToBalanceFrom(formState.ReduceQuota);
+        console.log(res);
+        if (res.Tag == 1) {
+            info('success', res.Message);
+        }
+    } catch (error) {
+        info('error', error);
+    }
+};
 </script>
 
 <template>
@@ -27,130 +108,151 @@ const query2 = ref('额度充值');
         <div class="edu">
             <div class="left-user-info">
                 <div class="title">账户余额(¥)</div>
-                <div class="num">143.40 <span>元</span></div>
+                <div class="num"
+                    >{{
+                        params?.titleCate == list[0].cate
+                            ? infos.details1.Balance
+                            : infos.details2.Balance
+                    }}
+                    <span>元</span></div
+                >
                 <div class="bi">
                     <div>
                         <p>竞卖额度</p>
-                        <p>¥500.000</p>
-                        <p>¥500.000可用</p>
+                        <p
+                            >¥{{
+                                params?.titleCate == list[0].cate
+                                    ? infos.details1.Quota
+                                    : infos.details2.Quota
+                            }}</p
+                        >
+                        <p
+                            >¥{{
+                                params?.titleCate == list[0].cate
+                                    ? infos.details1.AvailableQuotas
+                                    : infos.details2.AvailableQuotas
+                            }}可用</p
+                        >
                     </div>
                     <img :src="getImageUrl('user/caiwu/list2.png')" alt="" />
                 </div>
             </div>
             <div class="right-info">
-                <div class="title">
-                    <p
-                        class="cate-item"
-                        :class="item.cate == query ? 'active' : ''"
-                        v-for="item in list"
-                        :key="item.cate"
-                    >
-                        <span>{{ item.cate }}</span>
-                    </p>
-                </div>
-                <div class="element">
-                    <div>
-                        <span>调整额度：</span> <input type="text" placeholder="金额（RMB）" />
-                    </div>
-                    <p>453.423-646.618</p>
-                    <p>竞卖额度用于竞买藏品，余额：额度=1:1000</p>
-                    <div class="btn">调整</div>
-                </div>
-            </div>
-        </div>
-        <div class="edu">
-            <div class="left-user-info">
-                <div class="title">账户余额(¥)</div>
-                <div class="num">143.40 <span>元</span></div>
-                <div class="bi">
-                    <div>
-                        <p>竞卖额度</p>
-                        <p>¥500.000</p>
-                        <p>¥500.000可用</p>
-                    </div>
-                    <img :src="getImageUrl('user/caiwu/list2.png')" alt="" />
-                </div>
-            </div>
-            <div class="right-info">
-                <div class="title">
-                    <p
-                        class="cate-item"
-                        :class="item.cate == query1 ? 'active' : ''"
-                        v-for="item in list"
-                        :key="item.cate"
-                    >
-                        <span>{{ item.cate }}</span>
-                    </p>
-                </div>
-                <div class="element">
-                    <div>
-                        <span>调整额度：</span> <input type="text" placeholder="金额（RMB）" />
-                    </div>
-                    <p>竞买额度为153423，额度：余额=50:1</p>
-                    <div class="btn">调整</div>
-                </div>
-            </div>
-        </div>
-        <div class="edu">
-            <div class="left-user-info">
-                <div class="title">账户余额(¥)</div>
-                <div class="num">143.40 <span>元</span></div>
-                <div class="bi">
-                    <div>
-                        <p>竞卖额度</p>
-                        <p>¥500.000</p>
-                        <p>¥500.000可用</p>
-                    </div>
-                    <img :src="getImageUrl('user/caiwu/list2.png')" alt="" />
-                </div>
-            </div>
-            <div class="right-info">
-                <div class="title">
-                    <p
-                        class="cate-item"
-                        :class="item.cate == query2 ? 'active' : ''"
-                        v-for="item in list"
-                        :key="item.cate"
-                    >
-                        <span>{{ item.cate }}</span>
-                    </p>
-                </div>
-                <div class="element">
-                    <p>直接输入目标额度，系统将按照比例100：1自动续算人民币</p>
-                    <div>
-                        <span>调整额度：</span> <input type="text" placeholder="金额（RMB）" />
-                    </div>
-                    <h5>选择支付方式</h5>
-                    <div class="check">
-                        <a-checkbox v-model:checked="checked">微信</a-checkbox>
-                        <a-checkbox v-model:checked="checked">支付宝</a-checkbox>
-                        <a-checkbox v-model:checked="checked">汇款</a-checkbox>
-                    </div>
-                    <div class="btn">去支付</div>
-                </div>
+                <showModal ref="showModals" :titleList="list">
+                    <template v-slot:active2 v-if="params?.titleCate == list[0].cate">
+                        <div class="form">
+                            <a-form
+                                :model="formState"
+                                labelAlign="left"
+                                :label-col="{ span: 5 }"
+                                :wrapper-col="{ span: 14 }"
+                                @finish="handleFinish"
+                                @finishFailed="handleFinishFailed"
+                            >
+                                <a-form-item
+                                    :rules="[{ required: true, message: '额度不可为空' }]"
+                                    label="调整额度"
+                                    name="AdjustQuota"
+                                >
+                                    <a-input type="number" v-model:value="formState.AdjustQuota" />
+                                </a-form-item>
+                                <p
+                                    >{{ infos.details1.Quota }} ~
+                                    {{ infos.details1.AvailableQuotas }}</p
+                                >
+                                <p class="bottoms"
+                                    >竞买额度用于竞买藏品 , 余额 : 额度=1:{{
+                                        infos.details1.BiLi
+                                    }}</p
+                                >
+
+                                <a-form-item :wrapper-col="{ offset: 5, span: 14 }">
+                                    <a-button type="primary" html-type="submit">调整</a-button>
+                                </a-form-item>
+                            </a-form>
+                        </div>
+                    </template>
+                    <template v-slot:active2 v-if="params?.titleCate == list[1].cate">
+                        <div class="form">
+                            <a-form
+                                :model="formState"
+                                labelAlign="left"
+                                :label-col="{ span: 5 }"
+                                :wrapper-col="{ span: 14 }"
+                                @finish="handleFinishs"
+                                @finishFailed="handleFinishFailed"
+                            >
+                                <a-form-item
+                                    :rules="[{ required: true, message: '额度不可为空' }]"
+                                    label="调整额度"
+                                    name="ReduceQuota"
+                                >
+                                    <a-input type="number" v-model:value="formState.ReduceQuota" />
+                                </a-form-item>
+                                <p
+                                    >可用调整额度为 {{ infos.details2.TransBalanceQuota }} , 额度 :
+                                    余额={{ infos.details2.BiLi }}:1</p
+                                >
+                                <p class="bottoms" style="opacity: 0">345678</p>
+                                <a-form-item :wrapper-col="{ offset: 5, span: 14 }">
+                                    <a-button type="primary" html-type="submit">调整</a-button>
+                                </a-form-item>
+                            </a-form>
+                        </div>
+                    </template>
+                    <template v-slot:active2 v-if="params?.titleCate == list[2].cate">
+                        <div class="forms">
+                            <a-form
+                                :model="formState"
+                                labelAlign="left"
+                                :label-col="{ span: 0 }"
+                                :wrapper-col="{ span: 14 }"
+                                @finish="handleFinishss"
+                                @finishFailed="handleFinishFailed"
+                            >
+                                <p>直接输入目标额度,系统将自动按照比例100:1自动换算人民币</p>
+                                <a-form-item
+                                    :rules="[{ required: true, message: '额度不可为空' }]"
+                                    name="ReduceQuota"
+                                >
+                                    <a-input type="number" v-model:value="formState.ReduceQuota" />
+                                </a-form-item>
+                                <a-form-item name="resource">
+                                    <p class="bottoms">选择支付方式</p>
+                                    <a-radio-group v-model:value="formState.resource">
+                                        <a-radio value="1">微信</a-radio>
+                                        <a-radio value="2">支付宝</a-radio>
+                                        <a-radio value="3">汇款</a-radio>
+                                    </a-radio-group>
+                                </a-form-item>
+                                <a-form-item :wrapper-col="{ offset: 0, span: 14 }">
+                                    <a-button disabled="true" type="primary" html-type="submit"
+                                        >去支付</a-button
+                                    >
+                                </a-form-item>
+                            </a-form>
+                        </div>
+                    </template>
+                </showModal>
             </div>
         </div>
     </div>
 </template>
 <style scoped lang="less">
 /* 在这里添加你的 Less 样式 */
-.chongzhi {
-    width: 100%;
-
-    .edu {
-        padding: 20px 16px;
-        .flex-row;
-        gap: 10px;
-        align-items: flex-start;
-        justify-content: flex-start;
-        background-color: #fff;
-    }
-
+.edu {
+    padding: 20px 16px;
+    .flex-row;
+    gap: 10px;
+    align-items: flex-start;
+    justify-content: flex-start;
+    background-color: #fff;
+    border-radius: 10px;
     .left-user-info {
         border-radius: 12px;
         background-color: #f7f7f7;
         padding: 40px;
-        min-width: 434px;
+        min-width: 334px;
         .flex-col;
         gap: 10px;
         align-items: flex-start;
@@ -188,78 +290,39 @@ const query2 = ref('额度充值');
             }
         }
     }
-
     .right-info {
-        width: 100%;
+        flex: 1;
 
-        .title {
-            padding: 10px 10px 0;
-            .flex-row;
+        .ant-form {
+            padding: 30px 20px;
 
-            justify-content: flex-start;
-            background-color: #eef3f8;
-            border: none;
+            .ant-form-item-control {
+                margin-left: 0;
 
-            .cate-item {
-                padding: 16px 20px;
-
-                &.active {
-                    background-color: #fff;
-                    border-radius: 6px 6px 0 0;
-                    color: #9a0000;
-                    font-weight: 700;
+                .ant-btn {
+                    padding: 21px 50px;
+                    border-radius: 4;
                 }
             }
         }
 
-        .element {
-            .flex-col;
-            align-items: flex-start;
-            padding: 40px;
-            gap: 20px;
-
-            input {
-                width: 300px;
-                height: 40px;
-                border-radius: 12px;
-                border: 1px solid #dae1e8;
-            }
-
-            textarea {
-                width: 400px;
-                padding: 20px;
-                height: 100px;
-                border-radius: 12px;
-                border: 1px solid #dae1e8;
-            }
-
-            .btn {
-                padding: 20px 50px;
-                background-color: #9a0000;
-                color: #fff;
-            }
-        }
-
-        .card-list {
+        .form {
             margin-top: 30px;
-            .flex-row;
-            gap: 20px;
-
-            .card-item {
-                border-radius: 6px;
-                flex: 1;
-                .flex-col;
-                gap: 10px;
-                padding: 20px;
-                background-color: #fdf1dd;
-
-                img {
-                    width: 40px;
-                    height: 40px;
-                }
-
-                color: #ebba87;
-                font-weight: 700;
+            margin-left: 39px;
+            p {
+                margin-left: 140px;
+                margin-bottom: 10px;
+            }
+            .bottoms {
+                margin-bottom: 46px;
+            }
+        }
+        .forms {
+            p {
+                margin-bottom: 20px;
+            }
+            .bottoms {
+                margin-bottom: 10px;
             }
         }
     }
