@@ -42,10 +42,12 @@ const onCheckAllChange = () => {
 };
 //查看专场详情
 const showGoods = (item) => {
-    console.log(item);
     router.push({
         path: '/jingmai/show-goods',
-        query: {}
+        query: {
+            Id: item.Id,
+            SType: item.SType
+        }
     });
 };
 </script>

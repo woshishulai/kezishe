@@ -33,6 +33,7 @@ const showNav = (item) => {
     if (item.router == route.path) {
         active.value = 0;
     }
+    // active.value = 0;
 };
 const changeActive = (index) => {
     active.value = index;
@@ -179,11 +180,11 @@ const removeActive = () => {
         background-color: #fff;
         .con-main-wrap {
             display: flex;
-            justify-content: space-between;
+            // justify-content: space-between;
             align-items: flex-start;
             padding: 30px 0;
             .item {
-                flex: 1;
+                // flex: 1;
                 .flex-col;
                 align-items: flex-start;
                 gap: 20px;
@@ -204,7 +205,7 @@ const removeActive = () => {
                     flex-wrap: wrap;
                     justify-content: flex-start;
                     gap: 16px;
-                    height: 140px;
+                    height: 150px;
                     span {
                         color: #000;
                         font-weight: 600;

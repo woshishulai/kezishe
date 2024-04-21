@@ -103,7 +103,7 @@ const chooseImageUrl = async (e) => {
 
             h5 {
                 font-size: 20px;
-                width: 40px;
+                width: 46px;
             }
         }
     }

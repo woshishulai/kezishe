@@ -11,8 +11,9 @@ const props = defineProps({});
 const fetchData = ref([]);
 onMounted(async () => {
     try {
-        let res = await getZhuanChangHomeApi();
+        let res = await getZhuanChangHomeApi({ Types: 1 });
         fetchData.value = res.Data;
+        console.log(res, '这里呢');
     } catch (err) {
         console.log(err);
     }
