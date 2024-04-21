@@ -1,12 +1,22 @@
 <script setup>
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { getImageUrl } from '@/utils';
+import { getMenuList } from '@/request/shougou/api';
 import ShouGou from './ShouGou.vue';
+import { info } from '@/hooks/antd/message';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
-onMounted(() => {});
+const active = ref(0);
+const fetchData = ref({});
+onMounted(async () => {
+    try {
+        let res = await getMenuList(698887626106605568);
+        console.log(res);
+    } catch (error) {
+        info('error', error);
+    }
+});
 const showDetails = (item) => {
     router.push('/shougou/details');
 };
@@ -24,9 +34,7 @@ const showDetails = (item) => {
                             <p>ACQUISITION</p>
                         </div>
                         <div class="center">
-                            <div class="nav-item active" @click="router.push('/shougou')">
-                                收购资讯
-                            </div>
+                            <div class="nav-item"> 收购资讯 </div>
                             <div class="nav-item"> 集邮资讯 </div>
                         </div>
                     </div>

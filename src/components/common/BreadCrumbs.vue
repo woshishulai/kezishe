@@ -4,10 +4,15 @@ import { useRoute, useRouter } from 'vue-router';
 const route = useRoute();
 const router = useRouter();
 const nameList = ref(route.matched.map((routeRecord) => routeRecord.meta.name));
+nameList.value = nameList.value.filter((item) => {
+    return item && item != '' && item != undefined && item != null;
+});
 watch(
     () => route.matched.map((routeRecord) => routeRecord.meta.name),
     (newNames) => {
-        nameList.value = newNames;
+        nameList.value = newNames.filter((item) => {
+            return item && item != '' && item != undefined && item != null;
+        });
     }
 );
 

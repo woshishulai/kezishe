@@ -121,7 +121,7 @@ const afterOpenChanges = (bool) => {
             <Tables @close="afterOpenChange"></Tables>
         </a-drawer>
         <a-drawer
-            width="1220"
+            width="1300"
             v-model:open="isDraweTableList"
             :title="comInfo.title"
             placement="right"

@@ -1,59 +1,36 @@
+<script setup>
+import { ref, computed, reactive, onMounted, watchEffect } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
+import { getImageUrl } from '@/utils';
+const router = useRouter();
+const route = useRoute();
+const list = ref([]);
+const props = defineProps({
+    swiperList: {
+        type: Object,
+        default: []
+    }
+});
+onMounted(() => {});
+watchEffect(() => {
+    list.value = props?.swiperList;
+});
+</script>
+
 <template>
-    <a-carousel autoplay dot-position="left">
-        <div class="item">
+    <a-carousel
+        v-if="list.length"
+        autoplay
+        :slides-to-scroll="2"
+        :slides-to-show="2"
+        dot-position="left"
+    >
+        <div class="item" v-for="item in list" :key="item.Uid">
             <p>
-                <span>李小鱼</span>
-                <span>2，050</span>
-                <span>2023-01-23</span>
-                <span>10:30:11</span>
-            </p>
-            <p>
-                <span>李小鱼</span>
-                <span>2，050</span>
-                <span>2023-01-23</span>
-                <span>10:30:11</span>
-            </p>
-        </div>
-        <div class="item">
-            <p>
-                <span>李小鱼</span>
-                <span>2，050</span>
-                <span>2023-01-23</span>
-                <span>10:30:11</span>
-            </p>
-            <p>
-                <span>李小鱼</span>
-                <span>2，050</span>
-                <span>2023-01-23</span>
-                <span>10:30:11</span>
-            </p>
-        </div>
-        <div class="item">
-            <p>
-                <span>李小鱼</span>
-                <span>2，050</span>
-                <span>2023-01-23</span>
-                <span>10:30:11</span>
-            </p>
-            <p>
-                <span>李小鱼</span>
-                <span>2，050</span>
-                <span>2023-01-23</span>
-                <span>10:30:11</span>
-            </p>
-        </div>
-        <div class="item">
-            <p>
-                <span>李小鱼</span>
-                <span>2，050</span>
-                <span>2023-01-23</span>
-                <span>10:30:11</span>
-            </p>
-            <p>
-                <span>李小鱼</span>
-                <span>2，050</span>
-                <span>2023-01-23</span>
-                <span>10:30:11</span>
+                <span>{{ item.Unick }}</span>
+                <span>¥{{ item.MPrice }}</span>
+                <span>{{ item.CreateTime }}</span>
+                <span>{{ item.IpAddr }}</span>
             </p>
         </div>
     </a-carousel>
@@ -63,12 +40,15 @@
 :deep(.slick-slide) {
     overflow: hidden;
 }
+:deep(.slick-list) {
+    margin: 5px 0;
+}
 .item {
-    padding: 10px 40px;
+    padding: 5px 40px;
     p {
         display: flex;
-        gap: 30px;
-        line-height: 30px;
+        justify-content: space-between;
+        // line-height: 30px;
         color: #777;
     }
 }

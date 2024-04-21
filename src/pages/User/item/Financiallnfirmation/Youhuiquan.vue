@@ -3,36 +3,20 @@ import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
 import CatePage from '@/components/common/CatePage.vue';
+import { youHuiQuan } from '@/request/user/api';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
-onMounted(() => {});
-const list = [
-    {
-        title: '优惠券名称'
-    },
-    {
-        title: '张数'
-    },
-    {
-        title: '优惠券id'
-    },
-    {
-        title: '使用范围'
-    },
-    {
-        title: '使用条件'
-    },
-    {
-        title: '使用有效期/使用日期'
-    },
-    {
-        title: '当前状态'
-    },
-    {
-        title: '操作'
+const list = ref([]);
+onMounted(async () => {
+    try {
+        let res = await youHuiQuan();
+        console.log(res);
+    } catch (error) {
+        info('error', error);
     }
-];
+});
+
 const sharedOnCell = (_, index) => {
     if (index === 4) {
         return {

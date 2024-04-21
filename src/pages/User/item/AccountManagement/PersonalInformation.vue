@@ -142,7 +142,7 @@ const onFinish = async () => {
                     @finish="handleFinish"
                     @finishFailed="handleFinishFailed"
                     :model="formState"
-                    :label-col="{ span: 5 }"
+                    :label-col="{ span: 6 }"
                     :wrapper-col="{ span: 19 }"
                     :hide-required-mark="true"
                     autocomplete="off"
@@ -200,7 +200,7 @@ const onFinish = async () => {
                     @finishFailed="handleFinishFailed"
                     :rules="changeUserInfoCallRules"
                     :model="formState1"
-                    :label-col="{ span: 5 }"
+                    :label-col="{ span: 6 }"
                     :wrapper-col="{ span: 19 }"
                     autocomplete="off"
                     :hide-required-mark="true"
@@ -255,7 +255,7 @@ const onFinish = async () => {
                     <a-form-item label="电话" name="Mobile">
                         <a-input v-model:value.trim="formState1.Mobile" />
                     </a-form-item>
-                    <a-form-item :wrapper-col="{ span: 19, offset: 5 }">
+                    <a-form-item :wrapper-col="{ span: 19, offset: 6 }">
                         <a-button html-type="submit" type="primary">保存基本信息</a-button>
                     </a-form-item>
                 </a-form>

@@ -22,3 +22,10 @@ export const goodsListAPi = (params) =>
     instance.post(
         `Web/Auction/Query?Cate1=2&Cate2=0&Lid=655038971692191744&AuctionStatuses=1&AuctionBrands=1&CategoryIds=655035684737781760&Grades=&Sort=0&DateStart=&DateEnd=&TimeRange=0&PriceRange=0,N&PageSize=2&PageIndex=1`
     );
+
+//获取商品详情
+export const getGoodsDetails = (params) =>
+    instance.get(`Web/Auction/GoodInfo?Id=695276069955047424`);
+
+//获取收货地址
+export const getAddress = (params) => instance.get(`Web/Area/ExpressPrice`);

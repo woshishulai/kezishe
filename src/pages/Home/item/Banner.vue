@@ -143,7 +143,7 @@ const onChange = (current) => {
                     <div class="text-item" v-for="item in liuchengList" :key="item.text">
                         <div class="text-info">
                             <span class="num">{{ item.num }}</span>
-                            <p>{{ item.text1 }}</p>
+                            <p>{{ item.text1 || '' }}</p>
                             <p>{{ item.text2 }}</p>
                         </div>
                         <img :src="getImageUrl('home/jiantou-right.png')" alt="" />
@@ -285,7 +285,7 @@ const onChange = (current) => {
 
             .text-item {
                 .flex-row;
-                gap: 40px;
+                gap: 30px;
 
                 .text-info {
                     .flex-col;
@@ -301,10 +301,11 @@ const onChange = (current) => {
                         background: #f4f0f0;
                         margin-bottom: 10px;
                     }
-
                     p {
                         line-height: 20px;
                         font-size: 14px;
+                        letter-spacing: 0;
+                        height: 20px;
                     }
                 }
             }

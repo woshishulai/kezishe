@@ -25,3 +25,6 @@ export const eDuZhuanYUE = async (params) =>
 //转余额
 export const QuotaToBalanceFrom = async (params) =>
     instance.post(`/Member/RecordBidquota/QuotaToBalanceFrom?ReduceQuota=${params}`);
+
+//优惠券
+export const youHuiQuan = async (data) => instance.get(`/Member/Coupon/GetList`, data);

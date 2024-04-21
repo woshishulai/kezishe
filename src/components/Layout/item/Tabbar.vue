@@ -42,6 +42,10 @@ const changeActive = (index) => {
 const removeActive = () => {
     active.value = null;
 };
+const showPage = (item) => {
+    // console.log(item);
+    //   @click="router.push(item.router)"
+};
 </script>
 
 <template>

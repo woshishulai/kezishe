@@ -2,159 +2,71 @@
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
+import { getAddress } from '@/request/jingmai/index';
 import Swiper from '@/pages/Chengjiao/details/Swiper.vue';
 import Fixed from '@/pages/Chengjiao/details/Fixed.vue';
 import Item from '@/pages/Chengjiao/details/Item.vue';
 import FooterSwiper from '@/pages/Chengjiao/details/FooterSwiper.vue';
+import { info } from '@/hooks/antd/message';
 const props = defineProps({
     query: {
         type: Object,
         default: {
             addPrice: true
         }
+    },
+    goodsDtails: {
+        type: Object,
+        default: () => ({})
     }
 });
 const columns = [
     {
         title: '昵称',
-        dataIndex: 'name',
-        key: 'name',
+        dataIndex: 'Unick',
+        key: 'Unick',
         align: 'center'
     },
     {
         title: '出价',
-        dataIndex: 'price',
-        key: 'price',
+        dataIndex: 'MPrice',
+        key: 'MPrice',
         align: 'center'
     },
     {
-        title: '时间',
-        dataIndex: 'time',
-        key: 'time',
+        title: '出价时间',
+        dataIndex: 'CreateTime',
+        key: 'CreateTime',
         align: 'center'
     },
     {
         title: '地区',
-        dataIndex: 'address',
-        key: 'address',
+        dataIndex: 'IpAddr',
+        key: 'IpAddr',
         align: 'center'
     }
 ];
-const data = [
-    {
-        name: '张三',
-        price: '150',
-        time: '2023-10-44 09:10:22',
-        address: '河南'
-    },
-    {
-        name: '张三',
-        price: '150',
-        time: '2023-10-44 09:10:22',
-        address: '河南'
-    },
-    {
-        name: '张三',
-        price: '150',
-        time: '2023-10-44 09:10:22',
-        address: '河南'
-    },
-    {
-        name: '张三',
-        price: '150',
-        time: '2023-10-44 09:10:22',
-        address: '河南'
-    },
-    {
-        name: '张三',
-        price: '150',
-        time: '2023-10-44 09:10:22',
-        address: '河南'
-    },
-    {
-        name: '张三',
-        price: '150',
-        time: '2023-10-44 09:10:22',
-        address: '河南'
-    },
-    {
-        name: '张三',
-        price: '150',
-        time: '2023-10-44 09:10:22',
-        address: '河南'
-    },
-    {
-        name: '张三',
-        price: '150',
-        time: '2023-10-44 09:10:22',
-        address: '河南'
-    },
-    {
-        name: '张三',
-        price: '150',
-        time: '2023-10-44 09:10:22',
-        address: '河南'
-    },
-    {
-        name: '张三',
-        price: '150',
-        time: '2023-10-44 09:10:22',
-        address: '河南'
-    },
-    {
-        name: '张三',
-        price: '150',
-        time: '2023-10-44 09:10:22',
-        address: '河南'
-    },
-    {
-        name: '张三',
-        price: '150',
-        time: '2023-10-44 09:10:22',
-        address: '河南'
-    },
-    {
-        name: '张三',
-        price: '150',
-        time: '2023-10-44 09:10:22',
-        address: '河南'
-    },
-    {
-        name: '张三',
-        price: '150',
-        time: '2023-10-44 09:10:22',
-        address: '河南'
-    },
-    {
-        name: '张三',
-        price: '150',
-        time: '2023-10-44 09:10:22',
-        address: '河南'
-    },
-    {
-        name: '张三',
-        price: '150',
-        time: '2023-10-44 09:10:22',
-        address: '河南'
-    },
-    {
-        name: '张三',
-        price: '150',
-        time: '2023-10-44 09:10:22',
-        address: '河南'
-    },
-    {
-        name: '张三',
-        price: '150',
-        time: '2023-10-44 09:10:22',
-        address: '河南'
+const userPriceInfo = reactive({
+    address: '请选择地址',
+    addressPrice: '0.00'
+});
+const addressList = ref([]);
+onMounted(async () => {
+    try {
+        let res = await getAddress();
+        addressList.value = res.Data;
+    } catch (error) {
+        info('error', error);
     }
-];
-onMounted(() => {});
+});
 const value = ref(2055);
 const modal1Visible = ref(false);
 const setModal1Visible = (open) => {
     modal1Visible.value = open;
+};
+const changeAddress = (value, selectAddress) => {
+    console.log(value, selectAddress);
+    userPriceInfo.addressPrice = selectAddress[1].ExpressPrice;
 };
 </script>
 
@@ -162,10 +74,7 @@ const setModal1Visible = (open) => {
     <div class="chengjiao-details">
         <div class="left-wrap">
             <div class="show-img">
-                <a-image
-                    :width="400"
-                    src="https://zos.alipayobjects.com/rmsportal/jkjgkEfvpUPVyRjUImniVslZfWPnJuuZ.png"
-                />
+                <a-image :width="400" :src="props.goodsDtails?.BaseData?.Atlas || ''" />
             </div>
             <div class="switch-img">
                 <img class="nav" :src="getImageUrl('chengjiao/icon1.svg')" alt="" />
@@ -180,43 +89,41 @@ const setModal1Visible = (open) => {
         <div class="right-wrap">
             <div class="top">
                 <div class="title">
-                    <p class="label"> 成交#{{ 622616001 }} </p>
+                    <p class="label"> 成交#{{ props.goodsDtails?.BaseData?.Bn }} </p>
                     <div class="right-time">
                         <img :src="getImageUrl('chengjiao/icon5.png')" alt="" />
-                        <p>2023-09-25</p>
-                        <p>19:00:20</p>
+                        <p>{{ props.goodsDtails?.offerData?.Ontime }}</p>
                     </div>
                 </div>
+
                 <div class="center">
-                    <h5>纪72全运会总t公司首日实寄美国，加盖首日戳、纪念戳 </h5>
+                    <h5> {{ props.goodsDtails?.BaseData?.Title }} </h5>
                     <div class="element-list">
-                        <div v-if="props.query.addPrice">
+                        <div v-if="props.goodsDtails?.BaseData?.IsRating != 1">
                             <p class="element-item"
-                                >品级: {{ '全品' }}
+                                >品级: {{ props.goodsDtails?.BaseData?.Official }}
                                 <a-tooltip color="#9a0000">
                                     <template #title>我是提示文本</template>
                                     <img :src="getImageUrl('chengjiao/icon6.png')" alt="" />
                                 </a-tooltip>
                             </p>
                             <p class="element-item">
-                                品相描述：{{
-                                    '真的很不错这个古董快来买啊 青青子衿悠悠我心纵我不往子宁不嗣音'
-                                }}
+                                品相描述：{{ props.goodsDtails?.BaseData?.BDescriptionn }}
                             </p></div
                         >
                         <div v-else>
-                            <p class="element-item">评级公司: {{ '中邮' }} </p>
                             <p class="element-item"
-                                >分数: {{ '100' }}分
+                                >评级公司: {{ props.goodsDtails?.BaseData?.Ratings }}
+                            </p>
+                            <p class="element-item"
+                                >分数: {{ props.goodsDtails?.BaseData?.RatingScore }}分
                                 <a-tooltip color="#9a0000">
                                     <template #title>我是提示文本</template>
                                     <img :src="getImageUrl('chengjiao/icon6.png')" alt="" />
                                 </a-tooltip>
                             </p>
                             <p class="element-item">
-                                品相描述：{{
-                                    '真的很不错这个古董快来买啊 青青子衿悠悠我心纵我不往子宁不嗣音'
-                                }}
+                                品相描述：{{ props.goodsDtails?.BaseData?.BDescriptionn }}
                             </p></div
                         >
                     </div>
@@ -224,10 +131,10 @@ const setModal1Visible = (open) => {
             </div>
             <div class="price" v-if="props.query.addPrice">
                 成交价格
-                <p>¥{{ '2,050' }}</p>
+                <p>¥{{ props.goodsDtails?.offerData?.MakePrice }}</p>
             </div>
             <div class="prices" v-if="!props.query.addPrice">
-                <p class="num">¥ {{ value }}</p>
+                <p class="num">¥ {{ props.goodsDtails?.offerData?.MakePrice }}</p>
                 <div class="add-price">
                     <div class="change-price">
                         <a-button>-</a-button>
@@ -236,16 +143,66 @@ const setModal1Visible = (open) => {
                     </div>
                     <a-button class="add">出价</a-button>
                 </div>
-                <p class="label">¥ 2,100(成交价)</p>
-                <p class="label">¥ 2,100(服务费11%)</p>
-                <p class="label">配送至：上海 ¥12.00 (本商品由壳子社北京仓库为您发货)</p>
+                <p class="label">¥ {{ props.goodsDtails?.offerData?.MPrice || 3000 }}(当前出价)</p>
+                <div class="info">
+                    <p> ¥ {{ props.goodsDtails?.offerData?.MTips || 300 }}(当前出价服务费 ) </p>
+                    <a-tooltip color="#9a0000">
+                        <template #title>
+                            <div class="info-fuwu">
+                                <p
+                                    >服务费基础服务费{{
+                                        props.goodsDtails?.offerData?.Tips || 300
+                                    }}</p
+                                >
+                                <p
+                                    >服务费百分比{{
+                                        props.goodsDtails?.offerData?.TipsRate || 300
+                                    }}</p
+                                >
+                                <p
+                                    >服务费起征点{{
+                                        props.goodsDtails?.offerData?.TipsLevel || 300
+                                    }}</p
+                                >
+                                <p
+                                    >服务费提示信息{{
+                                        props.goodsDtails?.offerData?.TipsDes || 300
+                                    }}</p
+                                >
+                            </div>
+                        </template>
+                        <img
+                            style="cursor: pointer"
+                            :src="getImageUrl('chengjiao/icon6.png')"
+                            alt=""
+                        /> </a-tooltip
+                ></div>
+
+                {{ props.goodsDtails?.offerData?.TipsRate }}
+                <div class="info"
+                    >配送至:
+                    <a-dropdown :trigger="['click']">
+                        <a-cascader
+                            :field-names="{
+                                label: 'AreaName',
+                                value: 'AreaName',
+                                children: 'ChildList'
+                            }"
+                            @change="changeAddress"
+                            expand-trigger="hover"
+                            v-model:value="userPriceInfo.address"
+                            :options="addressList"
+                        />
+                    </a-dropdown>
+                    ¥{{ userPriceInfo.addressPrice }} (本商品由壳子社北京仓库为您发货)</div
+                >
             </div>
             <div class="record">
                 <div class="title-price">
-                    出价记录(45)
+                    出价记录({{ props.goodsDtails?.recomData?.length }})
                     <span class="more" @click="modal1Visible = true"> 更多 </span>
                 </div>
-                <Swiper></Swiper>
+                <Swiper :swiperList="props.goodsDtails?.recomData"></Swiper>
                 <a-modal
                     :footer="null"
                     v-model:open="modal1Visible"
@@ -255,9 +212,8 @@ const setModal1Visible = (open) => {
                     @ok="setModal1Visible(false)"
                 >
                     <a-table
-                        :scroll="{ x: 700, y: 600 }"
                         :pagination="false"
-                        :dataSource="data"
+                        :dataSource="props.goodsDtails?.recomData"
                         :columns="columns"
                     />
                 </a-modal>
@@ -380,6 +336,7 @@ const setModal1Visible = (open) => {
                 gap: 20px;
                 .change-price {
                     .flex-row;
+                    gap: 2px;
                     .ant-btn {
                         background-color: #e8e8e8;
                         width: 60px;
@@ -387,8 +344,8 @@ const setModal1Visible = (open) => {
                         border: none;
                     }
                     .ant-input {
-                        height: 54px;
                         width: 100px;
+                        text-align: center;
                         border: none;
                     }
                 }
@@ -402,6 +359,12 @@ const setModal1Visible = (open) => {
             }
             .label {
                 color: #101010;
+                margin-top: 20px;
+            }
+            .info {
+                .flex-row;
+                justify-content: flex-start;
+                gap: 10px;
                 margin-top: 20px;
             }
         }

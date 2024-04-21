@@ -502,9 +502,9 @@ const addRoutes = [
                 children: [
                     {
                         path: '',
-                        meta: {
-                            name: '收购资讯'
-                        },
+                        // meta: {
+                        //     // name: '收购资讯'
+                        // },
                         component: () => import('@/pages/Shougou/ShouGou.vue')
                     },
                     {
