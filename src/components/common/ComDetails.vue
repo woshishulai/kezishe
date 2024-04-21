@@ -2,7 +2,7 @@
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
-import { getAddress } from '@/request/jingmai/index';
+import { getAddress, addPriceApi } from '@/request/jingmai/index';
 import Swiper from '@/pages/Chengjiao/details/Swiper.vue';
 import Fixed from '@/pages/Chengjiao/details/Fixed.vue';
 import Item from '@/pages/Chengjiao/details/Item.vue';
@@ -67,6 +67,20 @@ const setModal1Visible = (open) => {
 const changeAddress = (value, selectAddress) => {
     console.log(value, selectAddress);
     userPriceInfo.addressPrice = selectAddress[1].ExpressPrice;
+};
+const addPriceBtn = async () => {
+    const query = {
+        Gid: '698192644647424000',
+        Unick: '小金',
+        MPrice: '400',
+        MType: '0'
+    };
+    try {
+        let res = await addPriceApi(query);
+        console.log(res, '出价格');
+    } catch (error) {
+        info('error', error);
+    }
 };
 </script>
 
@@ -141,7 +155,7 @@ const changeAddress = (value, selectAddress) => {
                         <a-input v-model:value="value"></a-input>
                         <a-button>+</a-button>
                     </div>
-                    <a-button class="add">出价</a-button>
+                    <a-button class="add" @click="addPriceBtn">出价</a-button>
                 </div>
                 <p class="label">¥ {{ props.goodsDtails?.offerData?.MPrice || 3000 }}(当前出价)</p>
                 <div class="info">

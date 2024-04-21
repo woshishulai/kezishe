@@ -12,6 +12,7 @@ const router = useRouter();
 const selector = ref('登录');
 const nikeNameList = ref([]);
 const user = useUserInfo();
+
 onMounted(async () => {
     try {
         if (user.userInfo.UserId) {

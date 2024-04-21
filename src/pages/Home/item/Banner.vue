@@ -1,5 +1,8 @@
 <script setup>
+import { useUserInfo } from '@/store/store';
 import { getImageUrl } from '@/utils/index';
+const user = useUserInfo();
+
 const textList = [
     {
         label: '《方寸乾坤-7月邮品精品专场》于7.29-31日与大家预期而约。'
@@ -78,6 +81,33 @@ const infoList = [
         shu: ''
     }
 ];
+const list = [
+    {
+        title: '我的竞买',
+        id: '',
+        key: ''
+    },
+    {
+        title: '我的关注',
+        id: '',
+        key: ''
+    },
+    {
+        title: '快速出价',
+        id: '',
+        key: ''
+    },
+    {
+        title: '一键委托',
+        id: '',
+        key: ''
+    },
+    {
+        title: '委托出售',
+        id: '',
+        key: ''
+    }
+];
 const onChange = (current) => {
     console.log(current);
 };
@@ -89,8 +119,8 @@ const onChange = (current) => {
             <div class="show-banner">
                 <div class="dynamic-wrap">
                     <div class="new-wrap">
-                        <h2>欢迎登录壳子社</h2>
-                        <div class="login-wrap">
+                        <h2 v-if="!user.userInfo.ApiToken">欢迎登录壳子社</h2>
+                        <div class="login-wrap" v-if="!user.userInfo.ApiToken">
                             <a-button>
                                 <img :src="getImageUrl('home/icon1.jpg')" alt="注册" />
                                 <span>注册</span>
@@ -99,6 +129,15 @@ const onChange = (current) => {
                                 <img :src="getImageUrl('home/icon2.png')" alt="登录" />
                                 <span>登录</span>
                             </a-button>
+                        </div>
+                        <div class="user-name" v-if="user.userInfo.ApiToken">
+                            <span> {{ user.userInfo.RealName }} </span>, 欢迎登录壳子社
+                        </div>
+                        <div class="nav-l" v-if="user.userInfo.ApiToken">
+                            <div class="nav-item" v-for="(item, index) in list" :key="index">
+                                <p></p>
+                                <span>{{ item.title }}</span>
+                            </div>
                         </div>
                         <div class="card-wrap">
                             <div class="top-info">
@@ -173,7 +212,7 @@ const onChange = (current) => {
         gap: 26px;
 
         .dynamic-wrap {
-            padding: 44px 20px 24px 20px;
+            padding: 24px 10px 24px;
             background: #c83327;
 
             .new-wrap {
@@ -188,7 +227,7 @@ const onChange = (current) => {
                     margin-top: 22px;
                     .flex-row;
                     justify-content: space-between;
-
+                    gap: 10px;
                     .ant-btn-default {
                         .flex-row;
                         background: #fcdca5;
@@ -198,6 +237,34 @@ const onChange = (current) => {
                         font-size: 22px;
                         color: #c83327;
                         font-weight: 600;
+                        border-radius: 6px;
+                    }
+                }
+                .user-name {
+                    margin-left: 20px;
+                    color: #fff;
+                    span {
+                        color: #fcdca5;
+                    }
+                }
+                .nav-l {
+                    margin-top: 20px;
+                    .flex-row;
+                    justify-content: space-between;
+                    color: #fff;
+                    .nav-item {
+                        flex: 1;
+                        cursor: pointer;
+                        .flex-col;
+                        height: 70px;
+                        border-radius: 10px;
+                        background-color: #ae3333;
+                        p {
+                            width: 40px;
+                            height: 40px;
+                            border-radius: 50%;
+                            background-color: #fff;
+                        }
                     }
                 }
             }

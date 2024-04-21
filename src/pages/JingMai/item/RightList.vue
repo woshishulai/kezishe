@@ -2,6 +2,8 @@
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
+import { info } from '@/hooks/antd/message';
+import { savaGoodsApi } from '@/request/jingmai/index';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
@@ -9,6 +11,21 @@ onMounted(() => {});
 const showList = ref(4);
 const changeShowList = (index) => {
     showList.value = index;
+};
+const saveGoods = async (item) => {
+    const query = {
+        Types: 1,
+        Gid: '662955610492375040'
+    };
+    try {
+        let res = await savaGoodsApi(query);
+        if (res.Tag == 1) {
+            info('success', res.Message);
+        }
+        console.log(res);
+    } catch (error) {
+        info('error', error);
+    }
 };
 </script>
 
@@ -47,7 +64,7 @@ const changeShowList = (index) => {
                     <p v-if="showList === 2">评级公司: PMG</p>
                     <div v-if="showList === 4" class="info"
                         ><span>分数: {{ 100 }} 分</span>
-                        <p>
+                        <p @click.stop="saveGoods(item)">
                             <span class="add">已收藏</span> <i class="iconfont icon-star active"></i
                         ></p>
                     </div>

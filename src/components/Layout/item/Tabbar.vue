@@ -30,21 +30,36 @@ watchEffect(async () => {
     // }
 });
 const showNav = (item) => {
-    if (item.router == route.path) {
+    if (item.router == '/jingmai') {
         active.value = 0;
     }
-    // active.value = 0;
 };
 const changeActive = (index) => {
     active.value = index;
-    console.log(tabbarList.value[active.value]);
 };
 const removeActive = () => {
     active.value = null;
 };
-const showPage = (item) => {
-    // console.log(item);
-    //   @click="router.push(item.router)"
+const showStamp = (item) => {
+    console.log(item);
+    if (item.TypeName == '邮票') {
+        router.push({
+            path: '/jingmai/stamp',
+            query: {
+                Id: item.Id
+            }
+        });
+    } else if (item.TypeName == '专场') {
+        router.push({
+            path: '/jingmai/',
+            query: {
+                Id: item.Id
+            }
+        });
+    }
+};
+const showStampGoods = (i) => {
+    console.log(i);
 };
 </script>
 
@@ -74,7 +89,11 @@ const showPage = (item) => {
             <div class="con-main-wrap">
                 <!-- //二级 -->
                 <div class="two-item" v-for="(item, index) in tabbarList" :key="item.Id">
-                    <li @mouseover="changeActive(index)" :class="active === index ? 'active' : ''">
+                    <li
+                        @mouseover="changeActive(index)"
+                        @click.stop="showStamp(item)"
+                        :class="active === index ? 'active' : ''"
+                    >
                         {{ item.TypeName }}</li
                     >
                 </div>
@@ -85,9 +104,12 @@ const showPage = (item) => {
                 <div class="item" v-for="item in tabbarList[active]?.Children">
                     <span class="san-name">{{ item.TypeName }}</span>
                     <div class="list">
-                        <span v-for="(i, index) in item.Children" :key="index">{{
-                            i.TypeName
-                        }}</span>
+                        <span
+                            v-for="(i, index) in item.Children"
+                            @click.stop="showStampGoods(i)"
+                            :key="index"
+                            >{{ i.TypeName }}</span
+                        >
                     </div>
                 </div>
             </div>

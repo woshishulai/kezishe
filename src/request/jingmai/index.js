@@ -29,3 +29,9 @@ export const getGoodsDetails = (params) =>
 
 //获取收货地址
 export const getAddress = (params) => instance.get(`Web/Area/ExpressPrice`);
+
+//藏品出价格
+export const addPriceApi = (data) => instance.post(`Web/Auction/BidSave`, data);
+
+//添加收藏
+export const savaGoodsApi = (data) => instance.post(`Web/Collect/Save`, data);
