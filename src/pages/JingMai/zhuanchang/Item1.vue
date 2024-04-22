@@ -31,7 +31,11 @@ const changeFormState = async (query) => {
     <div class="wrap">
         <Title :SpecialInfo="formState.SpecialInfo"></Title>
         <div class="con-wrap">
-            <LeftMenu @changeFormState="changeFormState"></LeftMenu>
+            <LeftMenu
+                :RatingCompanyType="formState.RatingCompanyType"
+                :BidderType="formState.BidderType"
+                @changeFormState="changeFormState"
+            ></LeftMenu>
             <RightList :goodsList="formState.GoodsList"></RightList>
         </div>
     </div>

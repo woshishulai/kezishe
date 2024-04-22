@@ -16,28 +16,6 @@ export const cateList = [
         label: '预展中'
     }
 ];
-export const catesList = [
-    {
-        value: '全选',
-        label: '全选'
-    },
-    {
-        value: '钱币类',
-        label: '钱币类'
-    },
-    {
-        value: '纪念系列--银 (118)',
-        label: '纪念系列--银 (118)'
-    },
-    {
-        value: '纪念系列--金 (11)',
-        label: '纪念系列--金 (11)'
-    },
-    {
-        value: '纪念系列--金 (11)',
-        label: '纪念系列--金 (11)'
-    }
-];
 export const cate2List = [
     {
         value: '全选',
@@ -113,36 +91,7 @@ export const cate6List = [
         label: '单列小圈'
     }
 ];
-export const cate7List = [
-    {
-        value: 'PMG',
-        label: 'PMG'
-    },
-    {
-        value: 'PSG',
-        label: 'PSG'
-    },
-    {
-        value: 'PCGS',
-        label: 'PCGS'
-    },
-    {
-        value: 'ASG',
-        label: 'ASG'
-    },
-    {
-        value: '中郎',
-        label: '中郎'
-    },
-    {
-        value: '源泰',
-        label: '源泰'
-    },
-    {
-        value: '信泰',
-        label: '信泰'
-    }
-];
+
 export const cate8List = [
     {
         value: '0',

@@ -1,20 +1,27 @@
 <script setup>
-import { ref, computed, reactive, onMounted } from 'vue';
+import { ref, computed, reactive, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import {
     cateList,
-    catesList,
     cate2List,
     cate3List,
     cate4List,
     cate5List,
     cate6List,
-    cate7List,
     cate8List
 } from '../data';
 const router = useRouter();
 const route = useRoute();
-const props = defineProps({});
+const props = defineProps({
+    RatingCompanyType: {
+        type: Array,
+        default: []
+    },
+    BidderType: {
+        type: Array,
+        default: []
+    }
+});
 const emits = defineEmits(['changeFormState']);
 const changeParams = () => {
     emits('changeFormState', state);
@@ -22,6 +29,7 @@ const changeParams = () => {
 onMounted(() => {
     changeParams();
 });
+//展开的项
 const activeKey = ref(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']);
 const state = reactive({
     Stype: route.query.SType,
@@ -31,7 +39,7 @@ const state = reactive({
     AuctionStatuses: 1, //藏品状态，1预展中、2竞买中，多个用逗号拼接
     AuctionBrands: 1, //藏品类型，1竞买、2一口价，多个用逗号拼接
     CategoryIds: 1, //藏品集合ID，下级分类,多个用逗号拼接
-    Grades: '', //品级集合，多个用逗号拼接
+    Grades: [], //品级集合，多个用逗号拼接
     Sort: 1, //排序，1结标时间、2价格高的、3价格低的、4热门的
     DateStart: '', //开始时间
     DateEnd: '', //结束时间
@@ -40,6 +48,27 @@ const state = reactive({
     PageSize: 10,
     PageIndex: 1
 });
+const treeSelectList = ref(['0-0']);
+//自定义字段
+const fieldNames = {
+    children: 'Children',
+    title: 'Value'
+};
+//树形勾选框
+const showCheckedList = (value) => {
+    console.log(value);
+    console.log(state);
+};
+watch(
+    state,
+    () => {
+        console.log(state);
+        changeParams();
+    },
+    {
+        deep: true
+    }
+);
 </script>
 
 <template>
@@ -52,12 +81,16 @@ const state = reactive({
             />
         </div>
         <a-collapse v-model:activeKey="activeKey">
-            <a-collapse-panel key="1" header="分类">
-                <a-checkbox-group
-                    v-model:value="state.value1"
-                    name="checkboxgrosssfffup"
-                    :options="catesList"
-                />
+            <a-collapse-panel key="1" header="分类" v-if="treeSelectList.length">
+                <a-tree
+                    v-model:expandedKeys="treeSelectList"
+                    v-model:selectedKeys="state.Grades"
+                    checkable
+                    @check="showCheckedList"
+                    :tree-data="props?.BidderType"
+                    :field-names="fieldNames"
+                >
+                </a-tree>
             </a-collapse-panel>
             <a-collapse-panel key="2" header="品级">
                 <a-checkbox-group
@@ -109,12 +142,16 @@ const state = reactive({
                     :options="cate6List"
                 />
             </a-collapse-panel>
-            <a-collapse-panel key="9" header="评级公司">
-                <a-radio-group
-                    v-model:value="state.value10"
-                    name="zhinlmlmkmfmmfedllssgxuanyige"
-                    :options="cate7List"
-                />
+            <a-collapse-panel key="9" header="评级公司" v-if="props?.RatingCompanyType">
+                <a-radio-group v-model:value="state.value10" name="radioGroup">
+                    <a-radio
+                        :value="item.Value"
+                        v-for="(item, index) in props.RatingCompanyType"
+                        :key="item.Key"
+                    >
+                        {{ item.Value }}
+                    </a-radio>
+                </a-radio-group>
             </a-collapse-panel>
             <a-collapse-panel key="7" header="分数">
                 <a-select

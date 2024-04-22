@@ -6,7 +6,12 @@ import { info } from '@/hooks/antd/message';
 import { savaGoodsApi } from '@/request/jingmai/index';
 const router = useRouter();
 const route = useRoute();
-const props = defineProps({});
+const props = defineProps({
+    goodsList: {
+        type: Array,
+        default: []
+    }
+});
 onMounted(() => {});
 const showList = ref(4);
 const changeShowList = (index) => {
@@ -51,7 +56,7 @@ const saveGoods = async (item) => {
             <div
                 class="goods-item"
                 @click="router.push('/jingmai/goods-details')"
-                v-for="(item, index) in 28"
+                v-for="(item, index) in props?.goodsList"
                 :key="index"
             >
                 <div class="top-img">
@@ -121,6 +126,7 @@ const saveGoods = async (item) => {
         .goods-item {
             flex: 1;
             min-width: 23%;
+            max-width: 276px;
             background-color: #f4f4f4;
             padding: 20px 16px;
             cursor: pointer;
