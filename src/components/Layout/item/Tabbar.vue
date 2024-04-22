@@ -30,8 +30,11 @@ watchEffect(async () => {
     // }
 });
 const showNav = (item) => {
+    console.log(item);
     if (item.router == '/jingmai') {
         active.value = 0;
+    } else {
+        active.value = null;
     }
 };
 const changeActive = (index) => {
@@ -41,7 +44,6 @@ const removeActive = () => {
     active.value = null;
 };
 const showStamp = (item) => {
-    console.log(item);
     if (item.TypeName == '邮票') {
         router.push({
             path: '/jingmai/stamp',

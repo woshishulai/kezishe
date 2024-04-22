@@ -12,7 +12,7 @@ onMounted(async () => {
     try {
         // let res = await getConfirmDetails({ id: route.query.id });
         let query = {
-            id: '698192685474779136'
+            id: route.query.id
         };
         let res = await getConfirmDetails(query);
         details.value = res.Data;
@@ -48,7 +48,7 @@ const columns = [
     },
 
     {
-        title: '藏品品味',
+        title: '藏品品位',
         dataIndex: 'Official',
         key: 'Official',
         align: 'center'
@@ -91,7 +91,7 @@ const returnStatus = (num) => {
 const changeStatus = async () => {
     try {
         let query = {
-            id: '698192685474779136'
+            id: route.query.id
         };
         let res = await confirmOrder(query);
         if (res.Tag == 1) {
@@ -108,14 +108,14 @@ const changeStatus = async () => {
         <Logo></Logo>
         <div class="titles"> 壳子社在线委托出售明细 </div>
         <div class="label"
-            ><span>委托方ID：{{ details.UserId }}</span>
+            ><span>委托方ID：{{ details?.UserId || '' }}</span>
             <p>
-                <span>状态：{{ details.Status == 1 ? '已确认' : '待确认' }}</span>
-                <span>合同编号：{{ details.Number }}</span>
+                <span>状态：{{ details?.Status == 1 ? '已确认' : '待确认' }}</span>
+                <span>合同编号：{{ details?.Number || '' }}</span>
             </p></div
         >
 
-        <a-table :pagination="false" :columns="columns" :data-source="details.ContractConfirmData">
+        <a-table :pagination="false" :columns="columns" :data-source="details?.ContractConfirmData">
             <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'Status'">
                     <span>{{ returnStatus(record.Status) }}</span>
@@ -123,7 +123,7 @@ const changeStatus = async () => {
             </template>
         </a-table>
         <div class="btn">
-            <a-button type="primary" v-if="details.Status != 1" @click="changeStatus"
+            <a-button type="primary" v-if="details?.Status != 1" @click="changeStatus"
                 >确认</a-button
             >
         </div>
@@ -133,7 +133,7 @@ const changeStatus = async () => {
 <style scoped lang="less">
 .wrap {
     height: 100vh;
-    width: 1050px;
+    width: 1250px;
     margin: 0 auto;
     color: #333;
     .titles {

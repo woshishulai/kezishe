@@ -32,22 +32,22 @@ const columns = [
     },
     {
         title: '汇款金额',
-        dataIndex: 'status',
-        key: 'status',
+        dataIndex: 'Prices',
+        key: 'Prices',
         align: 'center',
         width: '200px'
     },
     {
         title: '汇款日期',
-        dataIndex: 'Card',
-        key: 'Card',
+        dataIndex: 'Dates',
+        key: 'Dates',
         align: 'center',
         width: '200px'
     },
     {
         title: '汇款人',
-        dataIndex: 'status',
-        key: 'status',
+        dataIndex: 'UName',
+        key: 'UName',
         align: 'center',
         width: '200px'
     },
@@ -67,8 +67,8 @@ const columns = [
     },
     {
         title: '关联单号',
-        dataIndex: 'Card',
-        key: 'Card',
+        dataIndex: 'Uid',
+        key: 'Uid',
         align: 'center',
         width: '200px'
     },
@@ -97,6 +97,10 @@ onMounted(async () => {
 
 <template>
     <div class="tables">
+        <div class="titles">
+            <p> 汇款告知记录</p>
+            <span @click="emits('close')">X</span>
+        </div>
         <a-table
             :columns="columns"
             :scroll="{ x: '1200px' }"
@@ -104,24 +108,9 @@ onMounted(async () => {
             :data-source="tableList"
         >
             <template #bodyCell="{ column, record }">
-                <template v-if="column.key === 'Address'">
-                    <div class="address">
-                        <span>{{ record.Address }}</span>
-                        <span>&nbsp;&nbsp;</span>
-                        <span>{{ record.BankName }}</span>
-                        <span>&nbsp;&nbsp;</span>
-                        <span>{{ record.Branch }}</span>
-                    </div>
-                </template>
                 <template v-if="column.key === 'status'">
                     <div class="status">
-                        <span @click="openChangeParamsModel('修改银行账户信息', record)">修改</span>
-                        <span @click="openModel('确定删除该银行信息吗', record.Id)">删除</span>
-                        <span
-                            @click="changeDefault(record.Id)"
-                            :class="record.Default == 1 ? 'active' : ''"
-                            >{{ record.Default ? '默认账号' : '设为默认' }}
-                        </span>
+                        {{ '通过' }}
                     </div>
                 </template>
             </template>
@@ -132,5 +121,27 @@ onMounted(async () => {
 <style scoped lang="less">
 .tables {
     width: 100%;
+    .titles {
+        .flex-row;
+        justify-content: space-between;
+        padding: 5px 30px 25px;
+        p {
+            font-size: 20px;
+            font-weight: 600;
+        }
+        span {
+            font-size: 16px;
+            font-weight: 600;
+            color: #666;
+            cursor: pointer;
+        }
+    }
+    :deep(.ant-table-wrapper .ant-table-thead > tr > th) {
+        background-color: #eef3f8;
+    }
+    :deep(.ant-table-cell) {
+        font-size: 14px;
+    }
 }
 </style>
+<style></style>

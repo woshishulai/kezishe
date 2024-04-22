@@ -235,5 +235,16 @@ const changePage = (paramss) => {
     p {
         flex: 1;
     }
+    .news {
+        display: block;
+        color: #9a0000;
+        font-weight: 500;
+        letter-spacing: 0px;
+        margin-right: 13px;
+        font-size: 12px;
+        &.active {
+            opacity: 0;
+        }
+    }
 }
 </style>

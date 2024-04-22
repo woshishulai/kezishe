@@ -1,4 +1,7 @@
 import instance from '../index';
+//汇款银行
+export const bankList = async (data) => instance.get(`Member/RecordRemittance/Base`, data);
+
 //汇款信息告知单
 export const createRecordRemittance = async (data) =>
     instance.post(`/Member/RecordRemittance/Create`, data);

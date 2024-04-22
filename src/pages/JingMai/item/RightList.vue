@@ -15,7 +15,7 @@ const changeShowList = (index) => {
 const saveGoods = async (item) => {
     const query = {
         Types: 1,
-        Gid: '662955610492375040'
+        Gid: '702454216018366464'
     };
     try {
         let res = await savaGoodsApi(query);

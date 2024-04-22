@@ -11,28 +11,28 @@ const router = useRouter();
 const route = useRoute();
 const goodsList = ref([]);
 const props = defineProps({});
-// const formState = ref({});
+const formState = ref({});
 const getGoodsList = async (query) => {
     try {
         let res = await goodsListAPi(query);
-        console.log(res);
+        formState.value = res.Data;
+        console.log(formState.value, '藏品列表页');
     } catch (error) {
         info('error', error);
     }
 };
 
 const changeFormState = async (query) => {
-    // formState.value = query;
     getGoodsList(query);
 };
 </script>
 
 <template>
     <div class="wrap">
-        <Title></Title>
+        <Title :SpecialInfo="formState.SpecialInfo"></Title>
         <div class="con-wrap">
             <LeftMenu @changeFormState="changeFormState"></LeftMenu>
-            <RightList :goodsList="goodsList"></RightList>
+            <RightList :goodsList="formState.GoodsList"></RightList>
         </div>
     </div>
 </template>

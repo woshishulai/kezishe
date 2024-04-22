@@ -73,6 +73,7 @@ const handleFinish = async () => {
         let res = await BalanceToQuotaInfo(formState.AdjustQuota);
         console.log(res);
         if (res.Tag == 1) {
+            detailsInfo1();
             info('success', res.Message);
         }
     } catch (error) {
@@ -84,6 +85,7 @@ const handleFinishs = async () => {
         let res = await QuotaToBalanceFrom(formState.ReduceQuota);
         console.log(res);
         if (res.Tag == 1) {
+            detailsInfo2();
             info('success', res.Message);
         }
     } catch (error) {
@@ -226,7 +228,7 @@ const handleFinishss = async () => {
                                     </a-radio-group>
                                 </a-form-item>
                                 <a-form-item :wrapper-col="{ offset: 0, span: 14 }">
-                                    <a-button disabled="true" type="primary" html-type="submit"
+                                    <a-button :disabled="true" type="primary" html-type="submit"
                                         >去支付</a-button
                                     >
                                 </a-form-item>

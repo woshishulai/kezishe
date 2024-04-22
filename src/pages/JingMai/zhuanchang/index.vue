@@ -13,7 +13,7 @@ onMounted(async () => {
     try {
         let res = await getZhuanChangHomeApi({ Types: 1 });
         fetchData.value = res.Data;
-        console.log(res, '这里呢');
+        console.log(res, '专场首页 index 竞买 16行');
     } catch (err) {
         console.log(err);
     }

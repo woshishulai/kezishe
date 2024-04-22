@@ -122,6 +122,7 @@ const showDetails = async (record) => {
             <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'Title'">
                     <div class="title-item">
+                        <span class="news" :class="record.IsRead == 1 ? 'active' : ''">News</span>
                         <a-checkbox
                             @change.stop="showCheck(record)"
                             style="margin-right: 15px"

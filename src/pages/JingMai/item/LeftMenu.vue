@@ -24,6 +24,7 @@ onMounted(() => {
 });
 const activeKey = ref(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']);
 const state = reactive({
+    Stype: route.query.SType,
     Cate1: 1, //区分专场、类别、搜索列表 1专场 2类别列表 3关键词搜索
     Cate2: 0, //0是 1否 ，默认列表列表左侧参数不参与计算，
     Lid: route.query.Id || '', //传递当前请求专场或竞买类别ID 下称集合ID
@@ -36,20 +37,8 @@ const state = reactive({
     DateEnd: '', //结束时间
     TimeRange: 0, //结标时间，0全部、1一小时、6六小时、24当天
     PriceRange: 0, //价格区间 0,N 0,122
-    PageSize: 1,
+    PageSize: 10,
     PageIndex: 1
-    // value: ['竞买', '一口价', '预展'],
-    // value1: ['全选'],
-    // value2: [],
-    // value3: '结标时间',
-    // value4: ['竞买', '一口价', '周周转'],
-    // value5: '',
-    // value6: '',
-    // value7: '全部',
-    // value8: '0',
-    // value9: '多列大圈',
-    // value10: '',
-    // value11: '0'
 });
 </script>
 
