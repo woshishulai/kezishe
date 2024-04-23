@@ -119,7 +119,7 @@ const saveGoods = async (item) => {
     .goods-list {
         padding: 20px 0;
         display: flex;
-        justify-content: space-between;
+        // justify-content: space-between;
         flex-direction: row;
         flex-wrap: wrap;
         gap: 16px 8px;

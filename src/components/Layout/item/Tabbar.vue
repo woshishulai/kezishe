@@ -17,18 +17,7 @@ onMounted(async () => {
         console.log(err);
     }
 });
-watchEffect(async () => {
-    // if (route.path == '/jingmai') {
-    //     try {
-    //         let res = await getTabbatList();
-    //         tabbarList.value = res.Data;
-    //     } catch (err) {
-    //         console.log(err);
-    //     }
-    // } else {
-    //     tabbarList.value = [];
-    // }
-});
+
 const showNav = (item) => {
     console.log(item);
     if (item.router == '/jingmai') {
@@ -74,7 +63,13 @@ const showStampGoods = (i) => {
                 v-for="item in navList"
                 @mouseover="showNav(item)"
                 :key="item.title"
-                :class="route.path == item.router ? 'active' : ''"
+                :class="
+                    route.path == item.router ||
+                    route.path == item.children1 ||
+                    route.path == item.children2
+                        ? 'active'
+                        : ''
+                "
             >
                 <span class="item"
                     >{{ item.title }}

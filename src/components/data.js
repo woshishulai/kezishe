@@ -5,7 +5,9 @@ let navList = [
     },
     {
         title: '竞买',
-        router: '/jingmai'
+        router: '/jingmai',
+        children1: '/jingmai/',
+        children2: '/jingmai/stamp'
     },
     {
         title: '委托',

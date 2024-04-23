@@ -26,7 +26,7 @@ const onSubmit = () => {
     console.log('submit!', toRaw(formState));
 };
 const isDraweComponent = ref(false);
-const isDraweTableList = ref(true);
+const isDraweTableList = ref(false);
 // const isDraweComponent = ref(false);
 //切换线下汇款的
 const changeShowPage = (index) => {

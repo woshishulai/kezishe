@@ -25,8 +25,9 @@ const resetForm = () => {
     emits('close');
 };
 const handleChange = (value, option) => {
+    let type = formState.Types;
     formRef.value.resetFields();
-    console.log(value);
+    formState.Types = type;
 };
 const handleChanges = (value, option) => {
     console.log(value);
@@ -175,7 +176,7 @@ const handleFinish = async () => {
         }
     }
     .red {
-        color: #9a0000;
+        color: #ff4d4f;
     }
     :deep(.ant-form-item) {
         position: relative;

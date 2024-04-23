@@ -157,7 +157,7 @@ const changePage = (paramss) => {
 <template>
     <div class="mail">
         <div class="card-box">
-            <div class="title"> 我的竞买 </div>
+            <div class="title"> 信箱 </div>
             <show-modal ref="showModals" :titleList="list">
                 <template v-slot:active2>
                     <Receiving
