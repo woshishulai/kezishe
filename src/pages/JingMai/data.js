@@ -20,59 +20,59 @@ export const cateList1 = [
 ];
 export const cate2List = [
     {
-        value: '全选',
+        value: '1',
         label: '全选'
     },
     {
-        value: '完全未使用品',
+        value: '2',
         label: '完全未使用品'
     },
     {
-        value: '近未使用',
+        value: '3',
         label: '近未使用'
     },
     {
-        value: '极美品',
+        value: '4',
         label: '极美品'
     },
     {
-        value: '评级币',
+        value: '5',
         label: '评级币'
     }
 ];
 export const cate3List = [
     {
-        value: '结标时间',
+        value: '1',
         label: '结标时间'
     },
     {
-        value: '价格高的',
+        value: '2',
         label: '价格高的'
     },
     {
-        value: '价格低的',
+        value: '3',
         label: '价格低的'
     },
     {
-        value: '热门的',
+        value: '4',
         label: '热门的'
     }
 ];
 export const cate4List = [
     {
-        value: '全部',
+        value: '1',
         label: '全部'
     },
     {
-        value: '1小时',
+        value: '2',
         label: '1小时'
     },
     {
-        value: '6小时',
+        value: '3',
         label: '6小时'
     },
     {
-        value: '当天',
+        value: '4',
         label: '当天'
     }
 ];
@@ -85,11 +85,11 @@ export const cate5List = [
 ];
 export const cate6List = [
     {
-        value: '多列大圈',
+        value: '1',
         label: '多列大圈'
     },
     {
-        value: '单列小圈',
+        value: '2',
         label: '单列小圈'
     }
 ];

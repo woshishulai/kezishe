@@ -40,21 +40,21 @@ const state = reactive({
     Lid: route.query.Id || '', //传递当前请求专场或竞买类别ID 下称集合ID
     AuctionStatuses: '1,2', //藏品状态，1预展中、2竞买中，多个用逗号拼接
     AuctionBrands: '1,2', //藏品类型，1竞买、2一口价，多个用逗号拼接
-    CategoryIds: 1, //藏品集合ID，下级分类,多个用逗号拼接
-    Grades: [], //选中的 品级集合，多个用逗号拼接
-    Sort: 1, //排序，1结标时间、2价格高的、3价格低的、4热门的
+    CategoryIds: [], //藏品集合ID，下级分类,多个用逗号拼接
+    Grades: '1', //选中的 品级集合，多个用逗号拼接
+    Sort: '1', //排序，1结标时间、2价格高的、3价格低的、4热门的
     DateStart: '', //开始时间
     DateEnd: '', //结束时间
-    TimeRange: 0, //结标时间，0全部、1一小时、6六小时、24当天
-    PriceRange: 0, //价格区间 0,N 0,122
+    TimeRange: '1', //结标时间，0全部、1一小时、6六小时、24当天
+    PriceRange: '1', //价格区间 0,N 0,122
     PageSize: 10,
     PageIndex: 1
 });
 //自定义字段
 const fieldNames = {
     children: 'Children',
-    title: 'Value'
-    // key: 'Key'
+    title: 'Value',
+    key: 'Key'
 };
 //展开的节点
 const treeSelectList = ref(['']);
@@ -73,47 +73,47 @@ const showPriceList = (value) => {
 const selectTree = ref(['']);
 //树形集合分类 树形勾选框
 const showCheckedList = (value, options) => {
-    console.log(value);
     if (options.checkedNodes.length < 1) {
-        state.Grades = '';
+        state.CategoryIds = '';
     } else {
         let arr = options.checkedNodes.map((item) => {
             return item.Key;
         });
-        state.Grades = arr.join(',');
+        state.CategoryIds = arr.join(',');
     }
 };
-
-// watch(
-//     state,
-//     () => {
-//         // console.log(state);
-//         // changeParams();
-//     },
-//     {
-//         deep: true
-//     }
-// );
-// watch(
-//     props,
-//     () => {
-//         const cate = props.BidderType.map((item) => item.Key);
-//         const cateChildrenKeys = props.BidderType.flatMap((item) => {
-//             if (Array.isArray(item.Children)) {
-//                 return item.Children.filter((child) => child && child.Key).map(
-//                     (child) => child.Key
-//                 );
-//             }
-//             return [];
-//         });
-//         selectTree.value = cate.concat(cateChildrenKeys);
-//         state.Grades = selectTree.value.join(',');
-//     },
-//     { deep: true }
-// );
-
-//   v-model:expandedKeys="treeSelectList"
-//                 v-model:selectedKeys="selectTree"
+//品级
+const gradesList = ref(['1']);
+const showPriceLists = (value) => {
+    state.Grades = value.join(',');
+};
+watch(
+    state,
+    () => {
+        console.log(state, '请求的参数');
+        changeParams();
+    },
+    {
+        deep: true
+    }
+);
+watch(
+    props,
+    () => {
+        const cate = props.BidderType.map((item) => item.Key);
+        const cateChildrenKeys = props.BidderType.flatMap((item) => {
+            if (Array.isArray(item.Children)) {
+                return item.Children.filter((child) => child && child.Key).map(
+                    (child) => child.Key
+                );
+            }
+            return [];
+        });
+        selectTree.value = cate.concat(cateChildrenKeys);
+        state.CategoryIds = selectTree.value.join(',');
+    },
+    { deep: true }
+);
 </script>
 
 <template>
@@ -140,7 +140,9 @@ const showCheckedList = (value, options) => {
                     v-if="props.BidderType.length"
                     checkable
                     defaultExpandAll
+                    v-model:expandedKeys="expandeselectTreedKeys"
                     v-model:selectedKeys="selectTree"
+                    v-model:checkedKeys="selectTree"
                     @check="showCheckedList"
                     :tree-data="props?.BidderType"
                     :field-names="fieldNames"
@@ -149,13 +151,14 @@ const showCheckedList = (value, options) => {
             </a-collapse-panel>
             <a-collapse-panel key="2" header="品级">
                 <a-checkbox-group
-                    v-model:value="state.value2"
+                    v-model:value="gradesList"
                     name="checkboxgroufsfsssp"
                     :options="cate2List"
+                    @change="showPriceLists"
                 />
             </a-collapse-panel>
             <a-collapse-panel key="3" header="排序">
-                <a-radio-group v-model:value="state.value3" name="weism" :options="cate3List" />
+                <a-radio-group v-model:value="state.Sort" name="weism" :options="cate3List" />
             </a-collapse-panel>
             <a-collapse-panel key="5" header="时间">
                 <div class="times">
@@ -163,14 +166,14 @@ const showCheckedList = (value, options) => {
                         value-format="YYYY-MM-DD"
                         placeholder="开始时间"
                         id="kaishi"
-                        v-model:value="state.value5"
+                        v-model:value="state.DateStart"
                         style="width: 100%"
                     />
                     <a-date-picker
                         value-format="YYYY-MM-DD"
                         placeholder="结束时间"
                         id="jieshu"
-                        v-model:value="state.value6"
+                        v-model:value="state.DateEnd"
                         style="width: 100%"
                     />
                     <a-button type="primary">搜索</a-button>
@@ -178,14 +181,14 @@ const showCheckedList = (value, options) => {
             </a-collapse-panel>
             <a-collapse-panel key="6" header="结标">
                 <a-radio-group
-                    v-model:value="state.value7"
+                    v-model:value="state.TimeRange"
                     name="zhinengxuanyige"
                     :options="cate4List"
                 />
             </a-collapse-panel>
             <a-collapse-panel key="7" header="价格">
                 <a-select
-                    v-model:value="state.value8"
+                    v-model:value="state.PriceRange"
                     style="width: 100%"
                     :options="cate5List"
                 ></a-select>
