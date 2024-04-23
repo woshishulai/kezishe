@@ -84,36 +84,36 @@ const showCheckedList = (value, options) => {
     }
 };
 
-watch(
-    state,
-    () => {
-        console.log(state);
-        // changeParams();
-    },
-    {
-        deep: true
-    }
-);
-watch(
-    props,
-    () => {
-        const cate = props.BidderType.map((item) => item.Key);
-        console.log(cate, '父级的');
+// watch(
+//     state,
+//     () => {
+//         // console.log(state);
+//         // changeParams();
+//     },
+//     {
+//         deep: true
+//     }
+// );
+// watch(
+//     props,
+//     () => {
+//         const cate = props.BidderType.map((item) => item.Key);
+//         const cateChildrenKeys = props.BidderType.flatMap((item) => {
+//             if (Array.isArray(item.Children)) {
+//                 return item.Children.filter((child) => child && child.Key).map(
+//                     (child) => child.Key
+//                 );
+//             }
+//             return [];
+//         });
+//         selectTree.value = cate.concat(cateChildrenKeys);
+//         state.Grades = selectTree.value.join(',');
+//     },
+//     { deep: true }
+// );
 
-        const cateChildrenKeys = props.BidderType.flatMap((item) => {
-            if (Array.isArray(item.Children)) {
-                return item.Children.filter((child) => child && child.Key).map(
-                    (child) => child.Key
-                );
-            }
-            return [];
-        });
-        selectTree.value = cate.concat(cateChildrenKeys);
-        state.Grades = selectTree.value.join(',');
-        console.log(state);
-    },
-    { deep: true }
-);
+//   v-model:expandedKeys="treeSelectList"
+//                 v-model:selectedKeys="selectTree"
 </script>
 
 <template>
@@ -137,9 +137,10 @@ watch(
         <a-collapse v-model:activeKey="activeKey">
             <a-collapse-panel key="1" header="分类" v-if="treeSelectList.length">
                 <a-tree
-                    v-model:expandedKeys="treeSelectList"
-                    v-model:selectedKeys="selectTree"
+                    v-if="props.BidderType.length"
                     checkable
+                    defaultExpandAll
+                    v-model:selectedKeys="selectTree"
                     @check="showCheckedList"
                     :tree-data="props?.BidderType"
                     :field-names="fieldNames"
