@@ -1,19 +1,21 @@
 export const cateList = [
     {
-        value: '竞买',
+        value: '1',
+        label: '预展中'
+    },
+    {
+        value: '2',
+        label: '竞买中'
+    }
+];
+export const cateList1 = [
+    {
+        value: '1',
         label: '竞买'
     },
     {
-        value: '一口价',
+        value: '2',
         label: '一口价'
-    },
-    {
-        value: '预展',
-        label: '预展'
-    },
-    {
-        value: '预展中',
-        label: '预展中'
     }
 ];
 export const cate2List = [

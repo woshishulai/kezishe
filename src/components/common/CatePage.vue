@@ -36,6 +36,7 @@ const onChange = () => {
             @change="onChange"
             :showSizeChanger="true"
             v-model:pageSize="pageSize"
+            :hideOnSinglePage="true"
             v-model:current="page"
             :page-size-options="pageSizeOptions"
             :total="props.paginations.total"
@@ -46,6 +47,7 @@ const onChange = () => {
 .cate-page {
     .flex-row;
     padding: 25px 0;
+    height: 102px;
     :deep(.ant-pagination .ant-pagination-options-quick-jumper input) {
         width: 120px;
         text-align: center;

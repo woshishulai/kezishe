@@ -14,7 +14,7 @@ onMounted(() => {});
 </script>
 
 <template>
-    <div class="top-title">
+    <div class="top-title" v-if="props?.SpecialInfo?.Title">
         <div class="title">
             <h5>{{ props.SpecialInfo.Title }}</h5>
             <p>时间 : {{ props.SpecialInfo.Starttime }} - {{ props.SpecialInfo.Ontime }}</p>
