@@ -22,21 +22,13 @@ const props = defineProps({
         default: []
     }
 });
-const emits = defineEmits(['changeFormState']);
-const changeParams = () => {
-    emits('changeFormState', state);
-};
-onMounted(() => {
-    changeParams();
-});
-//展开的项
-const activeKey = ref(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']);
+const requestNum = ref(0);
 const state = reactive({
-    Stype: route.query.SType,
+    Stype: null,
     KeyWd: '', //名称搜索
-    Cate1: route.query.Cate1 || 1, //区分专场、类别、搜索列表 1专场 2类别列表 3关键词搜索
+    Cate1: null, //区分专场、类别、搜索列表 1专场 2类别列表 3关键词搜索
     Cate2: 1, //0是 1否 ，默认列表列表左侧参数不参与计算，
-    Lid: route.query.Id || '', //传递当前请求专场或竞买类别ID 下称集合ID
+    Lid: null, //传递当前请求专场或竞买类别ID 下称集合ID
     AuctionStatuses: '1,2', //藏品状态，1预展中、2竞买中，多个用逗号拼接
     AuctionBrands: '1,2', //藏品类型，1竞买、2一口价，多个用逗号拼接
     CategoryIds: '', //藏品集合ID，下级分类,多个用逗号拼接
@@ -47,6 +39,31 @@ const state = reactive({
     TimeRange: '0', //结标时间，0全部、1一小时、6六小时、24当天
     PriceRange: '0' //价格区间 0,N 0,122
 });
+const emits = defineEmits(['changeFormState']);
+const changeParams = () => {
+    emits('changeFormState', state);
+};
+watch(
+    () => route.query,
+    (newValue, oldValue) => {
+        console.log(route.query);
+        // state.Lid = newValue;
+        // requestNum.value++;
+        // if (requestNum.value >= 3) {
+        //     selectTree.value && selectTree.value.length >= 1
+        //         ? (state.CategoryIds = selectTree.value.join(','))
+        //         : (state.CategoryIds = '');
+        //     changeParams();
+        // }
+    }
+);
+
+onMounted(() => {
+    changeParams();
+});
+//展开的项
+const activeKey = ref(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']);
+
 //自定义字段
 const fieldNames = {
     children: 'Children',
@@ -92,14 +109,16 @@ const changeStart = (value) => {
 const changeEnd = (value) => {
     state.DateEnd = value;
 };
-const lid = computed(() => route.query.Id);
 watch(
     state,
     () => {
-        selectTree.value && selectTree.value.length >= 1
-            ? (state.CategoryIds = selectTree.value.join(','))
-            : (state.CategoryIds = '');
-        changeParams();
+        // requestNum.value++;
+        // if (requestNum.value >= 3) {
+        //     selectTree.value && selectTree.value.length >= 1
+        //         ? (state.CategoryIds = selectTree.value.join(','))
+        //         : (state.CategoryIds = '');
+        //     changeParams();
+        // }
     },
     {
         deep: true

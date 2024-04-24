@@ -201,9 +201,6 @@ const changePage = (paramss) => {
         font-weight: 500;
         font-family: 微软雅黑;
     }
-    .ant-checkbox-wrapper {
-        // opacity: 0;
-    }
 }
 :deep(.ant-table-row) {
     cursor: pointer;
