@@ -9,21 +9,35 @@ import { goodsListAPi } from '@/request/jingmai';
 import { info } from '@/hooks/antd/message';
 const router = useRouter();
 const route = useRoute();
-const goodsList = ref([]);
 const props = defineProps({});
+const postParams = ref({});
 const formState = ref({});
-const getGoodsList = async (query) => {
+const getGoodsList = async () => {
     try {
-        let res = await goodsListAPi(query);
+        let res = await goodsListAPi(postParams.value);
         formState.value = res.Data;
-        console.log(formState.value, '藏品列表页');
     } catch (error) {
         info('error', error);
     }
 };
 
-const changeFormState = async (query) => {
-    getGoodsList(query);
+const changeFormState = async (query, paginations) => {
+    if (!postParams.value) {
+        postParams.value = {};
+    }
+    if (query) {
+        Object.assign(postParams.value, query);
+    }
+    if (paginations) {
+        Object.assign(postParams.value, paginations);
+    } else {
+        Object.assign(postParams.value, {
+            PageSize: 10,
+            PageIndex: 1
+        });
+    }
+    console.log(postParams.value);
+    getGoodsList();
 };
 </script>
 
@@ -36,7 +50,10 @@ const changeFormState = async (query) => {
                 :BidderType="formState.BidderType"
                 @changeFormState="changeFormState"
             ></LeftMenu>
-            <RightList :goodsList="formState.GoodsList"></RightList>
+            <RightList
+                @changeFormState="changeFormState"
+                :goodsList="formState.GoodsList"
+            ></RightList>
         </div>
     </div>
 </template>

@@ -33,7 +33,7 @@ instance.interceptors.response.use(
         Loading.changeSpinning(false);
         //个人信息返回缺少tag
         res.data.Tag == 1
-            ? console.log('返回的数据', res.data, new Date().toLocaleTimeString())
+            ? ''
             : res.data.Tag == 2
               ? removeUserInfo()
               : info('error', res.data.Message);

@@ -14,15 +14,15 @@ export const useUserInfo = defineStore(
         const userNickName = ref({});
         const changeUserInfo = async (params) => {
             userInfo.value = Object.assign({}, userInfo.value, params);
-            console.log('更新的用户个人信息', userInfo.value);
+            // console.log('更新的用户个人信息', userInfo.value);
         };
         const changeUserTranslate = async (params) => {
             userTranslate.value = Object.assign({}, userTranslate.value, params);
-            console.log('更新的用户资料信息', userTranslate.value);
+            // console.log('更新的用户资料信息', userTranslate.value);
         };
         const changeUserNickName = async (params) => {
             userNickName.value = params;
-            console.log('更新的用户昵称信息', userNickName.value);
+            // console.log('更新的用户昵称信息', userNickName.value);
         };
         const removeUserInfo = async () => {
             userInfo.value = {};

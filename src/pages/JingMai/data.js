@@ -60,28 +60,30 @@ export const cate3List = [
 ];
 export const cate4List = [
     {
-        value: '1',
+        value: '0',
         label: '全部'
     },
     {
-        value: '2',
+        value: '1',
         label: '1小时'
     },
     {
-        value: '3',
+        value: '6',
         label: '6小时'
     },
     {
-        value: '4',
+        value: '24',
         label: '当天'
     }
 ];
 export const cate5List = [
-    { value: '0', label: '0-不限' },
+    { value: '0', label: '全部' },
     { value: '1', label: '0-100' },
-    { value: '2', label: '1-1000' },
-    { value: '3', label: '1000-10000' },
-    { value: '4', label: '10000-100000' }
+    { value: '2', label: '100-500' },
+    { value: '3', label: '500-2000' },
+    { value: '4', label: '2000-10000' },
+    { value: '5', label: '10000-100000' },
+    { value: '6', label: '100000-不限' }
 ];
 export const cate6List = [
     {

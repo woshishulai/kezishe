@@ -6,6 +6,10 @@ import { info } from '@/hooks/antd/message';
 import { savaGoodsApi } from '@/request/jingmai/index';
 const router = useRouter();
 const route = useRoute();
+const paginations = ref({
+    PageSize: 11,
+    PageIndex: 1
+});
 const props = defineProps({
     goodsList: {
         type: Array,
@@ -14,6 +18,7 @@ const props = defineProps({
 });
 
 onMounted(() => {});
+const emits = defineEmits(['changeFormState']);
 const showList = ref(4);
 const changeShowList = (index) => {
     showList.value = index;
@@ -21,17 +26,21 @@ const changeShowList = (index) => {
 const saveGoods = async (item) => {
     const query = {
         Types: 1,
-        Gid: '702454216018366464'
+        Gid: item.id
     };
     try {
         let res = await savaGoodsApi(query);
         if (res.Tag == 1) {
+            emits('changeFormState', paginations.value);
             info('success', res.Message);
         }
         console.log(res);
     } catch (error) {
         info('error', error);
     }
+};
+const changeParams = () => {
+    emits('changeFormState', paginations.value);
 };
 </script>
 
@@ -61,17 +70,21 @@ const saveGoods = async (item) => {
                 :key="index"
             >
                 <div class="top-img">
-                    <img :src="getImageUrl('jingmai/list/list2.png')" alt="" />
+                    <img :src="item.CoverImg" alt="" />
                 </div>
                 <div class="text-wrap">
-                    <h5>{{ '蓝颜 纯手工主人杯 升级版' }}</h5>
-                    <p class="price">¥{{ 299 }}</p>
-                    <p class="time">{{ '2023-10-23 10:23:20' }}</p>
+                    <h5>{{ item.Title }}</h5>
+                    <p class="price">¥{{ item.BasePrice }}</p>
+                    <p class="time">{{ item.Ontime }}</p>
                     <p v-if="showList === 2">评级公司: PMG</p>
                     <div v-if="showList === 4" class="info"
                         ><span>分数: {{ 100 }} 分</span>
-                        <p @click.stop="saveGoods(item)">
-                            <span class="add">已收藏</span> <i class="iconfont icon-star active"></i
+                        <p class="addgoods" @click.stop="saveGoods(item)">
+                            <span class="add"> {{ item.IsCollect == 1 ? '已收藏' : '收藏' }} </span>
+                            <i
+                                class="iconfont icon-star"
+                                :class="item.IsCollect == 1 ? 'active' : ''"
+                            ></i
                         ></p>
                     </div>
                     <p v-if="showList === 2" class="label"
@@ -84,7 +97,7 @@ const saveGoods = async (item) => {
                 </div>
             </div>
         </div>
-        <CatePage></CatePage>
+        <CatePage :paginations="paginations" @fetchList="changeParams"></CatePage>
     </div>
 </template>
 
@@ -139,7 +152,9 @@ const saveGoods = async (item) => {
                 padding: 20px;
                 background-color: #fff;
                 img {
-                    width: 100%;
+                    max-width: 100%;
+                    max-height: 217px;
+                    margin: 0 auto;
                 }
             }
             h5 {
@@ -172,12 +187,13 @@ const saveGoods = async (item) => {
     .flex-list {
         display: flex;
         flex-direction: row;
+        justify-content: space-between;
         flex-wrap: wrap;
         gap: 20px 16px;
         padding: 20px 0;
+        box-sizing: border-box;
         .goods-item {
-            min-width: 48%;
-            flex: 1;
+            width: 49.2%;
             display: flex;
             flex-direction: row;
             gap: 20px;
@@ -193,10 +209,14 @@ const saveGoods = async (item) => {
                 background-color: #fff;
                 padding: 20px;
                 img {
-                    width: 100%;
+                    max-width: 100%;
+                    max-height: 215px;
+                    margin: 0 auto;
                 }
             }
             .text-wrap {
+                width: 50%;
+                flex: 1;
                 display: flex;
                 flex-direction: column;
                 justify-content: space-around;
@@ -216,6 +236,12 @@ const saveGoods = async (item) => {
                     text-align: right;
                 }
             }
+        }
+    }
+    .goods-item:hover {
+        background: #fff;
+        .top-img {
+            background: #f4f4f4;
         }
     }
 }

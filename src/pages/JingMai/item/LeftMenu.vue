@@ -8,7 +8,6 @@ import {
     cate3List,
     cate4List,
     cate5List,
-    cate6List,
     cate8List
 } from '../data';
 const router = useRouter();
@@ -40,15 +39,13 @@ const state = reactive({
     Lid: route.query.Id || '', //传递当前请求专场或竞买类别ID 下称集合ID
     AuctionStatuses: '1,2', //藏品状态，1预展中、2竞买中，多个用逗号拼接
     AuctionBrands: '1,2', //藏品类型，1竞买、2一口价，多个用逗号拼接
-    CategoryIds: [], //藏品集合ID，下级分类,多个用逗号拼接
+    CategoryIds: '', //藏品集合ID，下级分类,多个用逗号拼接
     Grades: '1', //选中的 品级集合，多个用逗号拼接
     Sort: '1', //排序，1结标时间、2价格高的、3价格低的、4热门的
     DateStart: '', //开始时间
     DateEnd: '', //结束时间
-    TimeRange: '1', //结标时间，0全部、1一小时、6六小时、24当天
-    PriceRange: '1', //价格区间 0,N 0,122
-    PageSize: 10,
-    PageIndex: 1
+    TimeRange: '0', //结标时间，0全部、1一小时、6六小时、24当天
+    PriceRange: '0' //价格区间 0,N 0,122
 });
 //自定义字段
 const fieldNames = {
@@ -87,10 +84,21 @@ const gradesList = ref(['1']);
 const showPriceLists = (value) => {
     state.Grades = value.join(',');
 };
+//选择的时间
+const startTime = ref('');
+const endTime = ref('');
+const changeStart = (value) => {
+    state.DateStart = value;
+};
+const changeEnd = (value) => {
+    state.DateEnd = value;
+};
 watch(
     state,
     () => {
-        console.log(state, '请求的参数');
+        selectTree.value && selectTree.value.length >= 1
+            ? (state.CategoryIds = selectTree.value.join(','))
+            : (state.CategoryIds = '');
         changeParams();
     },
     {
@@ -99,7 +107,11 @@ watch(
 );
 watch(
     props,
-    () => {
+    (newValue) => {
+        // if (newValue.BidderType == props.BidderType) {
+        //     console.log('一样的');
+        //     return;
+        // }
         const cate = props.BidderType.map((item) => item.Key);
         const cateChildrenKeys = props.BidderType.flatMap((item) => {
             if (Array.isArray(item.Children)) {
@@ -110,7 +122,7 @@ watch(
             return [];
         });
         selectTree.value = cate.concat(cateChildrenKeys);
-        state.CategoryIds = selectTree.value.join(',');
+        // state.CategoryIds = selectTree.value.join(',');
     },
     { deep: true }
 );
@@ -135,12 +147,11 @@ watch(
             />
         </div>
         <a-collapse v-model:activeKey="activeKey">
-            <a-collapse-panel key="1" header="分类" v-if="treeSelectList.length">
+            <a-collapse-panel key="1" header="分类" v-if="props?.BidderType.length">
                 <a-tree
                     v-if="props.BidderType.length"
                     checkable
                     defaultExpandAll
-                    v-model:expandedKeys="expandeselectTreedKeys"
                     v-model:selectedKeys="selectTree"
                     v-model:checkedKeys="selectTree"
                     @check="showCheckedList"
@@ -166,14 +177,16 @@ watch(
                         value-format="YYYY-MM-DD"
                         placeholder="开始时间"
                         id="kaishi"
-                        v-model:value="state.DateStart"
+                        @change="changeStart"
+                        v-model:value="startTime"
                         style="width: 100%"
                     />
                     <a-date-picker
                         value-format="YYYY-MM-DD"
                         placeholder="结束时间"
                         id="jieshu"
-                        v-model:value="state.DateEnd"
+                        @change="changeEnd"
+                        v-model:value="endTime"
                         style="width: 100%"
                     />
                     <a-button type="primary">搜索</a-button>
@@ -193,14 +206,14 @@ watch(
                     :options="cate5List"
                 ></a-select>
             </a-collapse-panel>
-            <a-collapse-panel key="8" header="显示">
+            <!-- <a-collapse-panel key="8" header="显示">
                 <a-radio-group
                     v-model:value="state.value9"
                     name="zhinlmlmkmfmmfengxuanyige"
                     :options="cate6List"
                 />
-            </a-collapse-panel>
-            <a-collapse-panel key="9" header="评级公司" v-if="props?.RatingCompanyType">
+            </a-collapse-panel> -->
+            <a-collapse-panel key="9" header="评级公司" v-if="props?.RatingCompanyType.length">
                 <a-radio-group v-model:value="state.value10" name="radioGroup">
                     <a-radio
                         :value="item.Value"
