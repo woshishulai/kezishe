@@ -46,20 +46,15 @@ const changeParams = () => {
 watch(
     () => route.query,
     (newValue, oldValue) => {
-        console.log(route.query);
-        // state.Lid = newValue;
-        // requestNum.value++;
-        // if (requestNum.value >= 3) {
-        //     selectTree.value && selectTree.value.length >= 1
-        //         ? (state.CategoryIds = selectTree.value.join(','))
-        //         : (state.CategoryIds = '');
-        //     changeParams();
-        // }
-    }
+        state.Lid = route.query.Id;
+        state.Stype = route.query.SType;
+        state.Cate1 = route.query.Cate1 || 1;
+    },
+    { immediate: true, deep: true }
 );
 
 onMounted(() => {
-    changeParams();
+    // changeParams();
 });
 //展开的项
 const activeKey = ref(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']);
@@ -70,7 +65,6 @@ const fieldNames = {
     title: 'Value',
     key: 'Key'
 };
-//展开的节点
 //选择的状态 经脉中 预展中
 const statusList = ref(['1', '2']);
 //发生变化
@@ -83,11 +77,15 @@ const showPriceList = (value) => {
     state.AuctionBrands = value.join(',');
 };
 //选中了树形勾选
-const selectTree = ref(['']);
+const selectTree = ref([]);
 //树形集合分类 树形勾选框
 const showCheckedList = (value, options) => {
+    console.log(options);
     if (options.checkedNodes.length < 1) {
         state.CategoryIds = '';
+        //因为这个本身默认就是空的 我在获取到这个树后 将他们的每一项都添加到数组里 但是只有它有值我才传递
+        //本身是空的 所有需要我手动触发
+        changeParams();
     } else {
         let arr = options.checkedNodes.map((item) => {
             return item.Key;
@@ -109,20 +107,19 @@ const changeStart = (value) => {
 const changeEnd = (value) => {
     state.DateEnd = value;
 };
+//数据变化发起请求
 watch(
     state,
     () => {
-        // requestNum.value++;
-        // if (requestNum.value >= 3) {
-        //     selectTree.value && selectTree.value.length >= 1
+        if (!state.Stype) {
+            return;
+        }
+        changeParams();
+        //  selectTree.value && selectTree.value.length >= 1
         //         ? (state.CategoryIds = selectTree.value.join(','))
         //         : (state.CategoryIds = '');
-        //     changeParams();
-        // }
     },
-    {
-        deep: true
-    }
+    { immediate: true, deep: true }
 );
 //监听传过来的数据 给tree都勾选上
 watch(
@@ -132,6 +129,9 @@ watch(
         //     console.log('一样的');
         //     return;
         // }
+        if (selectTree.value.length) {
+            return;
+        }
         const cate = props.BidderType.map((item) => item.Key);
         const cateChildrenKeys = props.BidderType.flatMap((item) => {
             if (Array.isArray(item.Children)) {
@@ -142,7 +142,7 @@ watch(
             return [];
         });
         selectTree.value = cate.concat(cateChildrenKeys);
-        // state.CategoryIds = selectTree.value.join(',');
+        // selectValue.value = selectTree.value.join(',');
     },
     { deep: true }
 );

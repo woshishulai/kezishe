@@ -92,9 +92,9 @@ const codeRules = {
             trigger: 'change'
         },
         {
-            min: 4,
+            min: 1,
             max: 4,
-            message: '请输入长度为4位数的验证码',
+            message: '请输入验证码',
             trigger: 'change'
         },
         {

@@ -12,6 +12,10 @@ export const useUserInfo = defineStore(
         const userTranslate = ref({});
         //昵称
         const userNickName = ref({});
+        //记住我的手机号
+        const userPhoneList = ref([]);
+        //记住我的账号
+        const userNameList = ref([]);
         const changeUserInfo = async (params) => {
             userInfo.value = Object.assign({}, userInfo.value, params);
             // console.log('更新的用户个人信息', userInfo.value);
@@ -24,6 +28,18 @@ export const useUserInfo = defineStore(
             userNickName.value = params;
             // console.log('更新的用户昵称信息', userNickName.value);
         };
+        const addPhoneList = async (params) => {
+            let res = userPhoneList.value.includes(params);
+            if (!res) {
+                userPhoneList.value.push(params);
+            }
+        };
+        const addUserNameList = async (params) => {
+            let res = userNameList.value.includes(params);
+            if (!res) {
+                userNameList.value.push(params);
+            }
+        };
         const removeUserInfo = async () => {
             userInfo.value = {};
         };
@@ -33,16 +49,34 @@ export const useUserInfo = defineStore(
         const removeUserNickName = async () => {
             userNickName.value = {};
         };
+        const removePhoneList = async (params) => {
+            const index = userPhoneList.value.findIndex((item) => {
+                item == params;
+            });
+            userPhoneList.value.splice(index, 1);
+        };
+        const removeUserNameList = async (params) => {
+            const index = userNameList.value.findIndex((item) => {
+                item == params;
+            });
+            userNameList.value.splice(index, 1);
+        };
         return {
             userInfo,
             userTranslate,
             userNickName,
+            userPhoneList,
+            userNameList,
             changeUserInfo,
             changeUserTranslate,
             changeUserNickName,
+            addPhoneList,
+            addUserNameList,
             removeUserInfo,
             removeUserTranslate,
-            removeUserNickName
+            removeUserNickName,
+            removePhoneList,
+            removeUserNameList
         };
     },
     {

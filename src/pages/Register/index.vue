@@ -2,13 +2,37 @@
 import Logo from '@/components/common/Logo.vue';
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { getImageUrl } from '@/utils';
-import { message } from 'ant-design-vue';
-// import { rules } from './rules';
+//引入状态
+import { usePassword } from '@/store/store';
+import { getCodeLogin, registerLogin } from '@/request/api';
+import { handleFinishFailed } from '@/utils/form/rules';
+import { encryptionPassword } from '@/hooks/user';
+//获取状态接口
+import { getCodeParams } from '@/request/api';
+import { info } from '@/hooks/antd/message';
+const newCodeParams = usePassword();
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
-onMounted(() => {});
+onMounted(() => {
+    //状态过期就重新更新
+    const codeTime = newCodeParams.codePasswords.ExpireTime;
+    const currentTime = Date.now();
+    if (!codeTime || currentTime > codeTime) {
+        getCodeParamsApi();
+    }
+});
+const getCodeParamsApi = async () => {
+    try {
+        let res = await getCodeParams();
+        if (res.Tag == 1) {
+            console.log(res);
+            newCodeParams.changeCodePasswords(res.Data);
+        }
+    } catch (error) {
+        info('error', error);
+    }
+};
 const repasswords = (rule, value) => {
     return new Promise((resolve, reject) => {
         if (value === '') {
@@ -102,9 +126,9 @@ const rules = {
             trigger: 'change'
         },
         {
-            min: 4,
-            max: 4,
-            message: '请输入长度为4位数的验证码',
+            min: 1,
+            max: 200,
+            message: '请输入验证码',
             trigger: 'change'
         },
         {
@@ -120,6 +144,19 @@ const rules = {
     ],
     remember: [{ required: true, validator: remembers, trigger: ['change', 'blur'] }]
 };
+function getUuid() {
+    return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (Math.random() * 10) | 0;
+        return (c == 'x' ? r : (r & 0x3) | 0x8).toString();
+    });
+}
+getUuid();
+const uuid = ref(getUuid());
+const imageUrl = ref(`http://apikzs.sc798.com/Member/Logon/GetCaptchaImage?uuid=${uuid.value}`);
+const changeCodeImg = () => {
+    uuid.value = getUuid();
+    imageUrl.value = `http://apikzs.sc798.com/Member/Logon/GetCaptchaImage?uuid=${uuid.value}`;
+};
 const countdown = ref(0);
 const formState = reactive({
     phone: '',
@@ -129,7 +166,6 @@ const formState = reactive({
     newCode: '',
     remember: true
 });
-const info = (status, msg) => message[status](msg);
 const getPhone = () => {
     const phoneRegex = /^1[3456789]\d{9}$/;
     const phoneNumber = formState.phone;
@@ -139,23 +175,46 @@ const getPhone = () => {
     }
     return isPhoneValid;
 };
-const getCode = () => {
+const getCode = async () => {
     const isPhoneValid = getPhone();
     if (isPhoneValid) {
         countdown.value = 60;
-        // getPhoneCodeApi(formState.phone) //获取验证码的API
-        info('success', '验证码发送成功请输入验证码');
+        let query = {
+            Mobile: formState.phone,
+            SType: 1
+        };
+        let res = await getCodeLogin(query);
+        if (res.Tag == 1) {
+            info('success', '验证码发送成功请输入验证码');
+        } else {
+            info('error', res.Message);
+        }
         const interval = setInterval(() => {
             countdown.value > 0 ? countdown.value-- : clearInterval(interval);
         }, 1000);
     }
 };
-const onFinish = (values) => {
-    info('success', '注册成功请登录');
-    router.push('/');
-};
-const onFinishFailed = (errors) => {
-    errors.errorFields.forEach((field) => info('error', field.errors[0]));
+const onFinish = async (values) => {
+    let params = {
+        Password: formState.password
+    };
+    let querys = encryptionPassword(params, newCodeParams.codePasswords.PublicKey);
+    try {
+        let query = {
+            Mobile: formState.phone,
+            SmsCode: formState.code,
+            CaptchaCode: formState.newCode,
+            Uuid: uuid.value
+        };
+        query.Password = querys.Password;
+        let res = await registerLogin(query);
+        if (res.Tag == 1) {
+            info('success', res.Message);
+            router.push('/login');
+        }
+    } catch (error) {
+        info('error', error);
+    }
 };
 </script>
 
@@ -173,17 +232,20 @@ const onFinishFailed = (errors) => {
                     :wrapper-col="{ span: 10 }"
                     autocomplete="off"
                     @finish="onFinish"
-                    @finishFailed="onFinishFailed"
+                    @finishFailed="handleFinishFailed"
                 >
                     <a-form-item label="手机号" name="phone">
                         <a-input v-model:value.trim="formState.phone" />
                     </a-form-item>
 
                     <a-form-item label="密码" name="password">
-                        <a-input-password v-model:value.trim="formState.password" />
+                        <a-input-password autocomplete="" v-model:value.trim="formState.password" />
                     </a-form-item>
                     <a-form-item label="确认密码" name="repassword">
-                        <a-input-password v-model:value.trim="formState.repassword" />
+                        <a-input-password
+                            autocomplete=""
+                            v-model:value.trim="formState.repassword"
+                        />
                     </a-form-item>
 
                     <a-form-item label="短信校验码" name="code">
@@ -200,11 +262,11 @@ const onFinishFailed = (errors) => {
                     </a-form-item>
                     <a-form-item label="验证码" name="newCode">
                         <a-input v-model:value.trim="formState.newCode">
-                            <template #suffix>
+                            <template #addonAfter>
                                 <!-- 后端返回的验证码 -->
-                                <span class="get-password">
-                                    {{ 5432 }}
-                                </span>
+                                <div class="code-img" @click="changeCodeImg">
+                                    <img :src="imageUrl" alt="" />
+                                </div>
                             </template>
                         </a-input>
                     </a-form-item>
@@ -270,6 +332,18 @@ const onFinishFailed = (errors) => {
     }
     :deep(.ant-input-affix-wrapper) {
         background-color: #f4f4f4;
+    }
+    .code-img {
+        width: 94.5px;
+        height: 52px;
+        cursor: pointer;
+        background-color: #f3f3f3;
+        .flex-row;
+
+        img {
+            width: 100%;
+            height: 52px;
+        }
     }
 }
 </style>

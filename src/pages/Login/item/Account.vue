@@ -12,8 +12,8 @@ const user = useUserInfo();
 const newCodeParams = usePassword();
 const router = useRouter();
 const formState = reactive({
-    username: 'xiaoyu',
-    password: '123456',
+    username: '',
+    password: '',
     code: '',
     remember: true
 });
@@ -59,6 +59,7 @@ const handleFinish = async () => {
     query.UserName = formState.username;
     let res = await submitLoginApi(query);
     if (res.Tag == 1) {
+        user.addUserNameList(formState.username);
         user.changeUserInfo(res.Data);
         router.push('/');
     }
@@ -81,9 +82,8 @@ const handleFinish = async () => {
                             v-for="(item, index) in user.userNameList"
                             :key="index"
                         >
-                            <span>账号</span>
                             <p @click="formState.username = item">{{ item }}</p>
-                            <CloseOutlined @click="user.removeNameList(item)" />
+                            <CloseOutlined @click="user.removeUserNameList(item)" />
                         </div>
                     </div>
                 </template>

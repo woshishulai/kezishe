@@ -2,7 +2,7 @@
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { codeRules } from './rules';
-import { message } from 'ant-design-vue';
+import { info } from '@/hooks/antd/message';
 import {
     UserOutlined,
     LockOutlined,
@@ -10,21 +10,35 @@ import {
     CloseOutlined
 } from '@ant-design/icons-vue';
 import { useUserInfo } from '@/store/store';
-import { handleFinishFailed } from '@/utils/form/rules.js';
+import { getCodeLogin, phoneCodeLogin } from '@/request/api';
+import { handleFinishFailed } from '@/utils/form/rules';
 const user = useUserInfo();
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
 const countdown = ref(0);
-onMounted(() => {});
+
 const formState = reactive({
     phone: '',
     phoneCode: '',
     code: '',
     remember: true
 });
+
+function getUuid() {
+    return 'xxxxxxxxxxxx4xxxyxxxxxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        var r = (Math.random() * 10) | 0;
+        return (c == 'x' ? r : (r & 0x3) | 0x8).toString();
+    });
+}
+getUuid();
+const uuid = ref(getUuid());
+const imageUrl = ref(`http://apikzs.sc798.com/Member/Logon/GetCaptchaImage?uuid=${uuid.value}`);
+const changeCodeImg = () => {
+    uuid.value = getUuid();
+    imageUrl.value = `http://apikzs.sc798.com/Member/Logon/GetCaptchaImage?uuid=${uuid.value}`;
+};
 const visible = ref(false);
-const info = (status, msg) => message[status](msg);
 const getPhone = () => {
     const phoneRegex = /^1[3456789]\d{9}$/;
     const phoneNumber = formState.phone;
@@ -34,18 +48,44 @@ const getPhone = () => {
     }
     return isPhoneValid;
 };
-const getCode = () => {
+const getCode = async () => {
     const isPhoneValid = getPhone();
     if (isPhoneValid) {
         countdown.value = 60;
-        info('success', '验证码发送成功请输入验证码');
+        let query = {
+            Mobile: formState.phone,
+            SType: 1
+        };
+        let res = await getCodeLogin(query);
+        if (res.Tag == 1) {
+            info('success', '验证码发送成功请输入验证码');
+        } else {
+            info('error', res.Message);
+        }
         const interval = setInterval(() => {
             countdown.value > 0 ? countdown.value-- : clearInterval(interval);
         }, 1000);
     }
 };
-const handleFinish = (values) => {
+const handleFinish = async (values) => {
+    let query = {
+        Mobile: formState.phone,
+        SmsCode: formState.phoneCode,
+        CaptchaCode: formState.code,
+        Uuid: uuid.value
+    };
+    try {
+        let res = await phoneCodeLogin(query);
+        if (res.Tag == 1) {
+            user.changeUserInfo(res.Data);
+            router.push('/');
+            info('success', res.Message);
+        }
+    } catch (error) {
+        info('error', error);
+    }
     formState.remember == true ? user.addPhoneList(formState.phone) : '';
+    return;
     info('success', '登录成功');
     router.push('/');
 };
@@ -68,7 +108,6 @@ const handleFinish = (values) => {
                                 v-for="(item, index) in user.userPhoneList"
                                 :key="index"
                             >
-                                <span>手机号码</span>
                                 <p @click="formState.phone = item">{{ item }}</p>
                                 <CloseOutlined @click="user.removePhoneList(item)" />
                             </div>
@@ -99,11 +138,11 @@ const handleFinish = (values) => {
                     <template #prefix>
                         <CheckCircleOutlined style="color: rgba(0, 0, 0, 1.25)" />
                     </template>
-                    <template #suffix>
+                    <template #addonAfter>
                         <!-- 后端返回的验证码 -->
-                        <span class="get-password">
-                            {{ 5432 }}
-                        </span>
+                        <div class="code-img" @click="changeCodeImg">
+                            <img :src="imageUrl" alt="" />
+                        </div>
                     </template>
                 </a-input>
             </a-form-item>
@@ -120,25 +159,25 @@ const handleFinish = (values) => {
 </template>
 
 <style scoped lang="less">
-.show-name-list {
-    .flex-col;
-    align-items: flex-start;
-    font-size: 16px;
-
-    .name-item {
-        .flex-row;
-        justify-content: space-between;
+.code {
+    .code-img {
+        width: 94.5px;
+        height: 52px;
         cursor: pointer;
-        width: 200px;
-        padding: 10px 0;
+        background-color: #f3f3f3;
+        .flex-row;
 
-        span {
-            font-size: 14px;
-        }
-
-        &:hover {
-            color: #9a0000;
+        img {
+            width: 100%;
+            height: 52px;
         }
     }
+}
+:deep(.ant-btn-primary:disabled) {
+    color: #fff;
+}
+.name-item {
+    .flex-row;
+    justify-content: space-between;
 }
 </style>

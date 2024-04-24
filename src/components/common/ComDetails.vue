@@ -117,18 +117,30 @@ const changeActive = (index) => {
                 <a-carousel arrows>
                     <template #prevArrow>
                         <div class="custom-slick-arrow" style="left: 10px; z-index: 1">
-                            <left-circle-outlined />
+                            <img
+                                class="swiper-nav"
+                                :src="getImageUrl('chengjiao/icon1.svg')"
+                                alt=""
+                            />
                         </div>
                     </template>
                     <template #nextArrow>
                         <div class="custom-slick-arrow" style="right: 10px">
-                            <right-circle-outlined />
+                            <img
+                                class="swiper-nav"
+                                :src="getImageUrl('chengjiao/icon2.svg')"
+                                alt=""
+                            />
                         </div>
                     </template>
-                    <div><h3>1</h3></div>
-                    <div><h3>2</h3></div>
-                    <div><h3>3</h3></div>
-                    <div><h3>4</h3></div>
+                    <div class="img-itme">
+                        <img
+                            v-for="(item, index) in props.goodsDtails?.BaseData?.Atlas.split(';')"
+                            :key="index"
+                            :src="item"
+                            alt=""
+                        />
+                    </div>
                 </a-carousel>
             </div>
         </div>
@@ -290,10 +302,14 @@ const changeActive = (index) => {
                 }
             }
         }
+
         .switch-img {
             padding: 20px 0 0;
             :deep(.ant-carousel) {
                 width: 100%;
+            }
+            .swiper-nav {
+                width: 30px;
             }
         }
     }

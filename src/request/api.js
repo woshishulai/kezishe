@@ -4,7 +4,17 @@ import instance from './index';
 export const getTabbatList = async () => instance.get('/Web/Auction/Columns');
 
 //登录
-export const submitLoginApi = async (data) => instance.post('/Member/Logon/LoginPwd', data);
+export const submitLoginApi = async (data) => instance.post('/Web/Logon/LoginPwd', data);
+
+//手机验证码登录
+export const phoneCodeLogin = async (data) => instance.post('/Web/Logon/LoginByMobile', data);
+
+//获取短信验证码
+export const getCodeLogin = async (data) =>
+    instance.post(`Web/Logon/GetMobileCode?Mobile=${data.Mobile}&SType=${data.SType}`);
+
+//账号注册
+export const registerLogin = async (data) => instance.post('/Web/Logon/SignUp', data);
 
 //用户资料完成度
 export const getUserDetailsApi = async () => instance.get('/Member/User/ProfileInfo');
