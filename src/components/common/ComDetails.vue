@@ -82,22 +82,54 @@ const addPriceBtn = async () => {
         info('error', error);
     }
 };
+//切换预览图片
+const visible = ref(false);
+//选中的图片
+const active = ref(0);
+const changeActive = (index) => {
+    active.value = index;
+};
 </script>
 
 <template>
     <div class="chengjiao-details">
         <div class="left-wrap">
-            <div class="show-img">
-                <a-image :width="400" :src="props.goodsDtails?.BaseData?.Atlas || ''" />
+            <div class="show-img" v-if="props.goodsDtails?.BaseData?.Atlas">
+                <a-image
+                    :preview="{ visible: false }"
+                    :width="400"
+                    @click="visible = true"
+                    :src="props.goodsDtails?.BaseData?.Atlas.split(';')[active]"
+                />
+            </div>
+            <div style="display: none">
+                <a-image-preview-group
+                    :preview="{ visible, onVisibleChange: (vis) => (visible = vis) }"
+                >
+                    <a-image
+                        v-for="(item, index) in props.goodsDtails?.BaseData?.Atlas.split(';')"
+                        :key="index"
+                        :src="item"
+                    />
+                </a-image-preview-group>
             </div>
             <div class="switch-img">
-                <img class="nav" :src="getImageUrl('chengjiao/icon1.svg')" alt="" />
-                <div class="img-list">
-                    <div class="img-item" v-for="(item, index) in 5" :key="index">
-                        <img :src="getImageUrl('chengjiao/list1.png')" alt="" />
-                    </div>
-                </div>
-                <img class="nav" :src="getImageUrl('chengjiao/icon2.svg')" alt="" />
+                <a-carousel arrows>
+                    <template #prevArrow>
+                        <div class="custom-slick-arrow" style="left: 10px; z-index: 1">
+                            <left-circle-outlined />
+                        </div>
+                    </template>
+                    <template #nextArrow>
+                        <div class="custom-slick-arrow" style="right: 10px">
+                            <right-circle-outlined />
+                        </div>
+                    </template>
+                    <div><h3>1</h3></div>
+                    <div><h3>2</h3></div>
+                    <div><h3>3</h3></div>
+                    <div><h3>4</h3></div>
+                </a-carousel>
             </div>
         </div>
         <div class="right-wrap">
@@ -244,6 +276,7 @@ const addPriceBtn = async () => {
     display: flex;
     flex-direction: row;
     gap: 15px;
+
     .left-wrap {
         width: 500px;
         .show-img {
@@ -258,30 +291,9 @@ const addPriceBtn = async () => {
             }
         }
         .switch-img {
-            display: flex;
-            flex-direction: row;
-            gap: 10px;
             padding: 20px 0 0;
-            .nav {
-                width: 30px;
-                cursor: pointer;
-            }
-            .img-list {
-                flex: 1;
-                .flex-row;
-                gap: 10px;
-                .img-item {
-                    flex: 1;
-                    .flex-row;
-                    width: 60px;
-                    height: 60px;
-                    padding: 10px;
-                    border: 2px solid #9a0000;
-                    cursor: pointer;
-                    img {
-                        width: 100%;
-                    }
-                }
+            :deep(.ant-carousel) {
+                width: 100%;
             }
         }
     }

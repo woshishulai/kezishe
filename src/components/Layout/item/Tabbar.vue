@@ -19,7 +19,6 @@ onMounted(async () => {
 });
 
 const showNav = (item) => {
-    console.log(item);
     if (item.router == '/jingmai') {
         active.value = 0;
     } else {
@@ -34,12 +33,13 @@ const removeActive = () => {
 };
 const showStamp = (item) => {
     if (item.TypeName == '邮票') {
-        router.push({
-            path: '/jingmai/stamp',
-            query: {
-                Id: item.Id
-            }
-        });
+        return;
+        // router.push({
+        //     path: '/jingmai/show-stamp-goods    ',
+        //     query: {
+        //         Id: item.Id
+        //     }
+        // });
     } else if (item.TypeName == '专场') {
         router.push({
             path: '/jingmai/',
@@ -50,7 +50,14 @@ const showStamp = (item) => {
     }
 };
 const showStampGoods = (i) => {
-    console.log(i);
+    router.push({
+        path: '/jingmai/show-stamp-goods',
+        query: {
+            Id: i.Id,
+            SType: 1,
+            Cate1: 2
+        }
+    });
 };
 </script>
 

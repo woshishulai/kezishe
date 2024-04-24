@@ -45,7 +45,7 @@ const changeParams = () => {
 </script>
 
 <template>
-    <div class="right-list">
+    <div class="right-list" v-if="props?.goodsList.length">
         <div class="title">
             <span></span>
             <h5>全部藏品列表</h5>
@@ -62,16 +62,26 @@ const changeParams = () => {
                 ></i>
             </div>
         </div>
-        <div :class="showList === 4 ? 'goods-list' : 'flex-list'">
+        <div
+            :class="[
+                showList === 4 ? 'goods-list' : 'flex-list',
+                props?.goodsList.length >= 4 ? '' : 'active'
+            ]"
+        >
             <div
                 class="goods-item"
-                @click="router.push('/jingmai/goods-details')"
+                @click="router.push('/jingmai/goods-details?id=' + item.Id)"
                 v-for="(item, index) in props?.goodsList"
                 :key="index"
             >
-                <div class="top-img">
-                    <img :src="item.CoverImg" alt="" />
-                </div>
+                <a-popover placement="rightBottom">
+                    <template #content>
+                        <img :src="item.CoverImg" alt="" />
+                    </template>
+                    <div class="top-img">
+                        <img :src="item.CoverImg" alt="" />
+                    </div>
+                </a-popover>
                 <div class="text-wrap">
                     <h5>{{ item.Title }}</h5>
                     <p class="price">¥{{ item.BasePrice }}</p>
@@ -80,7 +90,9 @@ const changeParams = () => {
                     <div v-if="showList === 4" class="info"
                         ><span>分数: {{ 100 }} 分</span>
                         <p class="addgoods" @click.stop="saveGoods(item)">
-                            <span class="add"> {{ item.IsCollect == 1 ? '已收藏' : '收藏' }} </span>
+                            <span class="add">
+                                {{ item.IsCollect == 1 ? '已收藏' : '收藏' }}
+                            </span>
                             <i
                                 class="iconfont icon-star"
                                 :class="item.IsCollect == 1 ? 'active' : ''"
@@ -99,6 +111,7 @@ const changeParams = () => {
         </div>
         <CatePage :paginations="paginations" @fetchList="changeParams"></CatePage>
     </div>
+    <a-empty class="right-list" v-else />
 </template>
 
 <style scoped lang="less">
@@ -133,14 +146,18 @@ const changeParams = () => {
     .goods-list {
         padding: 20px 0;
         display: flex;
-        // justify-content: space-between;
+        justify-content: space-between;
         flex-direction: row;
         flex-wrap: wrap;
-        gap: 16px 8px;
+        gap: 16px 0;
+        &.active {
+            gap: 16px 15px;
+            justify-content: flex-start;
+        }
         .goods-item {
             flex: 1;
-            min-width: 23%;
-            max-width: 276px;
+            // min-width: 23%;
+            max-width: 24%;
             background-color: #f4f4f4;
             padding: 20px 16px;
             cursor: pointer;
@@ -239,10 +256,11 @@ const changeParams = () => {
         }
     }
     .goods-item:hover {
-        background: #fff;
-        .top-img {
-            background: #f4f4f4;
-        }
+        border-color: transparent;
+        box-shadow:
+            0 1px 2px -2px rgba(0, 0, 0, 0.16),
+            0 3px 6px 0 rgba(0, 0, 0, 0.12),
+            0 5px 12px 4px rgba(0, 0, 0, 0.09);
     }
 }
 </style>

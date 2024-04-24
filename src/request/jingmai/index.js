@@ -14,8 +14,7 @@ export const goodsListAPi = (params) =>
 //     );
 
 //获取商品详情
-export const getGoodsDetails = (params) =>
-    instance.get(`Web/Auction/GoodInfo?Id=695276069955047424`);
+export const getGoodsDetails = (params) => instance.get(`Web/Auction/GoodInfo?Id=${params}`);
 
 //获取收货地址
 export const getAddress = (params) => instance.get(`Web/Area/ExpressPrice`);

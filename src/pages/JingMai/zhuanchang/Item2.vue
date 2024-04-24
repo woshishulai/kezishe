@@ -11,14 +11,15 @@ const props = defineProps({});
 const goodsDtails = ref({});
 onMounted(async () => {
     try {
-        let res = await getGoodsDetails();
+        let res = await getGoodsDetails(route.query.id);
         goodsDtails.value = res.Data;
+        console.log(goodsDtails.value, '商品详情页');
     } catch (error) {
         info('error', error);
     }
 });
 const query = {
-    addPrice: false
+    addPrice: true
 };
 </script>
 

@@ -347,14 +347,16 @@ const addRoutes = [
                         meta: {
                             name: '藏品展示'
                         },
-                        component: () => import('@/pages/JingMai/youpiao/Item1.vue')
+                        component: () => import('@/pages/JingMai/zhuanchang/Item1.vue')
+                        // component: () => import('@/pages/JingMai/youpiao/Item1.vue')
                     },
                     {
                         path: 'stamp-goods-details',
                         meta: {
                             name: '藏品详情'
                         },
-                        component: () => import('@/pages/JingMai/youpiao/Item2.vue')
+                        component: () => import('@/pages/JingMai/zhuanchang/Item2.vue')
+                        // component: () => import('@/pages/JingMai/youpiao/Item2.vue')
                     }
                 ]
             },

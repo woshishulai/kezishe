@@ -36,23 +36,25 @@ const changeFormState = async (query, paginations) => {
             PageIndex: 1
         });
     }
-    console.log(postParams.value);
+    if (!route.query.Id) {
+        return;
+    }
     getGoodsList();
 };
 </script>
 
 <template>
     <div class="wrap">
-        <Title :SpecialInfo="formState.SpecialInfo"></Title>
+        <Title :SpecialInfo="formState?.SpecialInfo"></Title>
         <div class="con-wrap">
             <LeftMenu
-                :RatingCompanyType="formState.RatingCompanyType"
-                :BidderType="formState.BidderType"
+                :RatingCompanyType="formState?.RatingCompanyType"
+                :BidderType="formState?.BidderType"
                 @changeFormState="changeFormState"
             ></LeftMenu>
             <RightList
                 @changeFormState="changeFormState"
-                :goodsList="formState.GoodsList"
+                :goodsList="formState?.GoodsList"
             ></RightList>
         </div>
     </div>

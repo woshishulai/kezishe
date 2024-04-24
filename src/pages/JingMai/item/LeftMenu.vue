@@ -34,7 +34,7 @@ const activeKey = ref(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11'])
 const state = reactive({
     Stype: route.query.SType,
     KeyWd: '', //名称搜索
-    Cate1: 1, //区分专场、类别、搜索列表 1专场 2类别列表 3关键词搜索
+    Cate1: route.query.Cate1 || 1, //区分专场、类别、搜索列表 1专场 2类别列表 3关键词搜索
     Cate2: 1, //0是 1否 ，默认列表列表左侧参数不参与计算，
     Lid: route.query.Id || '', //传递当前请求专场或竞买类别ID 下称集合ID
     AuctionStatuses: '1,2', //藏品状态，1预展中、2竞买中，多个用逗号拼接
@@ -54,7 +54,6 @@ const fieldNames = {
     key: 'Key'
 };
 //展开的节点
-const treeSelectList = ref(['']);
 //选择的状态 经脉中 预展中
 const statusList = ref(['1', '2']);
 //发生变化
@@ -93,6 +92,7 @@ const changeStart = (value) => {
 const changeEnd = (value) => {
     state.DateEnd = value;
 };
+const lid = computed(() => route.query.Id);
 watch(
     state,
     () => {
@@ -105,6 +105,7 @@ watch(
         deep: true
     }
 );
+//监听传过来的数据 给tree都勾选上
 watch(
     props,
     (newValue) => {
