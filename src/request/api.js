@@ -22,6 +22,9 @@ export const getUserDetailsApi = async () => instance.get('/Member/User/ProfileI
 //个人信息
 export const getUserInfoApi = async () => instance.get('/Member/User/PersonInfo');
 
+//个人等级
+export const getUserLevel = async (data) => instance.post(`/Member/UserLevel/Info`);
+
 //获取oss签名
 export const getOssALiBaBaApi = async (data) =>
     instance.post(`/File/GetSignature?fileModule=${data.fileModule}&fileName=${data.fileName}`);

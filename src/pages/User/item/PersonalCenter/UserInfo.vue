@@ -29,7 +29,7 @@ const showGrand = () => {
                 <img :src="getImageUrl('jingmai/list/list2.png')" alt="" />
                 <div class="element-info">
                     <div class="element-top">
-                        <h5>{{ user.userInfo.RealName }}</h5>
+                        <h5 v-if="user.userInfo.RealName">{{ user.userInfo.RealName }}</h5>
                         <p>客户编号: {{ user.userInfo.UserId }}</p>
                     </div>
                     <p class="show-grade" @click="showGrand">{{ '五钻三星' }}</p>

@@ -2,59 +2,73 @@
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
+import { getUserLevel } from '@/request/api';
+import { info } from '@/hooks/antd/message';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
-onMounted(() => {});
-const list = [
+const fetchData = ref([
     {
-        title: '竞买',
-        num: 5,
-        label: '五钻会员',
-        chengzhang: '成长值',
-        chengzhang1: '9266',
-        baoji: '',
-        baoji1: '6184',
-        time: '',
         image: 'user/zuanshi.png'
     },
     {
-        title: '委托',
-        num: 3,
-        label: '',
-        chengzhang: '',
-        baoji: '',
-        time: '',
         image: 'user/wjx.png'
     }
-];
+]);
+onMounted(async () => {
+    try {
+        let res = await getUserLevel();
+        if (res.Tag == 1) {
+            fetchData.value[0].Title = res.Data.JingMai.Title; //等级秒速s
+            fetchData.value[0].Level = res.Data.JingMai.Level; //等级
+            fetchData.value[0].GrowthValue = res.Data.JingMai.GrowthValue; //成长值
+            fetchData.value[0].ProtectionValue = res.Data.JingMai.ProtectionValue; //保级
+            fetchData.value[0].PromotionValue = res.Data.JingMai.PromotionValue; //晋级
+            fetchData.value[0].EffectiveDate = res.Data.JingMai.EffectiveDate; //有效期
+            fetchData.value[1].Title = res.Data.WeiTuo.Title; //等级秒速
+            fetchData.value[1].Level = res.Data.WeiTuo.Level; //等级
+            fetchData.value[1].GrowthValue = res.Data.WeiTuo.GrowthValue; //成长值
+            fetchData.value[1].ProtectionValue = res.Data.WeiTuo.ProtectionValue; //保级
+            fetchData.value[1].PromotionValue = res.Data.WeiTuo.PromotionValue; //晋级
+            fetchData.value[1].tiEffectiveDatetle = res.Data.WeiTuo.EffectiveDate; //有效期
+
+            info('success', res.Message);
+        }
+    } catch (error) {
+        info('error', error);
+    }
+});
 </script>
 
 <template>
     <div class="show-grand">
         <div
             class="card-box"
-            v-for="item in list"
-            :key="item.title"
+            v-for="item in fetchData"
+            :key="item.Title"
             :style="{ backgroundImage: 'url(' + getImageUrl(item.image) + ')' }"
-            :class="item.title == '委托' ? 'active' : ''"
+            :class="item.Title == '委托' ? 'active' : ''"
         >
-            <h5>{{ item.title }}</h5>
-            <div class="icons">
-                <img
-                    v-for="i in item.num"
-                    :key="i"
-                    :src="getImageUrl(item.title === '委托' ? 'user/xing.jpg' : 'user/zuan.jpg')"
-                    alt=""
-                />
+            <div class="shang">
+                <h5>{{ item.Title }}</h5>
+                <div class="icons">
+                    <img
+                        v-for="i in 5"
+                        :key="i"
+                        :src="
+                            getImageUrl(item.Title === '委托' ? 'user/xing.jpg' : 'user/zuan.jpg')
+                        "
+                        alt=""
+                    />
+                </div>
+                <div class="info"> {{ item.Level }} </div>
             </div>
-            <div class="info"> 五星会员 </div>
             <div class="text">
-                <p>成长值: 9266</p>
-                <p>保级还需: 6184</p>
-                <p>晋级还需: 6184</p>
+                <p>成长值: {{ item.GrowthValue }}</p>
+                <p>保级还需: {{ item.ProtectionValue }}</p>
+                <p>晋级还需: {{ item.PromotionValue }}</p>
             </div>
-            <div class="time"> 会员有效期至 2024.02.09 </div>
+            <div class="time"> 会员有效期至 {{ item.EffectiveDate }} </div>
         </div>
     </div>
 </template>
@@ -67,6 +81,9 @@ const list = [
     padding: 80px 60px;
     background-color: #fff;
     .card-box {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
         width: 471px;
         height: 253px;
         background-size: 100% 100%;
@@ -89,13 +106,11 @@ const list = [
             font-size: 16px;
         }
         .text {
-            margin-top: 18px;
             p {
-                margin-bottom: 6px;
+                margin: 7px 0;
             }
         }
         .time {
-            margin-top: 29px;
         }
     }
 }
