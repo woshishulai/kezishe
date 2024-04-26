@@ -1,13 +1,17 @@
 <script setup>
-import { ref, computed, reactive, onMounted } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
+import { ref, computed, reactive, onMounted, watchEffect } from 'vue';
+import { useRouter, useRoute, routerKey } from 'vue-router';
 import { getImageUrl } from '@/utils';
-import { getAddress, addPriceApi } from '@/request/jingmai/index';
+import { getAddress, addPriceApi, removePriceApi } from '@/request/jingmai/index';
 import Swiper from '@/pages/Chengjiao/details/Swiper.vue';
 import Fixed from '@/pages/Chengjiao/details/Fixed.vue';
 import Item from '@/pages/Chengjiao/details/Item.vue';
 import FooterSwiper from '@/pages/Chengjiao/details/FooterSwiper.vue';
 import { info } from '@/hooks/antd/message';
+import { watch } from 'vue';
+import { useUserInfo } from '@/store/store';
+const user = useUserInfo();
+const route = useRoute();
 const props = defineProps({
     query: {
         type: Object,
@@ -59,36 +63,181 @@ onMounted(async () => {
         info('error', error);
     }
 });
-const value = ref(2055);
+//出价 代理价
+const isFirstPrice = ref(false);
+//更新 代理价
+const newFirstPrice = ref(false);
+const emits = defineEmits(['getGoodsDetailsFn']);
+//最低出价的范围
+const startPrice = ref(0);
+//出价的价格
+const value = ref(0);
 const modal1Visible = ref(false);
 const setModal1Visible = (open) => {
     modal1Visible.value = open;
 };
-const changeAddress = (value, selectAddress) => {
-    console.log(value, selectAddress);
-    userPriceInfo.addressPrice = selectAddress[1].ExpressPrice;
+//减去价格
+const reducePrice = () => {
+    //每次操作 重新赋值加价格的范围
+    const priceAllList = props.goodsDtails?.offerData?.Jiajia;
+    const getItem = priceAllList.find((item) => Number(item.Mmax) > value.value);
+    startPrice.value = Number(getItem.Jiajia);
+    if (value.value - startPrice.value <= props.goodsDtails?.offerData?.MakePrice) {
+        value.value = props.goodsDtails?.offerData?.MakePrice + startPrice.value;
+    } else {
+        value.value = value.value - startPrice.value;
+    }
 };
+//加价格
+const addPrice = () => {
+    const priceAllList = props.goodsDtails?.offerData?.Jiajia;
+    const getItem = priceAllList.find((item) => Number(item.Mmax) > value.value);
+    startPrice.value = Number(getItem.Jiajia);
+    value.value = Number(value.value) + startPrice.value;
+};
+//输入价格
+const changePrice = () => {
+    if (value.value < props.goodsDtails?.offerData?.MakePrice + Number(startPrice.value)) {
+        value.value = props.goodsDtails?.offerData?.MakePrice + Number(startPrice.value);
+    }
+    console.log(value.value);
+};
+//出价
 const addPriceBtn = async () => {
     const query = {
-        Gid: '698192644647424000',
-        Unick: '小金',
-        MPrice: '400',
-        MType: '0'
+        Gid: route.query.id,
+        Unick: user.userNickName.NickName,
+        MPrice: value.value,
+        MType: isFirstPrice.value ? '1' : '0'
     };
     try {
         let res = await addPriceApi(query);
-        console.log(res, '出价格');
+        if (res.Tag == 1) {
+            info('success', res.Message);
+            emits('getGoodsDetailsFn');
+        }
     } catch (error) {
         info('error', error);
     }
 };
+//取消价格
+const removeDaiLiPrice = async () => {
+    const query = {
+        Gid: route.query.id,
+        ProxyId: props.goodsDtails?.offerData?.DaiLiInfo?.Id
+    };
+    try {
+        let res = await removePriceApi(query);
+        if (res.Tag == 1) {
+            info('success', res.Message);
+            emits('getGoodsDetailsFn');
+        }
+    } catch (error) {
+        info('error', error);
+    }
+};
+//修改地址
+const changeAddress = (value, selectAddress) => {
+    console.log(value, selectAddress);
+    userPriceInfo.addressPrice = selectAddress[1].ExpressPrice;
+};
+
 //切换预览图片
 const visible = ref(false);
 //选中的图片
 const active = ref(0);
-const changeActive = (index) => {
+//轮播图实例
+const carousel = ref(null);
+//轮播图下标记
+const handleAfterChange = (index) => {
     active.value = index;
 };
+//成交价格
+const transactionPrice = computed(
+    () => value.value + (value.value * Number(props.goodsDtails?.offerData?.TipsRate)) / 100
+);
+//服务费
+const service = computed(
+    () => (value.value * Number(props.goodsDtails?.offerData?.TipsRate)) / 100
+);
+//获取最低出价和是否时代理价格
+watch(
+    () => props.goodsDtails,
+    (newParams, oldParams) => {
+        const priceAllList = props.goodsDtails?.offerData?.Jiajia;
+        const nowNewPrice = props.goodsDtails?.offerData?.MakePrice;
+        if (!priceAllList || !priceAllList.length) {
+            return;
+        }
+        if (nowNewPrice !== 0 && !nowNewPrice) {
+            console.warn('nowNewPrice 是 falsy 值，无法进行比较');
+            return;
+        }
+        const getItem = priceAllList.find((item) => Number(item.Mmax) > nowNewPrice);
+        startPrice.value = Number(getItem.Jiajia);
+        value.value = nowNewPrice + startPrice.value;
+        if (!props.goodsDtails?.recomData?.length) {
+            return;
+        }
+        //设置出价还是代理
+        const id = props.goodsDtails?.recomData[0].Uid;
+        const userId = user.userInfo.UserId;
+        if (id != userId) {
+            isFirstPrice.value = false;
+        } else {
+            isFirstPrice.value = true;
+        }
+        //判断是不是已经存在代理价
+        const arr = Object.keys(props.goodsDtails?.offerData?.DaiLiInfo);
+        if (arr.length) {
+            newFirstPrice.value = true;
+        } else {
+            newFirstPrice.value = false;
+        }
+    },
+    { deep: true }
+);
+const endTime = () => {
+    console.log('时间到了');
+};
+// 倒计时
+const countdown = ref('');
+
+const calculateCountdown = () => {
+    const offerTime = props.goodsDtails?.offerData?.Ontime;
+    if (!offerTime) return;
+
+    // 将服务器时间转换为用户时区的本地时间
+    const serverTime = new Date(offerTime + 'Z'); // 服务器时间以 'Z' 结尾表示 UTC 时间
+    const userTime = new Date(serverTime.getTime() + 8 * 60 * 60 * 1000); // 假设用户时区为 UTC+8
+
+    const endTime = userTime;
+    const currentTime = new Date();
+
+    const difference = endTime - currentTime;
+    if (difference > 0) {
+        const totalSeconds = Math.floor(difference / 1000);
+
+        const hours = Math.floor(totalSeconds / (60 * 60));
+        const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
+        const seconds = Math.floor(totalSeconds % 60);
+
+        countdown.value = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
+            2,
+            '0'
+        )}:${String(seconds).padStart(2, '0')}`;
+    } else {
+        countdown.value = '00:00:00';
+        // 倒计时结束，调用 endTime 方法
+        endTime();
+    }
+};
+
+watchEffect(() => {
+    calculateCountdown();
+    const interval = setInterval(calculateCountdown, 1000);
+    return () => clearInterval(interval);
+});
 </script>
 
 <template>
@@ -97,7 +246,6 @@ const changeActive = (index) => {
             <div class="show-img" v-if="props.goodsDtails?.BaseData?.Atlas">
                 <a-image
                     :preview="{ visible: false }"
-                    :width="400"
                     @click="visible = true"
                     :src="props.goodsDtails?.BaseData?.Atlas.split(';')[active]"
                 />
@@ -113,10 +261,22 @@ const changeActive = (index) => {
                     />
                 </a-image-preview-group>
             </div>
-            <div class="switch-img">
-                <a-carousel arrows>
+            <div class="swiper-img">
+                <a-carousel
+                    ref="carousel"
+                    :after-change="handleAfterChange"
+                    :autoplay="!visible"
+                    arrows
+                    :dots="false"
+                    :slides-to-show="
+                        props.goodsDtails?.BaseData?.Atlas.split(';').length >= 4
+                            ? 4
+                            : props.goodsDtails?.BaseData?.Atlas.split(';').length
+                    "
+                    :slides-to-scroll="1"
+                >
                     <template #prevArrow>
-                        <div class="custom-slick-arrow" style="left: 10px; z-index: 1">
+                        <div class="custom-slick-arrow" style="left: -2px; z-index: 1">
                             <img
                                 class="swiper-nav"
                                 :src="getImageUrl('chengjiao/icon1.svg')"
@@ -125,7 +285,7 @@ const changeActive = (index) => {
                         </div>
                     </template>
                     <template #nextArrow>
-                        <div class="custom-slick-arrow" style="right: 10px">
+                        <div class="custom-slick-arrow" style="right: 0px">
                             <img
                                 class="swiper-nav"
                                 :src="getImageUrl('chengjiao/icon2.svg')"
@@ -133,31 +293,38 @@ const changeActive = (index) => {
                             />
                         </div>
                     </template>
-                    <div class="img-itme">
-                        <img
-                            v-for="(item, index) in props.goodsDtails?.BaseData?.Atlas.split(';')"
-                            :key="index"
-                            :src="item"
-                            alt=""
-                        />
+                    <div
+                        class="img-item"
+                        v-for="(item, index) in props.goodsDtails?.BaseData?.Atlas.split(';')"
+                        :key="index"
+                    >
+                        <div class="imgs" :class="active == index ? 'active' : ''">
+                            <img :src="item" alt="" />
+                        </div>
                     </div>
                 </a-carousel>
             </div>
         </div>
-        <div class="right-wrap">
+
+        <div class="right-wrap" :class="props.goodsDtails?.recomData?.length ? '' : 'active'">
             <div class="top">
                 <div class="title">
-                    <p class="label"> 成交#{{ props.goodsDtails?.BaseData?.Bn }} </p>
+                    <p class="label">
+                        {{ props.goodsDtails?.BaseData?.Status == 1 ? '成交' : '竞买' }}#{{
+                            props.goodsDtails?.BaseData?.Bn
+                        }}
+                    </p>
                     <div class="right-time">
                         <img :src="getImageUrl('chengjiao/icon5.png')" alt="" />
                         <p>{{ props.goodsDtails?.offerData?.Ontime }}</p>
+                        <p>({{ countdown }})</p>
                     </div>
                 </div>
 
                 <div class="center">
                     <h5> {{ props.goodsDtails?.BaseData?.Title }} </h5>
                     <div class="element-list">
-                        <div v-if="props.goodsDtails?.BaseData?.IsRating != 1">
+                        <div class="left-element" v-if="props.goodsDtails?.BaseData?.IsRating == 1">
                             <p class="element-item"
                                 >品级: {{ props.goodsDtails?.BaseData?.Official }}
                                 <a-tooltip color="#9a0000">
@@ -167,8 +334,8 @@ const changeActive = (index) => {
                             </p>
                             <p class="element-item">
                                 品相描述：{{ props.goodsDtails?.BaseData?.BDescriptionn }}
-                            </p></div
-                        >
+                            </p>
+                        </div>
                         <div v-else>
                             <p class="element-item"
                                 >评级公司: {{ props.goodsDtails?.BaseData?.Ratings }}
@@ -187,46 +354,43 @@ const changeActive = (index) => {
                     </div>
                 </div>
             </div>
-            <div class="price" v-if="props.query.addPrice">
+            <div class="price" v-if="props.goodsDtails?.BaseData?.Status == 1">
                 成交价格
-                <p>¥{{ props.goodsDtails?.offerData?.MakePrice }}</p>
+                <p>¥{{ props.goodsDtails?.offerData?.MPrice }}</p>
             </div>
-            <div class="prices" v-if="!props.query.addPrice">
+            <div class="prices" v-else>
                 <p class="num">¥ {{ props.goodsDtails?.offerData?.MakePrice }}</p>
                 <div class="add-price">
                     <div class="change-price">
-                        <a-button>-</a-button>
-                        <a-input v-model:value="value"></a-input>
-                        <a-button>+</a-button>
+                        <a-button @click="reducePrice">-</a-button>
+                        <a-input @blur="changePrice" v-model:value="value"></a-input>
+                        <a-button @click="addPrice">+</a-button>
                     </div>
-                    <a-button class="add" @click="addPriceBtn">出价</a-button>
+                    <a-button
+                        v-if="!newFirstPrice"
+                        :class="isFirstPrice ? 'active' : 'add'"
+                        @click="addPriceBtn"
+                        >{{ isFirstPrice ? '代理价' : '出价' }}</a-button
+                    >
+                    <a-button
+                        v-if="newFirstPrice"
+                        :class="newFirstPrice ? 'active' : 'add'"
+                        @click="addPriceBtn"
+                    >
+                        更新代理价
+                    </a-button>
+                    <a-button v-if="newFirstPrice" @click="removeDaiLiPrice"> 取消代理 </a-button>
                 </div>
-                <p class="label">¥ {{ props.goodsDtails?.offerData?.MPrice || 3000 }}(当前出价)</p>
+                <p class="label">¥ {{ transactionPrice }}(成交价)</p>
                 <div class="info">
-                    <p> ¥ {{ props.goodsDtails?.offerData?.MTips || 300 }}(当前出价服务费 ) </p>
+                    <p> ¥ {{ service }}(服务费率 {{ props.goodsDtails?.offerData?.TipsRate }}%) </p>
                     <a-tooltip color="#9a0000">
                         <template #title>
                             <div class="info-fuwu">
-                                <p
-                                    >服务费基础服务费{{
-                                        props.goodsDtails?.offerData?.Tips || 300
-                                    }}</p
-                                >
-                                <p
-                                    >服务费百分比{{
-                                        props.goodsDtails?.offerData?.TipsRate || 300
-                                    }}</p
-                                >
-                                <p
-                                    >服务费起征点{{
-                                        props.goodsDtails?.offerData?.TipsLevel || 300
-                                    }}</p
-                                >
-                                <p
-                                    >服务费提示信息{{
-                                        props.goodsDtails?.offerData?.TipsDes || 300
-                                    }}</p
-                                >
+                                <p>服务费基础服务费{{ props.goodsDtails?.offerData?.Tips }}</p>
+                                <p>服务费百分比{{ props.goodsDtails?.offerData?.TipsRate }}</p>
+                                <p>服务费起征点{{ props.goodsDtails?.offerData?.TipsLevel }}</p>
+                                <p>服务费提示信息{{ props.goodsDtails?.offerData?.TipsDes }}</p>
                             </div>
                         </template>
                         <img
@@ -235,8 +399,6 @@ const changeActive = (index) => {
                             alt=""
                         /> </a-tooltip
                 ></div>
-
-                {{ props.goodsDtails?.offerData?.TipsRate }}
                 <div class="info"
                     >配送至:
                     <a-dropdown :trigger="['click']">
@@ -255,12 +417,15 @@ const changeActive = (index) => {
                     ¥{{ userPriceInfo.addressPrice }} (本商品由壳子社北京仓库为您发货)</div
                 >
             </div>
-            <div class="record">
+            <div class="record" :class="props.goodsDtails?.recomData?.length ? '' : 'active'">
                 <div class="title-price">
                     出价记录({{ props.goodsDtails?.recomData?.length }})
                     <span class="more" @click="modal1Visible = true"> 更多 </span>
                 </div>
-                <Swiper :swiperList="props.goodsDtails?.recomData"></Swiper>
+                <Swiper
+                    :swiperList="props.goodsDtails?.recomData"
+                    :userId="user.userInfo.UserId"
+                ></Swiper>
                 <a-modal
                     :footer="null"
                     v-model:open="modal1Visible"
@@ -273,12 +438,35 @@ const changeActive = (index) => {
                         :pagination="false"
                         :dataSource="props.goodsDtails?.recomData"
                         :columns="columns"
-                    />
+                    >
+                        <template #bodyCell="{ column, record }">
+                            <template v-if="column.key === 'Unick'">
+                                <span :class="record.Uid == user.userInfo.UserId ? 'active' : ''">{{
+                                    record.Unick
+                                }}</span>
+                            </template>
+                            <template v-if="column.key === 'MPrice'">
+                                <span :class="record.Uid == user.userInfo.UserId ? 'active' : ''"
+                                    >¥{{ record.MPrice }}</span
+                                >
+                            </template>
+                            <template v-if="column.key === 'CreateTime'">
+                                <span :class="record.Uid == user.userInfo.UserId ? 'active' : ''">{{
+                                    record.CreateTime
+                                }}</span>
+                            </template>
+                            <template v-if="column.key === 'IpAddr'">
+                                <span :class="record.Uid == user.userInfo.UserId ? 'active' : ''">{{
+                                    record.IpAddr
+                                }}</span>
+                            </template>
+                        </template>
+                    </a-table>
                 </a-modal>
             </div>
         </div>
     </div>
-    <Item v-if="query.addPrice"></Item>
+    <Item v-if="route.query?.show"></Item>
     <FooterSwiper></FooterSwiper>
     <Fixed></Fixed>
 </template>
@@ -302,14 +490,32 @@ const changeActive = (index) => {
                 }
             }
         }
-
-        .switch-img {
-            padding: 20px 0 0;
-            :deep(.ant-carousel) {
-                width: 100%;
+        .swiper-img {
+            margin-top: 20px;
+            :deep(.slick-list) {
+                width: 86%;
+                margin: 0 auto;
             }
             .swiper-nav {
-                width: 30px;
+                width: 40px;
+            }
+            .img-item {
+                display: flex !important;
+                align-items: center;
+                justify-content: center;
+                .imgs {
+                    padding: 5px;
+                    width: 84px;
+                    height: 60px;
+                    border: 1px solid transparent;
+                    &.active {
+                        border-color: #9a0000;
+                    }
+                    img {
+                        height: 50px;
+                        margin: 0 auto;
+                    }
+                }
             }
         }
     }
@@ -317,7 +523,10 @@ const changeActive = (index) => {
         flex: 1;
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
+        &.active {
+            gap: 40px;
+            justify-content: space-between;
+        }
         .title {
             .flex-row;
             justify-content: space-between;
@@ -326,7 +535,7 @@ const changeActive = (index) => {
             background: url('@/assets/img/weituo/menu-title.png');
             background-size: 100% 100%;
             .label {
-                font-size: 18px;
+                font-size: 20px;
                 font-weight: 600;
             }
             .right-time {
@@ -340,15 +549,17 @@ const changeActive = (index) => {
                 font-size: 20px;
             }
             .element-list {
-                padding: 0 40px 10px;
+                display: flex;
+                gap: 50px;
+                padding: 0 40px 15px;
                 border-bottom: 1px solid #e4e4e4;
+
                 .element-item {
                     display: flex;
                     align-items: center;
                     gap: 5px;
                     color: #101010;
                     margin: 10px 0;
-
                     img {
                         cursor: pointer;
                     }
@@ -365,19 +576,24 @@ const changeActive = (index) => {
             }
         }
         .prices {
+            flex: 1;
+            .flex-col;
+            justify-content: space-around;
+            align-items: flex-start;
             padding: 0 40px;
             .num {
                 color: #ff2e00;
-                font-size: 20px;
+                font-size: 26px;
                 font-weight: 600;
             }
             .add-price {
-                margin-top: 20px;
                 .flex-row;
                 justify-content: flex-start;
                 gap: 20px;
                 .change-price {
                     .flex-row;
+                    height: 52px;
+                    background-color: #f4f4f4;
                     gap: 2px;
                     .ant-btn {
                         background-color: #e8e8e8;
@@ -387,31 +603,39 @@ const changeActive = (index) => {
                     }
                     .ant-input {
                         width: 100px;
+                        height: 52px;
+                        flex: 1;
                         text-align: center;
                         border: none;
                     }
                 }
                 .ant-btn {
+                    width: 120px;
                     &.add {
                         background-color: #fe2e00;
                         color: #fff;
-                        width: 120px;
+                    }
+                    &.active {
+                        background-color: #9a0000;
+                        color: #fff;
                     }
                 }
             }
             .label {
                 color: #101010;
-                margin-top: 20px;
             }
             .info {
                 .flex-row;
                 justify-content: flex-start;
                 gap: 10px;
-                margin-top: 20px;
             }
         }
         .record {
             background-color: #f8f8f8;
+            &.active {
+                opacity: 0;
+            }
+
             .title-price {
                 .flex-row;
                 justify-content: space-between;
@@ -423,6 +647,11 @@ const changeActive = (index) => {
                 }
             }
         }
+    }
+}
+:deep(.ant-table-cell) {
+    .active {
+        color: #9a0000;
     }
 }
 </style>

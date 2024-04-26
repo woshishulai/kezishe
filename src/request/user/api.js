@@ -8,7 +8,9 @@ export const createRecordRemittance = async (data) =>
 
 //汇款信息列表
 export const recordRemittanceList = async (data) =>
-    instance.get(`/Member/RecordRemittance/GetList`, data);
+    instance.get(
+        `Member/RecordRemittance/GetList?PageIndex=${data.PageIndex}&PageSize=${data.PageSize}`
+    );
 
 //余额详情
 export const detailsYuE = async (data) =>

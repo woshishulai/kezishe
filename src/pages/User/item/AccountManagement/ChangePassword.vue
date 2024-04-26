@@ -155,17 +155,22 @@ const onPayFinish = async () => {
                             name="oldLoginPassword"
                             v-if="status.UserLogPwdStatus"
                         >
-                            <a-input-password v-model:value="formState.oldLoginPassword" />
+                            <a-input-password
+                                autocomplete="“off”"
+                                v-model:value="formState.oldLoginPassword"
+                            />
                         </a-form-item>
 
                         <a-form-item label="新登陆密码" name="newLoginPassword">
                             <a-input-password
+                                autocomplete="“off”"
                                 :visibility-toggle="false"
                                 v-model:value="formState.newLoginPassword"
                             />
                         </a-form-item>
                         <a-form-item label="再次确认登录密码" name="confirmLoginPassword">
                             <a-input-password
+                                autocomplete="“off”"
                                 :visibility-toggle="false"
                                 v-model:value="formState.confirmLoginPassword"
                             />
@@ -193,17 +198,22 @@ const onPayFinish = async () => {
                             name="payPassword"
                             v-if="status.UserPayPwdStatus"
                         >
-                            <a-input-password v-model:value="formState.payPassword" />
+                            <a-input-password
+                                autocomplete="“off”"
+                                v-model:value="formState.payPassword"
+                            />
                         </a-form-item>
 
                         <a-form-item label="新支付密码" name="newPayPassword">
                             <a-input-password
+                                autocomplete="“off”"
                                 :visibility-toggle="false"
                                 v-model:value="formState.newPayPassword"
                             />
                         </a-form-item>
                         <a-form-item label="再次确认支付密码" name="confirmPayPassword">
                             <a-input-password
+                                autocomplete="“off”"
                                 :visibility-toggle="false"
                                 v-model:value="formState.confirmPayPassword"
                             />

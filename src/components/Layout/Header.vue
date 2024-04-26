@@ -1,8 +1,8 @@
 <script setup>
 import { ref, onMounted, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
-import { navList } from '../data';
 import { useUserInfo } from '@/store/store';
+import { defaultUserNickName } from '@/request/api';
 import { getUserNikeNameApi } from '@/request/api';
 import { DownOutlined } from '@ant-design/icons-vue';
 import HeaderInput from './item/HeaderInput.vue';
@@ -33,8 +33,20 @@ onMounted(async () => {
         console.log(error);
     }
 });
-const changeUserName = (item) => {
-    user.changeUserNickName(item);
+//修改默认的用户名
+const changeUserName = async (item) => {
+    if (item.Default) {
+        return;
+    }
+    let res = await defaultUserNickName(item.Id);
+    if (res.Tag === 1) {
+        const oldDefaultNickName = user.userNickName.Id;
+        let index = nikeNameList.value.findIndex((item) => item.Id == oldDefaultNickName);
+        nikeNameList.value[index].Default = 0;
+        item.Default = 1;
+        user.changeUserNickName(item);
+        selector.value = user.userNickName.NickName;
+    }
 };
 watchEffect(async () => {
     selector.value = user.userNickName.NickName;

@@ -80,18 +80,25 @@ const columns = [
         align: 'center'
     }
 ];
+const params = reactive({
+    total: 1
+});
 const emits = defineEmits(['close']);
-
-onMounted(async () => {
+const getList = async (page, pageSize) => {
     try {
-        let res = await recordRemittanceList();
-        console.log(res, '备注');
+        params.PageIndex = page;
+        params.PageSize = pageSize;
+        let res = await recordRemittanceList(params);
         if (res.Tag == 1) {
+            params.total = res.Total;
             tableList.value = res.Data;
         }
     } catch (error) {
         info('error', error);
     }
+};
+onMounted(async () => {
+    getList(1, 10);
 });
 </script>
 
@@ -102,8 +109,9 @@ onMounted(async () => {
             <span @click="emits('close')">X</span>
         </div>
         <a-table
+            :pagination="false"
             :columns="columns"
-            :scroll="{ x: '1200px' }"
+            :scroll="{ x: '1200px', y: '500px' }"
             scrollToFirstRowOnChange="true"
             :data-source="tableList"
         >
@@ -115,6 +123,7 @@ onMounted(async () => {
                 </template>
             </template>
         </a-table>
+        <cate-page :paginations="params" @fetchList="getList"></cate-page>
     </div>
 </template>
 

@@ -26,7 +26,7 @@ const changeShowList = (index) => {
 const saveGoods = async (item) => {
     const query = {
         Types: 1,
-        Gid: item.id
+        Gid: item.Id
     };
     try {
         let res = await savaGoodsApi(query);

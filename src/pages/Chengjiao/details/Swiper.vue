@@ -4,33 +4,33 @@ import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
 const router = useRouter();
 const route = useRoute();
-const list = ref([]);
 const props = defineProps({
     swiperList: {
         type: Object,
         default: []
+    },
+    userId: {
+        type: String,
+        default: ''
     }
 });
 onMounted(() => {});
-watchEffect(() => {
-    list.value = props?.swiperList;
-});
 </script>
 
 <template>
     <a-carousel
-        v-if="list.length"
+        v-if="props?.swiperList.length"
         autoplay
         :slides-to-scroll="2"
         :slides-to-show="2"
         dot-position="left"
     >
-        <div class="item" v-for="item in list" :key="item.Uid">
-            <p>
-                <span>{{ item.Unick }}</span>
-                <span>¥{{ item.MPrice }}</span>
-                <span>{{ item.CreateTime }}</span>
-                <span>{{ item.IpAddr }}</span>
+        <div class="item" v-for="item in props?.swiperList" :key="item.Uid">
+            <p :class="item.Uid == props?.userId ? 'active' : ''">
+                <span class="user">{{ item.Unick }}</span>
+                <span class="price">¥{{ item.MPrice }}</span>
+                <span class="time">{{ item.CreateTime }}</span>
+                <span class="address">{{ item.IpAddr }}</span>
             </p>
         </div>
     </a-carousel>
@@ -43,6 +43,9 @@ watchEffect(() => {
 :deep(.slick-list) {
     margin: 5px 0;
 }
+:deep(.slick-track) {
+    height: auto !important;
+}
 .item {
     padding: 5px 40px;
     p {
@@ -50,6 +53,23 @@ watchEffect(() => {
         justify-content: space-between;
         // line-height: 30px;
         color: #777;
+        &.active {
+            color: #9a0000;
+        }
+        span {
+            &.user {
+                width: 200px;
+            }
+            &.price {
+                width: 140px;
+            }
+            &.time {
+                width: 200px;
+            }
+            &.address {
+                min-width: 100px;
+            }
+        }
     }
 }
 </style>

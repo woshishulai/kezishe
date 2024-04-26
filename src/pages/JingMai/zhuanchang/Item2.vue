@@ -9,7 +9,7 @@ const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
 const goodsDtails = ref({});
-onMounted(async () => {
+const getGoodsDetailsFn = async () => {
     try {
         let res = await getGoodsDetails(route.query.id);
         goodsDtails.value = res.Data;
@@ -17,7 +17,11 @@ onMounted(async () => {
     } catch (error) {
         info('error', error);
     }
+};
+onMounted(async () => {
+    getGoodsDetailsFn();
 });
+
 const query = {
     addPrice: true
 };
@@ -25,7 +29,11 @@ const query = {
 
 <template>
     <div class="wrap">
-        <ComDetails :query="query" :goodsDtails="goodsDtails"></ComDetails>
+        <ComDetails
+            :query="query"
+            @getGoodsDetailsFn="getGoodsDetailsFn"
+            :goodsDtails="goodsDtails"
+        ></ComDetails>
     </div>
 </template>
 

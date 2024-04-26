@@ -1,5 +1,5 @@
 <script setup>
-import { ref, reactive, onMounted } from 'vue';
+import { ref, reactive, onMounted, onActivated } from 'vue';
 import {
     getUserNikeNameApi,
     removeNickNameApi,
@@ -33,20 +33,31 @@ const shippingColumns = [
         align: 'center'
     }
 ];
-const nikeNameList = ref([]);
-onMounted(async () => {
+const getUserNikeNameList = async () => {
     try {
         let res = await getUserNikeNameApi();
-        let status;
         if (res.Tag == 1) {
-            status = 'success';
             nikeNameList.value = res.Data;
         } else {
-            status = 'error';
-            info(status, res.Message);
+            info('error', res.Message);
         }
     } catch (error) {
         info('error', error);
+    }
+};
+const nikeNameList = ref([]);
+onMounted(async () => {
+    getUserNikeNameList();
+});
+
+onActivated(() => {
+    if (!nikeNameList.value.length) {
+        return;
+    }
+    const userDefaultAddressId = user.userNickName.Id;
+    const index = nikeNameList.value.findIndex((item) => item.Default == 1);
+    if (nikeNameList.value[index].Id != userDefaultAddressId) {
+        getUserNikeNameList();
     }
 });
 const params = reactive({

@@ -22,5 +22,9 @@ export const getAddress = (params) => instance.get(`Web/Area/ExpressPrice`);
 //藏品出价格
 export const addPriceApi = (data) => instance.post(`Web/Auction/BidSave`, data);
 
+//取消藏品出价
+export const removePriceApi = (data) =>
+    instance.post(`Web/Auction/CancelProxy?Gid=${data.Gid}&ProxyId=${data.ProxyId}`);
+
 //添加收藏
 export const savaGoodsApi = (data) => instance.post(`Web/Collect/Save`, data);

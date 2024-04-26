@@ -30,7 +30,7 @@ onMounted(async () => {
             fetchData.value[1].GrowthValue = res.Data.WeiTuo.GrowthValue; //成长值
             fetchData.value[1].ProtectionValue = res.Data.WeiTuo.ProtectionValue; //保级
             fetchData.value[1].PromotionValue = res.Data.WeiTuo.PromotionValue; //晋级
-            fetchData.value[1].tiEffectiveDatetle = res.Data.WeiTuo.EffectiveDate; //有效期
+            fetchData.value[1].EffectiveDate = res.Data.WeiTuo.EffectiveDate; //有效期
 
             info('success', res.Message);
         }
@@ -51,9 +51,9 @@ onMounted(async () => {
         >
             <div class="shang">
                 <h5>{{ item.Title }}</h5>
-                <div class="icons">
+                <div class="icons" v-if="item.Level != 0">
                     <img
-                        v-for="i in 5"
+                        v-for="i in item.Level"
                         :key="i"
                         :src="
                             getImageUrl(item.Title === '委托' ? 'user/xing.jpg' : 'user/zuan.jpg')
@@ -61,7 +61,7 @@ onMounted(async () => {
                         alt=""
                     />
                 </div>
-                <div class="info"> {{ item.Level }} </div>
+                <div class="info" v-if="item.Level != 0"> {{ item.Level }} </div>
             </div>
             <div class="text">
                 <p>成长值: {{ item.GrowthValue }}</p>
