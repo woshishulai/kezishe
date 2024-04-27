@@ -42,12 +42,21 @@ const saveGoods = async (item) => {
 const changeParams = () => {
     emits('changeFormState', paginations.value);
 };
+const showGoodsDetails = (item) => {
+    router.push({
+        path: '/jingmai/goods-details',
+        query: {
+            id: item.Id,
+            show: route.query.show
+        }
+    });
+};
 </script>
 
 <template>
     <div class="right-list" v-if="props?.goodsList.length">
         <div class="title">
-            <span></span>
+            <span v-if="route.query.show"></span>
             <h5>全部藏品列表</h5>
             <div class="right-icon">
                 <i
@@ -70,7 +79,7 @@ const changeParams = () => {
         >
             <div
                 class="goods-item"
-                @click="router.push('/jingmai/goods-details?id=' + item.Id)"
+                @click="showGoodsDetails(item)"
                 v-for="(item, index) in props?.goodsList"
                 :key="index"
             >

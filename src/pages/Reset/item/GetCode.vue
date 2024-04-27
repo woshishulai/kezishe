@@ -1,8 +1,9 @@
 <script setup>
 import { ref, computed, reactive, onMounted, inject } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { getCodeLogin, phoneCodeLogin } from '@/request/api';
 import { getImageUrl } from '@/utils';
-import { message } from 'ant-design-vue';
+import { info } from '@/hooks/antd/message';
 import { codeRules } from '@/pages/Login/item/rules';
 const router = useRouter();
 const route = useRoute();
@@ -10,10 +11,9 @@ const props = defineProps({});
 const nextClick = inject('nextClick');
 onMounted(() => {});
 const formState = reactive({
-    phone: '17633328473',
-    phoneCode: '215215'
+    phone: '',
+    phoneCode: ''
 });
-const info = (status, msg) => message[status](msg);
 const countdown = ref(0);
 const getPhone = () => {
     const phoneRegex = /^1[3456789]\d{9}$/;
@@ -24,12 +24,21 @@ const getPhone = () => {
     }
     return isPhoneValid;
 };
-const getCode = () => {
+const getCode = async () => {
     const isPhoneValid = getPhone();
     if (isPhoneValid) {
         countdown.value = 60;
-        // getPhoneCodeApi(formState.phone) //获取验证码的API
-        info('success', '验证码发送成功请输入验证码');
+        countdown.value = 60;
+        let query = {
+            Mobile: formState.phone,
+            SType: 1
+        };
+        let res = await getCodeLogin(query);
+        if (res.Tag == 1) {
+            info('success', '验证码发送成功请输入验证码');
+        } else {
+            info('error', res.Message);
+        }
         const interval = setInterval(() => {
             countdown.value > 0 ? countdown.value-- : clearInterval(interval);
         }, 1000);

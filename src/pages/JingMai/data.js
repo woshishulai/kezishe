@@ -60,7 +60,7 @@ export const cate3List = [
 ];
 export const cate4List = [
     {
-        value: '0',
+        value: '',
         label: '全部'
     },
     {

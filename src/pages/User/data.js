@@ -224,4 +224,136 @@ const shippingColumns = [
         align: 'center'
     }
 ];
-export { infoList, infoDataSource, infoColumns, statusList, shippingDataSource, shippingColumns };
+const jingMaiList = [
+    {
+        cate: '竞买中'
+    },
+    {
+        cate: '已得标'
+    },
+    {
+        cate: '未得标'
+    },
+    {
+        cate: '未支付'
+    },
+    {
+        cate: '不支付'
+    },
+    {
+        cate: '未发货'
+    },
+    {
+        cate: '已发货'
+    }
+];
+
+export const timeOptions = [
+    {
+        value: '',
+        label: '全部'
+    },
+    {
+        value: '1',
+        label: '1小时'
+    },
+    {
+        value: '6',
+        label: '6小时'
+    },
+    {
+        value: '24',
+        label: '当天'
+    }
+];
+export const statusOptions = [
+    {
+        value: '',
+        label: '全部状态'
+    },
+    {
+        value: '1',
+        label: '领先'
+    },
+    {
+        value: '2',
+        label: '代理'
+    },
+    {
+        value: '3',
+        label: '出局'
+    }
+];
+export const pingTai = [
+    {
+        value: '',
+        label: '全部'
+    },
+    {
+        value: '0',
+        label: '壳子社'
+    }
+];
+export const jingMaiColumns = [
+    {
+        title: '商品编号',
+        dataIndex: 'Bn',
+        key: 'Bn',
+        align: 'center',
+        ellipsis: true,
+        width: 180
+    },
+    {
+        title: '类型',
+        dataIndex: 'Brand',
+        key: 'Brand',
+        align: 'center'
+    },
+    {
+        title: '商品名称',
+        dataIndex: 'Title',
+        key: 'Title',
+        align: 'center',
+        width: 250,
+        ellipsis: true
+    },
+    {
+        title: '平台',
+        dataIndex: 'PingTai',
+        key: 'PingTai',
+        align: 'center',
+        ellipsis: true
+    },
+    {
+        title: '当前价',
+        dataIndex: 'MPrice',
+        key: 'MPrice',
+        align: 'center',
+        ellipsis: true,
+        width: 140
+},
+    {
+        title: '状态',
+        dataIndex: 'Status',
+        key: 'Status',
+        align: 'center',
+        ellipsis: true
+    },
+    {
+        title: '结标时间',
+        dataIndex: 'Ontime',
+        key: 'Ontime',
+        align: 'center',
+        ellipsis: true,
+        width: 220
+    }
+];
+export {
+    infoList,
+    infoDataSource,
+    infoColumns,
+    statusList,
+    jingMaiList,
+    shippingDataSource,
+    shippingColumns
+};

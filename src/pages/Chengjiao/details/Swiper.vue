@@ -21,8 +21,8 @@ onMounted(() => {});
     <a-carousel
         v-if="props?.swiperList.length"
         autoplay
-        :slides-to-scroll="2"
-        :slides-to-show="2"
+        :slides-to-scroll="props?.swiperList.length > 2 ? 2 : 1"
+        :slides-to-show="props?.swiperList.length > 2 ? 2 : 1"
         dot-position="left"
     >
         <div class="item" v-for="item in props?.swiperList" :key="item.Uid">

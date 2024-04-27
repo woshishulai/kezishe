@@ -21,22 +21,8 @@ const getGoodsDetailsFn = async () => {
 onMounted(async () => {
     getGoodsDetailsFn();
 });
-
-const query = {
-    addPrice: true
-};
 </script>
 
 <template>
-    <div class="wrap">
-        <ComDetails
-            :query="query"
-            @getGoodsDetailsFn="getGoodsDetailsFn"
-            :goodsDtails="goodsDtails"
-        ></ComDetails>
-    </div>
+    <ComDetails @getGoodsDetailsFn="getGoodsDetailsFn" :goodsDtails="goodsDtails"></ComDetails>
 </template>
-
-<style scoped lang="less">
-/* 在这里添加你的 Less 样式 */
-</style>

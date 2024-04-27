@@ -1,9 +1,10 @@
 <script setup>
-import { ref, computed, reactive, onMounted, watchEffect } from 'vue';
+import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute, routerKey } from 'vue-router';
 import { getImageUrl } from '@/utils';
 import { getAddress, addPriceApi, removePriceApi } from '@/request/jingmai/index';
 import Swiper from '@/pages/Chengjiao/details/Swiper.vue';
+import timtClock from '@/pages/Jingmai/item/timeClock.vue';
 import Fixed from '@/pages/Chengjiao/details/Fixed.vue';
 import Item from '@/pages/Chengjiao/details/Item.vue';
 import FooterSwiper from '@/pages/Chengjiao/details/FooterSwiper.vue';
@@ -12,13 +13,8 @@ import { watch } from 'vue';
 import { useUserInfo } from '@/store/store';
 const user = useUserInfo();
 const route = useRoute();
+const router = useRouter();
 const props = defineProps({
-    query: {
-        type: Object,
-        default: {
-            addPrice: true
-        }
-    },
     goodsDtails: {
         type: Object,
         default: () => ({})
@@ -148,6 +144,10 @@ const visible = ref(false);
 const active = ref(0);
 //轮播图实例
 const carousel = ref(null);
+//点击切换轮播图
+const changeSwiperItem = (index) => {
+    active.value = index;
+};
 //轮播图下标记
 const handleAfterChange = (index) => {
     active.value = index;
@@ -164,6 +164,21 @@ const service = computed(
 watch(
     () => props.goodsDtails,
     (newParams, oldParams) => {
+        if (
+            props.goodsDtails?.BaseData?.Status != 1 &&
+            props.goodsDtails?.BaseData?.Status != 2 &&
+            props.goodsDtails?.BaseData?.Status != 3 &&
+            props.goodsDtails?.BaseData?.Status != 7 &&
+            props.goodsDtails?.BaseData?.Status != 8
+        ) {
+            info('error', '页面发生错误，将回到首页');
+            let timer = setTimeout(() => {
+                router.push('/');
+                clearTimeout(timer);
+            }, 2000);
+            return;
+        }
+
         const priceAllList = props.goodsDtails?.offerData?.Jiajia;
         const nowNewPrice = props.goodsDtails?.offerData?.MakePrice;
         if (!priceAllList || !priceAllList.length) {
@@ -197,47 +212,6 @@ watch(
     },
     { deep: true }
 );
-const endTime = () => {
-    console.log('时间到了');
-};
-// 倒计时
-const countdown = ref('');
-
-const calculateCountdown = () => {
-    const offerTime = props.goodsDtails?.offerData?.Ontime;
-    if (!offerTime) return;
-
-    // 将服务器时间转换为用户时区的本地时间
-    const serverTime = new Date(offerTime + 'Z'); // 服务器时间以 'Z' 结尾表示 UTC 时间
-    const userTime = new Date(serverTime.getTime() + 8 * 60 * 60 * 1000); // 假设用户时区为 UTC+8
-
-    const endTime = userTime;
-    const currentTime = new Date();
-
-    const difference = endTime - currentTime;
-    if (difference > 0) {
-        const totalSeconds = Math.floor(difference / 1000);
-
-        const hours = Math.floor(totalSeconds / (60 * 60));
-        const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
-        const seconds = Math.floor(totalSeconds % 60);
-
-        countdown.value = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(
-            2,
-            '0'
-        )}:${String(seconds).padStart(2, '0')}`;
-    } else {
-        countdown.value = '00:00:00';
-        // 倒计时结束，调用 endTime 方法
-        endTime();
-    }
-};
-
-watchEffect(() => {
-    calculateCountdown();
-    const interval = setInterval(calculateCountdown, 1000);
-    return () => clearInterval(interval);
-});
 </script>
 
 <template>
@@ -269,9 +243,11 @@ watchEffect(() => {
                     arrows
                     :dots="false"
                     :slides-to-show="
-                        props.goodsDtails?.BaseData?.Atlas.split(';').length >= 4
+                        props.goodsDtails?.BaseData?.Atlas.split(';').length > 4
                             ? 4
-                            : props.goodsDtails?.BaseData?.Atlas.split(';').length
+                            : props.goodsDtails?.BaseData?.Atlas.split(';').length > 1
+                              ? props.goodsDtails?.BaseData?.Atlas.split(';').length - 1
+                              : 1
                     "
                     :slides-to-scroll="1"
                 >
@@ -297,6 +273,7 @@ watchEffect(() => {
                         class="img-item"
                         v-for="(item, index) in props.goodsDtails?.BaseData?.Atlas.split(';')"
                         :key="index"
+                        @click="changeSwiperItem(index)"
                     >
                         <div class="imgs" :class="active == index ? 'active' : ''">
                             <img :src="item" alt="" />
@@ -305,22 +282,30 @@ watchEffect(() => {
                 </a-carousel>
             </div>
         </div>
-
         <div class="right-wrap" :class="props.goodsDtails?.recomData?.length ? '' : 'active'">
             <div class="top">
                 <div class="title">
                     <p class="label">
-                        {{ props.goodsDtails?.BaseData?.Status == 1 ? '成交' : '竞买' }}#{{
-                            props.goodsDtails?.BaseData?.Bn
-                        }}
+                        {{
+                            props.goodsDtails?.BaseData?.Status == 1
+                                ? '预展中'
+                                : props.goodsDtails?.BaseData?.Status == 2
+                                  ? '竞买中'
+                                  : props.goodsDtails?.BaseData?.Status == 3
+                                    ? '已成交'
+                                    : props.goodsDtails?.BaseData?.Status == 7
+                                      ? '未成交'
+                                      : props.goodsDtails?.BaseData?.Status == 8
+                                        ? '已下架'
+                                        : '未知状态'
+                        }}#{{ props.goodsDtails?.BaseData?.Bn }}
                     </p>
-                    <div class="right-time">
+                    <div class="right-time" v-if="props.goodsDtails?.BaseData?.Status == 2">
                         <img :src="getImageUrl('chengjiao/icon5.png')" alt="" />
                         <p>{{ props.goodsDtails?.offerData?.Ontime }}</p>
-                        <p>({{ countdown }})</p>
+                        <timtClock :time="props.goodsDtails?.offerData?.Ontime"></timtClock>
                     </div>
                 </div>
-
                 <div class="center">
                     <h5> {{ props.goodsDtails?.BaseData?.Title }} </h5>
                     <div class="element-list">
@@ -355,8 +340,7 @@ watchEffect(() => {
                 </div>
             </div>
             <div class="price" v-if="props.goodsDtails?.BaseData?.Status == 1">
-                成交价格
-                <p>¥{{ props.goodsDtails?.offerData?.MPrice }}</p>
+                <p>¥{{ props.goodsDtails?.BaseData?.BasePrice }}</p>
             </div>
             <div class="prices" v-else>
                 <p class="num">¥ {{ props.goodsDtails?.offerData?.MakePrice }}</p>
@@ -465,6 +449,13 @@ watchEffect(() => {
                 </a-modal>
             </div>
         </div>
+        <div class="hot-goods" v-if="route.query?.show">
+            <div class="goods-item">
+                <img src="" alt="" />
+                <p class="goods-item-title"></p>
+                <p class="time">34</p>
+            </div>
+        </div>
     </div>
     <Item v-if="route.query?.show"></Item>
     <FooterSwiper></FooterSwiper>
@@ -505,7 +496,7 @@ watchEffect(() => {
                 justify-content: center;
                 .imgs {
                     padding: 5px;
-                    width: 84px;
+                    // width: 84px;
                     height: 60px;
                     border: 1px solid transparent;
                     &.active {
@@ -523,6 +514,7 @@ watchEffect(() => {
         flex: 1;
         display: flex;
         flex-direction: column;
+
         &.active {
             gap: 40px;
             justify-content: space-between;
@@ -571,6 +563,7 @@ watchEffect(() => {
             color: #ff2e00;
             font-size: 20px;
             font-weight: 600;
+
             p {
                 margin-top: 20px;
             }
@@ -580,7 +573,7 @@ watchEffect(() => {
             .flex-col;
             justify-content: space-around;
             align-items: flex-start;
-            padding: 0 40px;
+            padding: 10px 40px 0;
             .num {
                 color: #ff2e00;
                 font-size: 26px;

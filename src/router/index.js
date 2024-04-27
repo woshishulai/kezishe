@@ -133,7 +133,7 @@ const userRoutes = [
             },
             {
                 path: 'my-bidding',
-                component: () => import('@/pages/User/item/MyBidding.vue'),
+                component: () => import('@/pages/User/item/Bidding/MyBidding.vue'),
                 meta: {
                     name: '我的竞买',
                     icon: PieChartOutlined

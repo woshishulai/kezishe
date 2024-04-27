@@ -1,5 +1,4 @@
 <script setup>
-console.log(123);
 import { useRouter, useRoute } from 'vue-router';
 import { reactive, ref, onMounted } from 'vue';
 import { isAddActive } from '@/hooks/user';
@@ -33,14 +32,14 @@ const formState1 = ref({
 onMounted(async () => {
     try {
         let res = await getUserInfoApi();
-        let status;
         if (res.Tag == 1) {
-            status = 'success';
+            if (res.Data.IdType == 0) {
+                res.Data.IdType = '';
+            }
             user.changeUserInfo(res.Data);
             formState.value = Object.assign({}, user.userInfo);
         } else {
-            status = 'error';
-            info(status, res.Message);
+            info('error', res.Message);
         }
     } catch (error) {
         info('error', error);
@@ -164,7 +163,10 @@ const onFinish = async () => {
                         />
                     </a-form-item>
                     <a-form-item label="证件类型" has-feedback name="region" class="card-cate">
-                        <a-select v-model:value.trim="formState.IdType" placeholder="">
+                        <a-select
+                            v-model:value.trim="formState.IdType"
+                            placeholder="请选择证件类型"
+                        >
                             <a-select-option value="1">身份证</a-select-option>
                             <a-select-option value="2">护照</a-select-option>
                             <a-select-option value="3">台胞证</a-select-option>

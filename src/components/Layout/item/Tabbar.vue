@@ -3,12 +3,12 @@ import { ref, computed, reactive, onMounted, watchEffect } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { navList } from '@/components/data';
 import { getTabbatList } from '@/request/api';
-import { useInternalMessage } from 'ant-design-vue/es/message/useMessage';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
 const tabbarList = ref([]);
 const active = ref(null);
+const sonActive = ref(0);
 onMounted(async () => {
     try {
         let res = await getTabbatList();
@@ -17,10 +17,13 @@ onMounted(async () => {
         console.log(err);
     }
 });
-
+const showFatherPage = (item) => {
+    sonActive.value = 0;
+    router.push(item.router);
+};
 const showNav = (item) => {
     if (item.router == '/jingmai') {
-        active.value = 0;
+        active.value = sonActive.value ? sonActive.value : 0;
     } else {
         active.value = null;
     }
@@ -31,7 +34,8 @@ const changeActive = (index) => {
 const removeActive = () => {
     active.value = null;
 };
-const showStamp = (item) => {
+const showStamp = (item, index) => {
+    sonActive.value = index;
     if (item.TypeName == '邮票') {
         return;
         // router.push({
@@ -50,6 +54,7 @@ const showStamp = (item) => {
     }
 };
 const showStampGoods = (i) => {
+    sonActive.value = active.value;
     router.push({
         path: '/jingmai/show-stamp-goods',
         query: {
@@ -67,7 +72,7 @@ const showStampGoods = (i) => {
         <div class="con-main-wrap">
             <li
                 class="nav-item"
-                @click="router.push(item.router)"
+                @click="showFatherPage(item)"
                 v-for="item in navList"
                 @mouseover="showNav(item)"
                 :key="item.title"
@@ -96,8 +101,8 @@ const showStampGoods = (i) => {
                 <div class="two-item" v-for="(item, index) in tabbarList" :key="item.Id">
                     <li
                         @mouseover="changeActive(index)"
-                        @click.stop="showStamp(item)"
-                        :class="active === index ? 'active' : ''"
+                        @click.stop="showStamp(item, index)"
+                        :class="sonActive === index ? 'active' : ''"
                     >
                         {{ item.TypeName }}</li
                     >

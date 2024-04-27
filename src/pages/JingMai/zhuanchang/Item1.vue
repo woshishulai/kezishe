@@ -4,6 +4,7 @@ import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
 import Title from '../item/Title.vue';
 import LeftMenu from '../item/LeftMenu.vue';
+import HotGoods from '../item/hotGoods.vue';
 import RightList from '../item/RightList.vue';
 import { goodsListAPi } from '@/request/jingmai';
 import { info } from '@/hooks/antd/message';
@@ -56,6 +57,8 @@ const changeFormState = async (query, paginations) => {
                 @changeFormState="changeFormState"
                 :goodsList="formState?.GoodsList"
             ></RightList>
+            <!-- <HotGoods v-if="route.query.show" :goodsList="formState?.GoodsList"></HotGoods> -->
+            <HotGoods :goodsList="formState?.GoodsList"></HotGoods>
         </div>
     </div>
 </template>
