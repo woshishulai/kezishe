@@ -25,8 +25,11 @@ onMounted(() => {});
                 <div class="goods-img">
                     <img :src="item.CoverImg" alt="" />
                 </div>
-                <p class="label">{{ item.Title }}</p>
-                <p class="time">{{ item.Ontime }}</p>
+                <div class="text-wrap">
+                    <p class="label">{{ item.Title }}</p>
+                    <p class="price">¥ {{ item.BasePrice }}</p>
+                    <p class="time">{{ item.Ontime }}</p>
+                </div>
             </div>
         </div>
     </div>
@@ -35,6 +38,7 @@ onMounted(() => {});
 <style scoped lang="less">
 .hot-goods {
     width: 300px;
+    margin-top: 30px;
     background-color: #fcdca5;
     .top-title {
         color: #fff;
@@ -45,27 +49,29 @@ onMounted(() => {});
     .goods-list {
         padding: 20px 10px;
         .goods-item {
-            .flex-col;
-            align-items: flex-start;
+            .flex-row;
             gap: 10px;
             margin-bottom: 20px;
-            padding: 10px 10px 15px;
+            padding: 10px 10px;
             justify-content: space-between;
-            background-color: #fff;
+            background-color: #f4f4f4;
             cursor: pointer;
             .goods-img {
                 .flex-row;
-                width: 100%;
-                height: 200px;
                 padding: 10px;
+                background-color: #fff;
                 img {
-                    max-height: 100%;
-                    max-width: 100%;
+                    max-height: 80px;
                 }
             }
-            .label {
-                width: 100%;
+            .text-wrap {
+                flex: 1;
                 .ellipsis;
+                .price {
+                    margin: 10px 0;
+                    color: #c83327;
+                    font-weight: normal;
+                }
             }
         }
     }

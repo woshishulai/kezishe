@@ -4,7 +4,8 @@ import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
 import Title from '../item/Title.vue';
 import LeftMenu from '../item/LeftMenu.vue';
-import HotGoods from '../item/hotGoods.vue';
+import HotGoods from '../item/HotGoods.vue';
+import NewGoods from '../item/NewGoods.vue';
 import RightList from '../item/RightList.vue';
 import { goodsListAPi } from '@/request/jingmai';
 import { info } from '@/hooks/antd/message';
@@ -57,8 +58,10 @@ const changeFormState = async (query, paginations) => {
                 @changeFormState="changeFormState"
                 :goodsList="formState?.GoodsList"
             ></RightList>
-            <!-- <HotGoods v-if="route.query.show" :goodsList="formState?.GoodsList"></HotGoods> -->
-            <HotGoods :goodsList="formState?.GoodsList"></HotGoods>
+            <div v-if="route.query.show" class="right-component">
+                <HotGoods title="热门推荐" :goodsList="formState?.GoodsList"></HotGoods>
+                <NewGoods title="邮票最新成交" :goodsList="formState?.GoodsList"></NewGoods>
+            </div>
         </div>
     </div>
 </template>
@@ -71,6 +74,13 @@ const changeFormState = async (query, paginations) => {
         flex-direction: row;
         gap: 15px;
         margin-top: 20px;
+    }
+    :deep(.goods-item:hover) {
+        border-color: transparent;
+        box-shadow:
+            0 1px 2px -2px rgba(0, 0, 0, 0.16),
+            0 3px 6px 0 rgba(0, 0, 0, 0.12),
+            0 5px 12px 4px rgba(0, 0, 0, 0.09);
     }
 }
 </style>

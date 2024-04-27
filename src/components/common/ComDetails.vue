@@ -4,7 +4,7 @@ import { useRouter, useRoute, routerKey } from 'vue-router';
 import { getImageUrl } from '@/utils';
 import { getAddress, addPriceApi, removePriceApi } from '@/request/jingmai/index';
 import Swiper from '@/pages/Chengjiao/details/Swiper.vue';
-import timtClock from '@/pages/Jingmai/item/timeClock.vue';
+import timtClock from '@/pages/Jingmai/item/TimeClock.vue';
 import Fixed from '@/pages/Chengjiao/details/Fixed.vue';
 import Item from '@/pages/Chengjiao/details/Item.vue';
 import FooterSwiper from '@/pages/Chengjiao/details/FooterSwiper.vue';

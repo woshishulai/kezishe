@@ -16,12 +16,17 @@ const props = defineProps({
         default: []
     }
 });
-
-onMounted(() => {});
+//1 3 是邮票 24是竞买
+const showList = ref('');
+onMounted(() => {
+    showList.value = route.query.show ? 3 : 4;
+    console.log(showList.value);
+});
 const emits = defineEmits(['changeFormState']);
-const showList = ref(4);
-const changeShowList = (index) => {
-    showList.value = index;
+const changeShowList = () => {
+    showList.value =
+        showList.value == 4 ? 2 : showList.value == 2 ? 4 : showList.value == 3 ? 1 : 3;
+    console.log(showList.value);
 };
 const saveGoods = async (item) => {
     const query = {
@@ -60,20 +65,26 @@ const showGoodsDetails = (item) => {
             <h5>全部藏品列表</h5>
             <div class="right-icon">
                 <i
-                    :class="{ active: showList === 4 }"
-                    @click="changeShowList(4)"
+                    :class="showList == 4 || showList == 3 ? 'active' : ''"
+                    @click="changeShowList"
                     class="iconfont icon-menu"
                 ></i>
                 <i
-                    @click="changeShowList(2)"
-                    :class="{ active: showList !== 4 }"
+                    @click="changeShowList"
+                    :class="showList == 1 || showList == 2 ? 'active' : ''"
                     class="iconfont cu icon-menu1"
                 ></i>
             </div>
         </div>
         <div
             :class="[
-                showList === 4 ? 'goods-list' : 'flex-list',
+                showList === 4
+                    ? 'goods-list'
+                    : showList === 2
+                      ? 'flex-list'
+                      : showList === 3
+                        ? 'show-lists'
+                        : 'show-flex',
                 props?.goodsList.length >= 4 ? '' : 'active'
             ]"
         >
@@ -95,10 +106,14 @@ const showGoodsDetails = (item) => {
                     <h5>{{ item.Title }}</h5>
                     <p class="price">¥{{ item.BasePrice }}</p>
                     <p class="time">{{ item.Ontime }}</p>
-                    <p v-if="showList === 2">评级公司: PMG</p>
-                    <div v-if="showList === 4" class="info"
+                    <p v-if="showList === 2 || showList === 1">评级公司: PMG</p>
+                    <div class="info"
                         ><span>分数: {{ 100 }} 分</span>
-                        <p class="addgoods" @click.stop="saveGoods(item)">
+                        <p
+                            v-if="showList === 4 || showList === 3"
+                            class="addgoods"
+                            @click.stop="saveGoods(item)"
+                        >
                             <span class="add">
                                 {{ item.IsCollect == 1 ? '已收藏' : '收藏' }}
                             </span>
@@ -108,12 +123,20 @@ const showGoodsDetails = (item) => {
                             ></i
                         ></p>
                     </div>
-                    <p v-if="showList === 2" class="label"
+                    <p v-if="showList === 2 || showList === 1" class="label"
                         >品相描述：
                         锦上添花书画专场共120余件拍品，作品类别丰富，题材多样，适合收藏和展示
                     </p>
-                    <p v-if="showList === 2" class="add"
-                        >已收藏 <i class="iconfont icon-star active"></i
+                    <p
+                        v-if="showList === 2 || showList === 1"
+                        class="add"
+                        @click.stop="saveGoods(item)"
+                    >
+                        {{ item.IsCollect == 1 ? '已收藏' : '收藏' }}
+                        <i
+                            class="iconfont icon-star"
+                            :class="item.IsCollect == 1 ? 'active' : ''"
+                        ></i
                     ></p>
                 </div>
             </div>
@@ -167,6 +190,63 @@ const showGoodsDetails = (item) => {
             flex: 1;
             // min-width: 23%;
             max-width: 24%;
+            background-color: #f4f4f4;
+            padding: 20px 16px;
+            cursor: pointer;
+            .top-img {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                height: 228px;
+                padding: 20px;
+                background-color: #fff;
+                img {
+                    max-width: 100%;
+                    max-height: 217px;
+                    margin: 0 auto;
+                }
+            }
+            h5 {
+                font-size: 18px;
+                margin-top: 20px;
+                .ellipsis;
+            }
+            .price {
+                margin-top: 10px;
+                font-weight: 600;
+                font-size: 20px;
+                color: #9a0000;
+            }
+            .time {
+                margin-top: 10px;
+            }
+            .info {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-top: 10px;
+                p {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                }
+            }
+        }
+    }
+    .show-lists {
+        padding: 20px 0;
+        display: flex;
+        justify-content: space-between;
+        flex-direction: row;
+        flex-wrap: wrap;
+        gap: 16px 0;
+        &.active {
+            gap: 16px 15px;
+            justify-content: flex-start;
+        }
+        .goods-item {
+            flex: 1;
+            min-width: 30%;
             background-color: #f4f4f4;
             padding: 20px 16px;
             cursor: pointer;
@@ -264,12 +344,55 @@ const showGoodsDetails = (item) => {
             }
         }
     }
-    .goods-item:hover {
-        border-color: transparent;
-        box-shadow:
-            0 1px 2px -2px rgba(0, 0, 0, 0.16),
-            0 3px 6px 0 rgba(0, 0, 0, 0.12),
-            0 5px 12px 4px rgba(0, 0, 0, 0.09);
+    .show-flex {
+        padding: 20px 0;
+        box-sizing: border-box;
+        .goods-item {
+            // width: 49.2%;
+            display: flex;
+            flex-direction: row;
+            gap: 20px;
+            background-color: #f4f4f4;
+            padding: 20px 30px 20px 20px;
+            cursor: pointer;
+            margin-bottom: 20px;
+            .top-img {
+                display: flex;
+                flex-direction: row;
+                align-items: center;
+                min-width: 225px;
+                height: 225px;
+                background-color: #fff;
+                padding: 20px;
+                img {
+                    max-width: 100%;
+                    max-height: 215px;
+                    margin: 0 auto;
+                }
+            }
+            .text-wrap {
+                width: 50%;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-around;
+                h5 {
+                    font-size: 18px;
+                    .ellipsis;
+                }
+                .price {
+                    font-weight: 600;
+                    font-size: 20px;
+                    color: #9a0000;
+                }
+                .label {
+                    line-height: 20px;
+                }
+                .add {
+                    text-align: right;
+                }
+            }
+        }
     }
 }
 </style>
