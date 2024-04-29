@@ -4,7 +4,7 @@ import { useRouter, useRoute, routerKey } from 'vue-router';
 import { getImageUrl } from '@/utils';
 import { getAddress, addPriceApi, removePriceApi } from '@/request/jingmai/index';
 import Swiper from '@/pages/Chengjiao/details/Swiper.vue';
-import timtClock from '@/pages/Jingmai/item/TimeClock.vue';
+import TimtClock from '@/pages/Jingmai/item/TimeClock.vue';
 import Fixed from '@/pages/Chengjiao/details/Fixed.vue';
 import Item from '@/pages/Chengjiao/details/Item.vue';
 import FooterSwiper from '@/pages/Chengjiao/details/FooterSwiper.vue';
@@ -282,7 +282,13 @@ watch(
                 </a-carousel>
             </div>
         </div>
-        <div class="right-wrap" :class="props.goodsDtails?.recomData?.length ? '' : 'active'">
+        <div
+            class="right-wrap"
+            :class="[
+                props.goodsDtails?.recomData?.length ? '' : 'active',
+                props.goodsDtails?.BaseData?.Status == 3 ? 'right-active' : ''
+            ]"
+        >
             <div class="top">
                 <div class="title">
                     <p class="label">
@@ -303,7 +309,7 @@ watch(
                     <div class="right-time" v-if="props.goodsDtails?.BaseData?.Status == 2">
                         <img :src="getImageUrl('chengjiao/icon5.png')" alt="" />
                         <p>{{ props.goodsDtails?.offerData?.Ontime }}</p>
-                        <timtClock :time="props.goodsDtails?.offerData?.Ontime"></timtClock>
+                        <TimtClock :time="props.goodsDtails?.offerData?.Ontime"></TimtClock>
                     </div>
                 </div>
                 <div class="center">
@@ -339,8 +345,12 @@ watch(
                     </div>
                 </div>
             </div>
-            <div class="price" v-if="props.goodsDtails?.BaseData?.Status == 1">
-                <p>¥{{ props.goodsDtails?.BaseData?.BasePrice }}</p>
+            <div class="statuss" v-if="props.goodsDtails?.BaseData?.Status == 3">
+                <div class="end-time">
+                    <p>成交时间:{{ props.goodsDtails?.offerData?.Ontime }}</p>
+                    <!-- <img :src="getImageUrl('chengjiao/icon5.png')" alt="" /> -->
+                </div>
+                <p class="price">成交价格:¥{{ props.goodsDtails?.offerData?.MakePrice }}</p>
             </div>
             <div class="prices" v-else>
                 <p class="num">¥ {{ props.goodsDtails?.offerData?.MakePrice }}</p>
@@ -449,15 +459,17 @@ watch(
                 </a-modal>
             </div>
         </div>
-        <div class="hot-goods" v-if="route.query?.show">
-            <div class="goods-item">
-                <img src="" alt="" />
-                <p class="goods-item-title"></p>
-                <p class="time">34</p>
-            </div>
-        </div>
     </div>
-    <Item v-if="route.query?.show"></Item>
+
+    <div
+        class="liucheng"
+        :style="{ backgroundImage: `url(${getImageUrl('chengjiao/list6.png')})` }"
+    >
+        <button class="show-details" @click="router.push('/weituo/online-commission')"
+            >查看详细</button
+        >
+    </div>
+    <Item v-if="route.query.show"></Item>
     <FooterSwiper></FooterSwiper>
     <Fixed></Fixed>
 </template>
@@ -514,6 +526,9 @@ watch(
         flex: 1;
         display: flex;
         flex-direction: column;
+        &.right-active {
+            justify-content: space-between;
+        }
 
         &.active {
             gap: 40px;
@@ -558,14 +573,15 @@ watch(
                 }
             }
         }
-        .price {
+        .statuss {
             padding: 0 40px;
-            color: #ff2e00;
-            font-size: 20px;
-            font-weight: 600;
-
+            .price {
+                color: #ff2e00;
+                font-size: 20px;
+                font-weight: 600;
+            }
             p {
-                margin-top: 20px;
+                margin-bottom: 20px;
             }
         }
         .prices {
@@ -640,6 +656,30 @@ watch(
                 }
             }
         }
+    }
+}
+.liucheng {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding: 0 22px;
+    height: 150px;
+    background-size: 100% 100%;
+    margin: 30px 0;
+    &:hover {
+        .show-details {
+            background-color: #9a0000;
+        }
+    }
+    .show-details {
+        height: 43px;
+        border-radius: 10px;
+        background-color: #333;
+        color: #fff;
+        width: 120px;
+        border: none;
+        margin-top: 1px;
+        cursor: pointer;
     }
 }
 :deep(.ant-table-cell) {

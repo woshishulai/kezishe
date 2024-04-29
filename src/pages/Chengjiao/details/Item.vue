@@ -10,7 +10,6 @@ onMounted(() => {});
 
 <template>
     <div class="chengjiao-item">
-        <img class="liucheng" :src="getImageUrl('chengjiao/list6.png')" alt="" />
         <div class="title">
             <h5>商品详情</h5>
             <span></span>
@@ -29,9 +28,6 @@ onMounted(() => {});
 
 <style scoped lang="less">
 .chengjiao-item {
-    .liucheng {
-        margin: 30px 0;
-    }
     .title {
         background: url('@/assets/img/home/lang-bg.jpg');
         .flex-col;

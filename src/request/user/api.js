@@ -33,3 +33,15 @@ export const QuotaToBalanceFrom = async (params) =>
 
 //优惠券
 export const youHuiQuan = async (data) => instance.get(`/Member/Coupon/GetList`, data);
+
+//我的藏品类别 比如已成交 待遇展等等
+export const getGoodsCateApi = async (data) => instance.get(`Member/Auction/TypeList`);
+
+//我的藏品类别 比如已成交 待遇展等等
+export const getSelectCateApi = async (data) => instance.get(`Member/Auction/BidderTypeList`);
+
+//根据类别获取藏品信息
+export const getGoodsListApi = async (params) =>
+    instance.get(
+        `Member/Auction/GoodsList?Cid=${params.Cid}&StartDateRange=${params.StartDateRange}&EndDateRange=${params.EndDateRange}&Brand=${params.Brand}&Kw=${params.Kw}&Status=${params.Status}&PageSize=${params.PageSize}&PageIndex=${params.PageIndex}`
+    );

@@ -11,12 +11,10 @@ const props = defineProps({
         default: null
     }
 });
-const params = reactive({
-    titleCate: props.titleList ? props.titleList[0].cate : null,
-    statusCate: JSON.parse(props.statusList ? props.statusList[0].cate : null)
-});
+const params = reactive({});
 watchEffect(() => {
-    params.statusCate = props.statusList;
+    params.statusCate = props?.statusList[0]?.Key;
+    params.titleCate = props?.titleList[0].cate;
 });
 const changeTitleCate = (item) => {
     if (params.titleCate == item.cate) {
@@ -28,7 +26,7 @@ const changeTitleCate = (item) => {
     params.titleCate = item.cate;
 };
 const changeStatusCate = (item) => {
-    params.statusCate = item.cate;
+    params.statusCate = item.Key;
 };
 defineExpose({
     params
@@ -51,9 +49,13 @@ defineExpose({
             </p>
         </div>
         <slot name="active2"></slot>
-        <div class="status-cate" v-if="props.statusList">
+        <div
+            class="status-cate"
+            :class="props?.statusList.length < 6 ? 'active' : ''"
+            v-if="props?.statusList"
+        >
             <p
-                v-for="item in props.statusList"
+                v-for="item in props?.statusList"
                 :key="item.Key"
                 @click="changeStatusCate(item)"
                 :class="item.Key == params.statusCate ? 'active' : ''"
@@ -97,10 +99,12 @@ defineExpose({
 
     :deep(.status-cate) {
         .flex-row;
-        justify-content: flex-start;
+        justify-content: space-between;
         padding: 30px 20px 10px;
-        gap: 30px;
-
+        &.active {
+            justify-content: flex-start;
+            gap: 30px;
+        }
         p {
             cursor: pointer;
             height: 17px;

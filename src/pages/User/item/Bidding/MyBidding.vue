@@ -11,12 +11,20 @@ import {
     getWeiZhiFuApi,
     getBuZhiFuApi
 } from '@/request/jingmai';
+import QuJian from './QuJian.vue';
+import Item from './Item.vue';
+import Item2 from './Item2.vue';
+import Item3 from './Item3.vue';
 import { info } from '@/hooks/antd/message';
 import { watch } from 'vue';
 const router = useRouter();
 const route = useRoute();
 const showModals = ref(null);
 const props = defineProps({});
+const showComponent = ref(1);
+const changeShowPage = (index) => {
+    showComponent.value = index;
+};
 const params = ref({
     Title: '',
     Status: '',
@@ -53,22 +61,21 @@ watch(
         } else if (showModals.value?.params?.titleCate == '已发货') {
             router.push('/user/logistics/yifahuo');
             return;
+        } else if (showModals.value?.params?.titleCate) {
+            Object.keys(params.value).forEach((item) => {
+                params.value[item] = '';
+            });
+            params.value.total = 1;
+            getFetchData(1, 10);
         }
-        Object.keys(params.value).forEach((item) => {
-            params.value[item] = '';
-        });
-        params.value.total = 1;
-        getFetchData(1, 10);
     }
 );
 const showGoodsDetails = (i) => {
+    console.log(i);
     router.push({
-        path: '/jingmai/show-stamp-goods',
+        path: '/jingmai/goods-details',
         query: {
-            Id: i.Gid,
-            SType: 1,
-            Cate1: 1
-            // show: true
+            id: i.Gid
         }
     });
 };
@@ -116,12 +123,18 @@ const getAll = () => {
 };
 //支付
 const zhiFu = () => {
+    showComponent.value = 2;
     console.log(checkList.value.DelList);
 };
 </script>
 
 <template>
-    <div class="my-bidding">
+    <Item
+        @changeShowPage="changeShowPage"
+        :fetchData="fetchData"
+        v-show="showComponent == 2"
+    ></Item>
+    <div class="my-bidding" v-show="showComponent == 1">
         <div class="card-box">
             <div class="title"> 我的竞买 </div>
             <show-modal ref="showModals" :titleList="jingMaiList">
@@ -157,7 +170,11 @@ const zhiFu = () => {
                         <a-button type="primary" @click="getFetchData(1, 10)">搜索</a-button>
                     </div>
                 </template>
-                <template v-slot:active3>
+                <!-- 快递取件码 -->
+                <!-- <template v-slot:active3>
+                    <QuJian v-show="showModals?.params?.titleCate == '未支付'"></QuJian>
+                </template> -->
+                <template v-slot:active4>
                     <a-table :pagination="false" :columns="jingMaiColumns" :dataSource="fetchData">
                         <template #bodyCell="{ column, record }">
                             <template
@@ -226,6 +243,8 @@ const zhiFu = () => {
             <CatePage :paginations="params" @fetchList="getFetchData"></CatePage>
         </div>
     </div>
+    <Item2 @changeShowPage="changeShowPage" v-show="showComponent == 3"></Item2>
+    <Item3 @changeShowPage="changeShowPage" v-show="showComponent == 4"></Item3>
 </template>
 
 <style scoped lang="less">

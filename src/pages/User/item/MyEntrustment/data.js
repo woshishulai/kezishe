@@ -231,74 +231,84 @@ const JingMaiStatusList = [
 const JingMaiColumns = [
     {
         title: '商品编号',
-        width: '200px',
+        ellipsis: true,
         dataIndex: 'Bn',
         key: 'Bn',
+        width: 140,
         align: 'center'
     },
     {
         title: '商品名称',
-        width: '200px',
+        ellipsis: true,
         dataIndex: 'Title',
         key: 'Title',
+        width: 200,
         align: 'center',
         ellipsis: true
     },
     {
         title: '合同编号',
-        width: '200px',
+        ellipsis: true,
         dataIndex: 'Cbn',
         key: 'Cbn',
+        width: 200,
         align: 'center'
     },
     {
         title: '委托时间',
-        width: '200px',
+        ellipsis: true,
         dataIndex: 'EntrustTime',
         key: 'EntrustTime',
-        align: 'center'
+        align: 'center',
+        width: 200
     },
     {
         title: '起始价',
-        width: '200px',
+        ellipsis: true,
         dataIndex: 'MakePrice',
         key: 'MakePrice',
-        align: 'center'
+        align: 'center',
+        width: 200
     },
     {
         title: '结标价',
-        width: '200px',
+        ellipsis: true,
         dataIndex: 'BasePrice',
         key: 'BasePrice',
-        align: 'center'
+        align: 'center',
+        width: 200
     },
     {
-        width: '200px',
+        ellipsis: true,
         title: '开始竞价时间',
         dataIndex: 'Starttime',
         key: 'Starttime',
-        align: 'center'
+        align: 'center',
+        width: 200
     },
     {
-        width: '200px',
+        ellipsis: true,
         title: '结标时间',
         dataIndex: 'ClosingTime',
         key: 'ClosingTime',
-        align: 'center'
+        align: 'center',
+        width: 200
     },
     {
-        width: '200px',
+        ellipsis: true,
         title: '结算状态',
         dataIndex: 'SettleStatus',
         key: 'SettleStatus',
-        align: 'center'
+        align: 'center',
+        width: 200
     },
     {
-        width: '200px',
+        ellipsis: true,
         title: '结算时间',
-        dataIndex: 'SettleTime',
-        key: 'SettleTimeime',
-        align: 'center'
+        dataIndex: 'EntrustTime',
+        key: 'EntrustTime',
+        align: 'center',
+        width: 200
     }
 ];
 const JingMaiDataSource = [

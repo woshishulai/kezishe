@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, reactive, onMounted, h, watchEffect } from 'vue';
+import { ref, computed, reactive, onMounted, h, watch, watchEffect } from 'vue';
 import CatePage from '@/components/common/CatePage.vue';
 import { SearchOutlined } from '@ant-design/icons-vue';
 import {
@@ -10,18 +10,23 @@ import {
     JingMaiColumns,
     ShippingColumns
 } from './data';
-import { getUserCollectionListApi } from '@/request/api';
+import { getGoodsCateApi, getSelectCateApi, getGoodsListApi } from '@/request/user/api.js';
+import { info } from '@/hooks/antd/message';
 const props = defineProps({});
 const tableList = ref([]);
+const navList = ref([]);
+const selectList = ref([]);
+const showModals = ref(null);
 const query = reactive({
-    cid: '-1', //默认
-    start: '-1', //时间范围
-    end: '-1', //时间范围
-    brand: '-1', //全部类型 竞买 一口价
-    kw: '', //关键字
-    status: '1', //active2
-    pageSize: '10',
-    pageIndex: '1'
+    Cid: '-1', //默认
+    StartDateRange: '-1', //时间范围
+    EndDateRange: '-1', //时间范围
+    Brand: '-1', //全部类型 竞买 一口价
+    Kw: '', //关键字
+    Status: '', //active2
+    PageSize: '10',
+    PageIndex: '1',
+    total: 1
 });
 const list = [
     {
@@ -31,41 +36,80 @@ const list = [
         cate: '购物'
     }
 ];
-const showModals = ref(null);
+//获取所有的分类
+const getNavCateList = async () => {
+    try {
+        let res = await getGoodsCateApi();
+        navList.value = res.Data;
+        query.Status = navList.value[0].Key;
+        console.log(navList.value, '我是顶部的类型');
+    } catch (error) {}
+};
+//获取所有的分类
+const getSelectCate = async () => {
+    try {
+        let res = await getSelectCateApi();
+        selectList.value = res.Data;
+        selectList.value.unshift({
+            Key: '-1',
+            Value: '全部'
+        });
+        console.log(selectList.value, '我是select的类型');
+    } catch (error) {}
+};
+const getTableList = async (page, pageSize) => {
+    query.PageSize = pageSize;
+    query.PageIndex = page;
+    try {
+        let newRes = await getGoodsListApi(query);
+        tableList.value = newRes.Data;
+        query.total = newRes.Total;
+        console.log(newRes, '我是返回的数据', query.total);
+    } catch (error) {
+        info('error');
+    }
+};
+onMounted(() => {
+    Promise.all([getNavCateList(), getSelectCate()]).then(() => {});
+});
+const showGoodsDetails = (i) => {
+    // console.log(i);
+    // router.push({
+    //     path: '/jingmai/goods-details',
+    //     query: {
+    //         id: i.Id
+    //     }
+    // });
+};
 const columnsList = ref([]);
 const params = ref({});
 var a = 2;
 var b = 5;
 console.log(a === 2 || (1 && b == 3) || 4);
-const getGoodsList = async () => {
-    console.log(query);
-    try {
-        let res = await getUserCollectionListApi(query);
-        tableList.value = res.Data;
-        tableList.value.BidderType.unshift({
-            Key: '-1',
-            Value: '全部'
-        });
-        console.log(tableList.value.GoodsStatusList);
-    } catch (error) {}
-};
-let res = [];
-onMounted(() => {
-    params.value = showModals.value?.params;
-    getGoodsList();
-});
+
+watch(
+    () => showModals.value?.params,
+    () => {
+        if (!showModals.value?.params?.titleCate) {
+            return;
+        }
+        if (!showModals.value?.params?.statusCate) {
+            return;
+        }
+        query.Status = showModals.value?.params?.statusCate;
+
+        getTableList(1, 10);
+    },
+    {
+        deep: true
+    }
+);
+
 watchEffect(() => {
     columnsList.value =
         params.value.titleCate == list[0].cate || params.value.titleCate == undefined
             ? JingMaiColumns
             : ShippingColumns;
-});
-const changeStatusCate = (item) => {
-    query.status = item.Key;
-    getGoodsList(query);
-};
-const state = reactive({
-    selectedRowKeys: []
 });
 const handleChange = () => {
     console.log(query);
@@ -86,59 +130,44 @@ const statusText = (value) => {
     <div class="my-entrustment">
         <div class="card-box">
             <div class="title"> 我的藏品 </div>
-            <show-modal ref="showModals" :titleList="list">
-                <template v-slot:active2>
-                    <div class="status-cate">
-                        <p
-                            v-for="item in tableList.GoodsStatusList"
-                            :key="item.Key"
-                            @click="changeStatusCate(item)"
-                            :class="item.Key == query.status ? 'active' : ''"
-                        >
-                            {{ item.Value }} ({{ item.Count }})
-                        </p>
-                    </div>
-                </template>
+            <show-modal ref="showModals" :titleList="list" :statusList="navList">
                 <template v-slot:active3>
-                    <div class="search-cate" v-if="params.titleCate == list[0].cate">
+                    <div class="search-cate" v-if="showModals?.params?.titleCate == list[0].cate">
                         <a-select
                             ref="select"
                             class="item"
                             placeholder="所有分类"
                             :field-names="{ label: 'Value', value: 'Key' }"
-                            v-model:value="query.cid"
-                            :options="tableList.BidderType"
-                            @change="handleChange"
+                            v-model:value="query.Cid"
+                            :options="selectList"
                         ></a-select>
                         <a-select
                             class="item"
                             placeholder="全部委托时间"
                             style="width: 300px"
-                            v-model:value="query.start"
+                            v-model:value="query.StartDateRange"
                             :options="timeStartOptions"
-                            @change="handleChange"
                         ></a-select>
                         <a-select
                             class="item"
                             placeholder="全部结标时间"
-                            v-model:value="query.end"
+                            v-model:value="query.EndDateRange"
                             :options="timeEndOptions"
-                            @change="handleChange"
                         ></a-select>
                         <a-select
                             class="item"
                             placeholder="全部类型"
-                            v-model:value="query.brand"
+                            v-model:value="query.Brand"
                             :options="sellingPriceList"
-                            @change="handleChange"
                         ></a-select>
                         <a-input
                             name="shulai"
-                            v-model:value="query.kw"
+                            v-model:value="query.Kw"
+                            @keydown.enter="getTableList"
                             class="item-input"
                             placeholder="名称和藏品"
                         />
-                        <a-button type="primary" @click="getGoodsList" :icon="h(SearchOutlined)"
+                        <a-button type="primary" @click="getTableList" :icon="h(SearchOutlined)"
                             >搜索</a-button
                         >
                     </div>
@@ -155,7 +184,7 @@ const statusText = (value) => {
                             style="width: 316px"
                             placeholder="名称/藏品/合同号"
                         />
-                        <a-button @click="getGoodsList" :icon="h(SearchOutlined)">搜索</a-button>
+                        <a-button :icon="h(SearchOutlined)">搜索</a-button>
                     </div>
                 </template>
                 <template v-slot:active4>
@@ -163,66 +192,17 @@ const statusText = (value) => {
                         <a-table
                             :pagination="false"
                             :columns="columnsList"
-                            :dataSource="tableList.GoodsList"
+                            :dataSource="tableList"
                             :scroll="{ x: '1070px' }"
                             scrollToFirstRowOnChange="true"
                         >
                             <template #bodyCell="{ column, record }">
-                                <template v-if="column.key === 'Bn'">
-                                    <div class="table-item-gooods-info">
-                                        <span style="width: 100%" :title="record.Bn">{{
-                                            record.Bn
-                                        }}</span>
-                                    </div>
-                                </template>
                                 <template v-if="column.key === 'Title'">
-                                    <div class="table-item-gooods-info">
+                                    <div class="goods-info" @click="showGoodsDetails(record)">
                                         <img :src="record.CoverImg" alt="" />
-                                        <span style="width: 100%" :title="record.Title">{{
-                                            record.Title
-                                        }}</span>
-                                    </div>
-                                </template>
-                                <template v-if="column.key === 'Cbn'">
-                                    <div class="table-item-gooods-info">
-                                        <span style="width: 100%" :title="record.Cbn">{{
-                                            record.Cbn
-                                        }}</span>
-                                    </div>
-                                </template>
-                                <template v-if="column.key === 'EntrustTime'">
-                                    <div class="table-item-gooods-info">
-                                        <span style="width: 100%" :title="record.EntrustTime">{{
-                                            record.EntrustTime
-                                        }}</span>
-                                    </div>
-                                </template>
-                                <template v-if="column.key === 'MakePrice'">
-                                    <div class="table-item-gooods-info">
-                                        <span style="width: 100%" :title="record.MakePrice">{{
-                                            record.MakePrice
-                                        }}</span>
-                                    </div>
-                                </template>
-                                <template v-if="column.key === 'BasePrice'">
-                                    <div class="table-item-gooods-info">
-                                        <span style="width: 100%" :title="record.BasePrice">{{
-                                            record.BasePrice
-                                        }}</span>
-                                    </div>
-                                </template>
-                                <template v-if="column.key === 'Starttime'">
-                                    <div class="table-item-gooods-info">
-                                        <span style="width: 100%" :title="record.Starttime">{{
-                                            record.Starttime
-                                        }}</span>
-                                    </div>
-                                </template>
-                                <template v-if="column.key === 'ClosingTime'">
-                                    <div class="table-item-gooods-info">
-                                        <span style="width: 100%" :title="record.ClosingTime">{{
-                                            record.ClosingTime
-                                        }}</span>
+                                        <span>
+                                            {{ record.Title }}
+                                        </span>
                                     </div>
                                 </template>
                                 <template v-if="column.key === 'SettleStatus'">
@@ -231,14 +211,6 @@ const statusText = (value) => {
                                         :class="record.SettleStatus == '5' ? 'active' : ''"
                                     >
                                         <span>{{ statusText(record.SettleStatus) }}</span>
-                                        <span class="tiem">({{ '10574279' }})</span>
-                                    </div>
-                                </template>
-                                <template v-if="column.key === 'SettleTime'">
-                                    <div class="table-item-gooods-info">
-                                        <span style="width: 100%" :title="record.SettleTime">{{
-                                            record.SettleTime
-                                        }}</span>
                                     </div>
                                 </template>
                                 <template v-if="column.key === 'jiesuanzhuangtai'">
@@ -252,7 +224,7 @@ const statusText = (value) => {
                     </div>
                 </template>
             </show-modal>
-            <CatePage></CatePage>
+            <CatePage :paginations="query" @fetchList="getTableList"></CatePage>
         </div>
     </div>
 </template>
@@ -265,13 +237,22 @@ const statusText = (value) => {
     :deep(.ant-select-selector) {
         padding: 0 20px;
     }
-    .table-item-gooods-info {
-        .flex-row;
-        gap: 10px;
-
+    .goods-info {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-align: center;
+        gap: 3px;
+        width: 100%;
+        &:hover {
+            color: #9a0000;
+            cursor: pointer;
+        }
         img {
-            max-width: 30px;
-            max-height: 30px;
+            height: 40px;
+        }
+        span {
+            flex: 1;
         }
     }
 
