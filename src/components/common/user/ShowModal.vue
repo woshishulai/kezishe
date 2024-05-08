@@ -13,8 +13,8 @@ const props = defineProps({
 });
 const params = reactive({});
 watchEffect(() => {
-    params.statusCate = props?.statusList[0]?.Key;
-    params.titleCate = props?.titleList[0].cate;
+    params.statusCate = props?.statusList ? props?.statusList[0]?.Key : '';
+    params.titleCate = props?.titleList ? props?.titleList[0]?.cate : '';
 });
 const changeTitleCate = (item) => {
     if (params.titleCate == item.cate) {
@@ -36,7 +36,11 @@ defineExpose({
 <template>
     <div class="show-modal">
         <slot name="active1"></slot>
-        <div class="title-cate" v-if="props.titleList">
+        <div
+            class="title-cate"
+            :class="props.titleList?.length > 5 ? 'active' : ''"
+            v-if="props.titleList"
+        >
             <p
                 class="cate-item"
                 @click="changeTitleCate(item)"
@@ -45,7 +49,7 @@ defineExpose({
                 :key="item.cate"
             >
                 <span>{{ item.cate }}</span>
-                <span v-if="item.num">({{ item.num }})</span>
+                <span v-if="item.num">({{ item.showText }} {{ item.num }})</span>
             </p>
         </div>
         <slot name="active2"></slot>
@@ -79,6 +83,9 @@ defineExpose({
         background-color: #eef3f8;
         border: none;
         border-radius: 4px;
+        &.active {
+            gap: 0;
+        }
 
         .cate-item {
             padding: 16px 0;

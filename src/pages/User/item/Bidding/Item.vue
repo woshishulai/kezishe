@@ -2,6 +2,7 @@
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
+import Header from './Header.vue';
 const jingMaiColumns = [
     {
         title: '订单编号',
@@ -139,9 +140,12 @@ const showGoodsDetails = (i) => {
 
 <template>
     <div class="address-wrap">
+        <Header num="1"></Header>
         <div class="title-nav">
             <h5>收货信息</h5>
-            <p>新增收货地址</p>
+            <p @click="router.push('/user/account-management/shipping-information')"
+                >新增收货地址</p
+            >
         </div>
         <!-- 地址 -->
         <div class="center">
@@ -156,14 +160,17 @@ const showGoodsDetails = (i) => {
                     <p>删除</p>
                 </div>
             </div>
-            <a-select
-                ref="select"
-                placeholder="选择地址"
-                class="item"
-                v-model:value="address"
-                :options="addressList"
-                style="width: 200px"
-            ></a-select>
+            <div class="check-one">
+                <a-select
+                    ref="select"
+                    placeholder="更多地址"
+                    class="item"
+                    v-model:value="address"
+                    :options="addressList"
+                    style="width: 140px"
+                ></a-select>
+                <img :src="getImageUrl('user/jingmai/icon8.svg')" alt="" />
+            </div>
         </div>
         <!-- 配送方式 -->
         <div class="title-nav">
@@ -351,7 +358,7 @@ const showGoodsDetails = (i) => {
     .title-nav {
         .flex-row;
         justify-content: space-between;
-        padding: 18px 30px;
+        padding: 18px 50px;
         background-color: #eef3f8;
         h5 {
             display: flex;
@@ -369,10 +376,14 @@ const showGoodsDetails = (i) => {
             padding-bottom: 1px;
             border-bottom: 1px solid #1677ff;
             cursor: pointer;
+            &:hover {
+                color: #b11503;
+                border-color: #b11503;
+            }
         }
     }
     .center {
-        padding: 40px 30px 50px;
+        padding: 34px 50px 22px;
         .address-default {
             .flex-row;
             justify-content: space-between;
@@ -437,8 +448,32 @@ const showGoodsDetails = (i) => {
             }
         }
         .ant-select {
-            margin-top: 30px;
+            margin-top: 15px;
             text-align: center;
+            font-size: 14px;
+        }
+        .check-one {
+            width: 141px;
+            position: relative;
+            margin-left: 38px;
+            img {
+                position: absolute;
+                top: 52%;
+                right: 17%;
+                width: 12px;
+            }
+        }
+        :deep(.ant-select-selector) {
+            .flex-row;
+            border-radius: 10px;
+            line-height: 45px;
+            height: 45px;
+            input {
+                height: 33px;
+            }
+        }
+        :deep(.ant-select-arrow) {
+            display: none;
         }
         .details {
             .flex-row;

@@ -3,7 +3,7 @@ import { ref, computed, reactive, onMounted, h } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
 import { SearchOutlined } from '@ant-design/icons-vue';
-import { jingMaiList, timeOptions, statusOptions, jingMaiColumns, pingTai } from '../../data.js';
+import { timeOptions, statusOptions, jingMaiColumns, pingTai } from '../../data.js';
 import {
     getJingMaiApi,
     getYiDeBiaoApi,
@@ -17,11 +17,35 @@ import Item2 from './Item2.vue';
 import Item3 from './Item3.vue';
 import { info } from '@/hooks/antd/message';
 import { watch } from 'vue';
+const jingMaiList = ref([
+    {
+        cate: '竞买中'
+    },
+    {
+        cate: '已得标'
+    },
+    {
+        cate: '未得标'
+    },
+    {
+        cate: '未支付',
+        num: ''
+    },
+    {
+        cate: '不支付'
+    },
+    {
+        cate: '未发货'
+    },
+    {
+        cate: '已发货'
+    }
+]);
 const router = useRouter();
 const route = useRoute();
 const showModals = ref(null);
 const props = defineProps({});
-const showComponent = ref(1);
+const showComponent = ref(2);
 const changeShowPage = (index) => {
     showComponent.value = index;
 };
@@ -46,7 +70,20 @@ const getFetchData = async (page, pageSize) => {
     params.value.PageSize = pageSize;
     try {
         let res = await apiList[showModals.value?.params?.titleCate](params.value); // 调用函数来获取数据
+        if (res.Tag != 1) {
+            return;
+        }
         params.total = res.Total;
+        let index = jingMaiList.value.findIndex((item) => {
+            return item.cate == showModals.value?.params?.titleCate;
+        });
+        jingMaiList.value.forEach((item) => {
+            item.num = '';
+        });
+        jingMaiList.value[index].num = res.Data.length;
+        if (index == 3) {
+            jingMaiList.value[index].showText = '预约';
+        }
         fetchData.value = res.Data;
     } catch (error) {
         info('error', error);
@@ -171,9 +208,10 @@ const zhiFu = () => {
                     </div>
                 </template>
                 <!-- 快递取件码 -->
-                <!-- <template v-slot:active3>
-                    <QuJian v-show="showModals?.params?.titleCate == '未支付'"></QuJian>
-                </template> -->
+                <template v-slot:active3>
+                    <!-- <QuJian v-show="showModals?.params?.titleCate == '未支付'"></QuJian> -->
+                    <QuJian></QuJian>
+                </template>
                 <template v-slot:active4>
                     <a-table :pagination="false" :columns="jingMaiColumns" :dataSource="fetchData">
                         <template #bodyCell="{ column, record }">

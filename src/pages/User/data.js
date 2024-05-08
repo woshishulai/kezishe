@@ -296,7 +296,7 @@ export const pingTai = [
 ];
 export const jingMaiColumns = [
     {
-        title: '商品编号',
+        title: '藏品编号',
         dataIndex: 'Bn',
         key: 'Bn',
         align: 'center',
@@ -310,7 +310,7 @@ export const jingMaiColumns = [
         align: 'center'
     },
     {
-        title: '商品名称',
+        title: '藏品名称',
         dataIndex: 'Title',
         key: 'Title',
         align: 'center',
@@ -331,7 +331,7 @@ export const jingMaiColumns = [
         align: 'center',
         ellipsis: true,
         width: 140
-},
+    },
     {
         title: '状态',
         dataIndex: 'Status',
