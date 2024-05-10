@@ -20,7 +20,7 @@ const formState = ref({
     Birthday: '',
     IdType: '',
     IdNumbers: '',
-    fileList: ''
+    IdImage: ''
 });
 const formState1 = ref({
     Mobile: user.userInfo.Mobile || '',
@@ -75,6 +75,9 @@ const getEmailCode = () => {
         }, 1000);
     }
 };
+const getFiles = (file) => {
+    formState.value.IdImage = file;
+};
 
 const handleFinish = async () => {
     let params = {
@@ -84,7 +87,7 @@ const handleFinish = async () => {
         Birthday: formState.value.Birthday,
         IdType: formState.value.IdType,
         IdNumbers: formState.value.IdNumbers,
-        IdImage: ''
+        IdImage: formState.value.IdImage
     };
     try {
         let res = await changeUserInfo(params);
@@ -152,7 +155,7 @@ const onFinish = async () => {
                     <a-form-item label="性别" name="gender">
                         <a-radio-group v-model:value.trim="formState.Gender">
                             <a-radio value="1">男</a-radio>
-                            <a-radio value="0">女</a-radio>
+                            <a-radio value="2">女</a-radio>
                         </a-radio-group>
                     </a-form-item>
                     <a-form-item label="出生年月" name="date1">
@@ -184,7 +187,7 @@ const onFinish = async () => {
                         />
                     </a-form-item>
                     <a-form-item label="证件照片" class="upload-wrap">
-                        <Upload></Upload>
+                        <Upload @getFiles="getFiles"></Upload>
                     </a-form-item>
                     <a-form-item :wrapper-col="{ span: 19, offset: 5 }">
                         <a-button html-type="submit" type="primary">保存基本信息</a-button>

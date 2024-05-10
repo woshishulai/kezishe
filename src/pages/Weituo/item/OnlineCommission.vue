@@ -11,10 +11,11 @@ const open = ref(false);
 const openTitle = ref('请先登录在填写申请单');
 const route = useRoute();
 const formState = ref({
-    username: '测试的',
-    phone: 17634448534,
-    introduction: '这里是测试的',
-    remember: true
+    username: '',
+    phone: '',
+    introduction: '',
+    remember: true,
+    UserFile: ''
 });
 const list = [
     {
@@ -78,6 +79,9 @@ onMounted(async () => {
     document.title = res.Data.seoData.seoTitle;
     console.log(res);
 });
+const getFiles = (file) => {
+    formState.value.UserFile = file;
+};
 const handleOk = (e) => {
     console.log(e);
     open.value = false;
@@ -94,7 +98,7 @@ const onFinish = async (values) => {
             UserName: formState.value.username,
             UserTel: formState.value.phone,
             Content: formState.value.introduction,
-            UserFile: '测试'
+            UserFile: formState.value.UserFile
         };
         console.log(query);
         let res = await submitWeituoAPi(query);
@@ -198,7 +202,7 @@ const onFinish = async (values) => {
                         <a-textarea v-model:value="formState.introduction" />
                     </a-form-item>
                     <a-form-item label="上传文档">
-                        <Upload :fileModule="4"></Upload>
+                        <Upload @getFiles="getFiles" :fileModule="4"></Upload>
                     </a-form-item>
                     <a-form-item name="remember" :wrapper-col="{ offset: 3, span: 10 }">
                         <a-checkbox v-model:checked="formState.remember">

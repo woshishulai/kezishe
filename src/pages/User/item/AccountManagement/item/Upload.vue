@@ -15,6 +15,7 @@ const props = defineProps({
 });
 let imageUrl = ref('');
 onMounted(() => {});
+const emits = defineEmits(['getFiles']);
 const chooseImageUrl = async (e) => {
     const MAX_FILE_SIZE = 2 * 1024 * 1024;
     const file = e.target.files[0];
@@ -46,6 +47,7 @@ const chooseImageUrl = async (e) => {
                 'Content-Type': 'multipart/form-data'
             }
         });
+        // emits('getFiles',response.data)
         console.log('File uploaded successfully:', response.data);
     } catch (error) {
         console.error('Error uploading file:', error);

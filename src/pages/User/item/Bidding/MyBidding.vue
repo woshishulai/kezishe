@@ -103,6 +103,7 @@ watch(
                 params.value[item] = '';
             });
             params.value.total = 1;
+            fetchData.value = [];
             getFetchData(1, 10);
         }
     }

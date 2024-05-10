@@ -13,7 +13,9 @@ import RemoveTableList from './item/RemoveTableList.vue';
 import { shippingColumns } from '../../data';
 import { handleFinishFailed } from '@/utils/form/rules.js';
 import { message } from 'ant-design-vue';
+import { useUserInfo } from '@/store/store';
 const countList = ref([]);
+const user = useUserInfo();
 const params = reactive({
     open: false, //是否打开弹窗
     title: '', //标题
@@ -53,6 +55,17 @@ onMounted(async () => {
             return;
         }
         address.value = res.Data;
+        res = null;
+        if (address.value.length >= 1) {
+            const item = address.value.find((item) => item.Default == 1);
+            if (item) {
+                user.changeUserAddress(item);
+            } else {
+                user.changeUserAddress(address.value[0]);
+            }
+        } else {
+            user.removeUserAddress();
+        }
         const ress = await getCountList();
         if (ress.Tag !== 1) {
             info('error', ress.Message);
@@ -98,33 +111,14 @@ const postAPi = async () => {
     if (res.Tag == 1) {
         const index = address.value.findIndex((item) => item.Id === params.id);
         address.value.splice(index, 1);
+        if (user.userAddress.Id == params.id) {
+            if (address.value.length >= 1) {
+                user.changeUserAddress(address.value[0]);
+            } else {
+                user.changeUserAddress();
+            }
+        }
         closeModel();
-    }
-};
-const changeApi = async (query) => {
-    let params = {
-        Id: changeParams.id,
-        NickName: query.username,
-        State: query.country,
-        Sheng: query.status,
-        Shi: query.shi,
-        Address: query.text,
-        Postal: query.postal,
-        Tel: query.tel,
-        Phone: query.phone,
-        Default: changeParams.default
-    };
-    let res = await changeUserAddressInfo(params);
-    let status;
-    if (res.Tag == 1) {
-        status = 'success';
-        const index = address.value.findIndex((item) => item.Id === params.Id);
-        address.value.splice(index, 1, params);
-        info(status, res.Message);
-        closeModel();
-    } else {
-        status = 'error';
-        info(status, res.Message);
     }
 };
 const changeDefault = async (id) => {
@@ -162,7 +156,7 @@ const handleFinish = async () => {
         Default: '0'
     };
     try {
-        let res = await changeUserAddressInfo(params);
+        let res = await addUserAddressInfo(params);
         params.Id = res.Data;
         if (res.Tag === 1) {
             address.value.push(params);
@@ -243,7 +237,7 @@ const handleFinishs = async () => {
                             <span
                                 @click="changeDefault(record.Id)"
                                 :class="record.Default ? 'active' : ''"
-                                >{{ record.Default ? '默认账号' : '设为默认' }}
+                                >{{ record.Default == 1 ? '默认账号' : '设为默认' }}
                             </span>
                         </div>
                     </template>

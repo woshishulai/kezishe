@@ -18,6 +18,7 @@ const getGoodsList = async () => {
     try {
         let res = await goodsListAPi(postParams.value);
         formState.value = res.Data;
+        console.log(formState.value, '专场item1');
     } catch (error) {
         info('error', error);
     }

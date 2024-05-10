@@ -16,6 +16,8 @@ export const useUserInfo = defineStore(
         const userPhoneList = ref([]);
         //记住我的账号
         const userNameList = ref([]);
+        //地址
+        const userAddress = ref({});
         const changeUserInfo = async (params) => {
             userInfo.value = Object.assign({}, userInfo.value, params);
             // console.log('更新的用户个人信息', userInfo.value);
@@ -26,6 +28,10 @@ export const useUserInfo = defineStore(
         };
         const changeUserNickName = async (params) => {
             userNickName.value = params;
+            // console.log('更新的用户昵称信息', userNickName.value);
+        };
+        const changeUserAddress = async (params) => {
+            userAddress.value = params;
             // console.log('更新的用户昵称信息', userNickName.value);
         };
         const addPhoneList = async (params) => {
@@ -49,6 +55,9 @@ export const useUserInfo = defineStore(
         const removeUserNickName = async () => {
             userNickName.value = {};
         };
+        const removeUserAddress = async () => {
+            userAddress.value = {};
+        };
         const removePhoneList = async (params) => {
             const index = userPhoneList.value.findIndex((item) => {
                 item == params;
@@ -67,14 +76,17 @@ export const useUserInfo = defineStore(
             userNickName,
             userPhoneList,
             userNameList,
+            userAddress,
             changeUserInfo,
             changeUserTranslate,
             changeUserNickName,
+            changeUserAddress,
             addPhoneList,
             addUserNameList,
             removeUserInfo,
             removeUserTranslate,
             removeUserNickName,
+            removeUserAddress,
             removePhoneList,
             removeUserNameList
         };

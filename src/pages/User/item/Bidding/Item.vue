@@ -1,8 +1,10 @@
 <script setup>
+import ShippingInformation from '../AccountManagement/ShippingInformation.vue';
+import Header from './Header.vue';
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
-import Header from './Header.vue';
+import { useUserInfo } from '@/store/store';
 const jingMaiColumns = [
     {
         title: '订单编号',
@@ -55,6 +57,7 @@ const jingMaiColumns = [
 ];
 const router = useRouter();
 const route = useRoute();
+const user = useUserInfo();
 const props = defineProps({
     fetchData: {
         type: Array,
@@ -90,6 +93,11 @@ const list1 = [
         text: '在线汇款'
     }
 ];
+//切换地址
+const open = ref(false);
+const changeOpen = () => {
+    open.value = true;
+};
 //勾选框 优惠券
 const checkedss = ref(false);
 //下拉选择勾选框
@@ -143,9 +151,7 @@ const showGoodsDetails = (i) => {
         <Header num="1"></Header>
         <div class="title-nav">
             <h5>收货信息</h5>
-            <p @click="router.push('/user/account-management/shipping-information')"
-                >新增收货地址</p
-            >
+            <p @click="changeOpen">新增收货地址</p>
         </div>
         <!-- 地址 -->
         <div class="center">
@@ -347,7 +353,10 @@ const showGoodsDetails = (i) => {
                 </div>
             </div>
         </div>
-        <!-- <p></p> -->
+        <!-- 订单相关的 -->
+        <a-drawer v-model:open="open" width="1000" class="custom-class" placement="right">
+            <ShippingInformation></ShippingInformation>
+        </a-drawer>
     </div>
 </template>
 
