@@ -1,4 +1,5 @@
 <script setup>
+import Header from './Header.vue';
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
@@ -41,6 +42,7 @@ const jingMaiColumns = [
 
 <template>
     <div class="bank">
+        <Header num="3"></Header>
         <div class="title-nav">
             <h5>银行地址及汇款地址</h5>
         </div>

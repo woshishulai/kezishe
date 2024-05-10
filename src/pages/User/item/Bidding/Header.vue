@@ -31,22 +31,24 @@ onMounted(() => {});
                 />
                 <img v-if="props?.num != 3" :src="getImageUrl('user/jingmai/icon4.png')" alt="" />
             </div>
+
             <div class="xian">
                 <div class="zero active">
                     <img :src="getImageUrl('user/jingmai/icon7.svg')" alt="" />
                 </div>
                 <p class="active" :class="props?.num == 2 || props?.num == 3 ? 'active' : ''"></p>
-                <div class="zero">
+                <div class="zero" :class="props?.num == 2 || props?.num == 3 ? 'active' : ''">
                     <img
                         v-if="props?.num == 2 || props?.num == 3"
                         :src="getImageUrl('user/jingmai/icon7.svg')"
                         alt=""
                 /></div>
                 <p :class="props?.num == 3 ? 'active' : ''"></p>
-                <div class="zero">
+                <div class="zero" :class="props?.num == 3 ? 'active' : ''">
                     <img v-if="props?.num == 3" :src="getImageUrl('user/jingmai/icon7.svg')" alt=""
                 /></div>
             </div>
+
             <div class="text-wrap">
                 <span class="active">确认支付方式</span>
                 <span :class="props?.num != 2 || props?.num != 3 ? 'active' : ''">支付确认</span>

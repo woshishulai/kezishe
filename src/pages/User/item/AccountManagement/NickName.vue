@@ -194,7 +194,7 @@ const changeDefault = async (query) => {
                                 @click="changeDefault(record)"
                                 :class="record.Default == 1 ? 'active' : ''"
                             >
-                                {{ record.Default ? '默认账号' : '设为默认' }}
+                                {{ record.Default == 1 ? '默认账号' : '设为默认' }}
                             </span>
                         </div>
                     </template>

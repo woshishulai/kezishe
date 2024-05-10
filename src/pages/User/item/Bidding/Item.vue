@@ -1,10 +1,20 @@
 <script setup>
-import ShippingInformation from '../AccountManagement/ShippingInformation.vue';
 import Header from './Header.vue';
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
 import { useUserInfo } from '@/store/store';
+import { handleFinishFailed } from '@/utils/form/rules';
+import { shippingColumns } from '../../data';
+import { info } from '@/hooks/antd/message';
+import { getZhiFu } from '@/request/user/api';
+import {
+    getUserAddressApi,
+    removeUserAddressApi,
+    changeUserAddressInfo,
+    addUserAddressInfo,
+    getCountList
+} from '@/request/api';
 const jingMaiColumns = [
     {
         title: '订单编号',
@@ -58,13 +68,39 @@ const jingMaiColumns = [
 const router = useRouter();
 const route = useRoute();
 const user = useUserInfo();
+//明天请求支付接口
+const getZhifuFangShi = ref([]);
+
+const formState = reactive({
+    Id: '', //数组的某一项
+    title: '', //标题
+    username: '',
+    region: '中国',
+    statusList: [], //省市数据
+    date1: undefined, //选择的省市
+    text: '', //详细地址
+    bankNmae: '', //邮编
+    tel: '', //电话
+    phone: ''
+});
 const props = defineProps({
     fetchData: {
         type: Array,
         default: []
     }
 });
-onMounted(() => {});
+onMounted(async () => {
+    const ress = await getCountList();
+    if (ress.Tag !== 1) {
+        info('error', ress.Message);
+        return;
+    }
+    const res = await getUserAddressApi();
+    addressList.value = res.Data;
+    countList.value = ress.Data;
+    formState.region = countList.value[0].AreaName;
+    formState.statusList = countList.value[0].ChildList;
+});
 const list = [
     {
         id: '1',
@@ -72,11 +108,11 @@ const list = [
     },
     {
         id: '2',
-        text: '顺丰特快 (到付)'
+        text: '顺丰标快 (到付)'
     },
     {
         id: '3',
-        text: '顺丰特快 (到付)'
+        text: '邮政EMS'
     }
 ];
 const list1 = [
@@ -93,10 +129,105 @@ const list1 = [
         text: '在线汇款'
     }
 ];
+//城市
+const countList = ref([]);
+const removeOpen = ref(false);
+const showAddress = ref(false);
+const showAddressList = () => {
+    showAddress.value = true;
+};
+const closeModel = () => {
+    removeOpen.value = false;
+};
+const showModal = () => {
+    removeOpen.value = true;
+};
+const postAPi = async () => {
+    let res = await removeUserAddressApi(user.userAddress.Id);
+    if (res.Tag == 1) {
+        formState.Id = '';
+        user.removeUserAddress();
+        closeModel();
+        const ress = await getUserAddressApi();
+        addressList.value = ress.Data;
+    }
+};
 //切换地址
 const open = ref(false);
-const changeOpen = () => {
+const changeAddress = (item) => {
+    showAddress.value = false;
+    user.changeUserAddress(item);
+};
+const changeOpen = (index) => {
+    if (index == 1) {
+        formState.title = '新增收货地址';
+        formState.Id = '';
+    }
+    if (index == 2) {
+        formState.title = '编辑收货地址';
+        formState.Id = user.userAddress.Id;
+        formState.username = user.userAddress.NickName;
+        formState.region = user.userAddress.State;
+        formState.date1 = [user.userAddress.Sheng, user.userAddress.Shi];
+        formState.text = user.userAddress.Address;
+        formState.bankNmae = user.userAddress.Postal;
+        formState.tel = user.userAddress.Tel;
+        formState.phone = user.userAddress.Phone;
+        formState.default = user.userAddress.Default;
+    }
     open.value = true;
+};
+//切换国家
+const handleChange = (value, option) => {
+    formState.region = value;
+    formState.statusList = option.ChildList;
+    formState.date1 = [];
+};
+//提交
+const handleFinish = async () => {
+    if (!formState.date1) {
+        message['error']('省市地区不能为空');
+        return;
+    }
+    let params = {
+        NickName: formState.username, //昵称
+        State: formState.region,
+        Sheng: formState.date1[0],
+        Shi: formState.date1[1],
+        Address: formState.text,
+        Postal: formState.bankNmae,
+        Tel: formState.tel,
+        Phone: formState.phone,
+        Default: '0',
+        Id: formState.Id
+    };
+    try {
+        let res;
+        if (formState.title == '新增收货地址') {
+            res = await addUserAddressInfo(params);
+            params.Id = res.Data;
+        }
+        if (formState.title == '编辑收货地址') {
+            res = await changeUserAddressInfo(params);
+        }
+        if (res.Tag === 1) {
+            addressList.value.push(params);
+            user.changeUserAddress(params);
+            formState.username = '';
+            // formState.region = '';
+            formState.bankNmae = '';
+            formState.tel = '';
+            formState.phone = '';
+            formState.text = '';
+            formState.date1 = [];
+            const ress = await getUserAddressApi();
+            addressList.value = ress.Data;
+            info('success', res.Message);
+            open.value = false;
+        }
+    } catch (error) {
+        info('error', error);
+    }
 };
 //勾选框 优惠券
 const checkedss = ref(false);
@@ -105,10 +236,19 @@ const selectCheckes = ref('');
 const emits = defineEmits(['changeShowPage']);
 //选择的地址
 const checked = ref(true);
-const address = ref(null);
 const addressList = ref([]);
 //选择的配送方式
-const checkedStatus = ref(false);
+const checkedStatus = ref(0);
+//快递公司
+const kuaidi = ref(0);
+const chanegKuaiDi = (index) => {
+    kuaidi.value = index;
+};
+//快递公司
+const zhifu = ref(0);
+const chanegZhiFu = (index) => {
+    zhifu.value = index;
+};
 
 //我要保价
 const baojia = ref(true);
@@ -151,43 +291,49 @@ const showGoodsDetails = (i) => {
         <Header num="1"></Header>
         <div class="title-nav">
             <h5>收货信息</h5>
-            <p @click="changeOpen">新增收货地址</p>
+            <p @click="changeOpen(1)">新增收货地址</p>
         </div>
         <!-- 地址 -->
         <div class="center">
             <div class="address-default">
                 <div class="address">
                     <a-radio v-model:checked="checked"></a-radio>
-                    <p>小鱼先生 中国北京西城区黄寺大街 1434u295295 (小鱼收)</p>
+                    <p v-if="user.userAddress.Id"
+                        >{{ user.userAddress.NickName }} {{ user.userAddress.State
+                        }}{{ user.userAddress.Sheng }}{{ user.userAddress.Shi
+                        }}{{ user.userAddress.Address }}{{ user.userAddress.Tel }}</p
+                    >
+                    <p v-else>请先添加地址</p>
                 </div>
-                <div class="change">
-                    <p>修改</p>
+                <div class="change" v-show="user.userAddress.Id">
+                    <p @click="changeOpen(2)">修改</p>
                     |
-                    <p>删除</p>
+                    <p @click="showModal">删除</p>
                 </div>
             </div>
-            <div class="check-one">
-                <a-select
+            <div class="check-one" @click="showAddressList">
+                更多地址
+                <!-- <a-select
                     ref="select"
                     placeholder="更多地址"
                     class="item"
                     v-model:value="address"
                     :options="addressList"
-                    style="width: 140px"
-                ></a-select>
+                ></a-select> -->
                 <img :src="getImageUrl('user/jingmai/icon8.svg')" alt="" />
             </div>
         </div>
         <!-- 配送方式 -->
         <div class="title-nav">
             <h5>配送方式</h5>
-            <p>新增收货地址</p>
         </div>
         <div class="center">
             <div class="select">
-                <a-radio v-model:checked="checkedStatus">
-                    <span class="radio">暂存</span>
-                </a-radio>
+                <a-radio-group v-model:value="checkedStatus">
+                    <a-radio :value="1">
+                        <span class="radio">暂存</span>
+                    </a-radio>
+                </a-radio-group>
                 <p
                     >选择暂存,商品将进入未发货状态中合并发货或<span>一键转存</span>;
                     暂存免60天仓储费,60天后正常收费,参照<span>仓储费收费标准</span>
@@ -195,26 +341,31 @@ const showGoodsDetails = (i) => {
             </div>
             <div class="kuai-di">
                 <div class="select">
-                    <a-radio v-model:checked="checkedStatus"
-                        ><span class="radio">物流发货</span></a-radio
-                    >
+                    <a-radio-group v-model:value="checkedStatus">
+                        <a-radio :value="2">
+                            <span class="radio">物流发货</span>
+                        </a-radio>
+                    </a-radio-group>
                     <p>(藏品约3个工作日发货) </p>
                 </div>
                 <div class="list">
                     <div
                         class="item"
-                        v-for="item in list"
-                        :key="item.id"
-                        :class="item.id == 1 ? 'active' : ''"
+                        v-for="(item, index) in list"
+                        :key="index"
+                        :class="index == kuaidi ? 'active' : ''"
+                        @click="chanegKuaiDi(index)"
                     >
                         {{ item.text }}
                     </div>
                 </div>
             </div>
             <div class="select">
-                <a-radio v-model:checked="checkedStatus"
-                    ><span class="radio">上门提货</span></a-radio
-                >
+                <a-radio-group v-model:value="checkedStatus">
+                    <a-radio :value="3">
+                        <span class="radio">上门提货</span>
+                    </a-radio>
+                </a-radio-group>
             </div>
         </div>
         <!-- 支付方式 -->
@@ -228,9 +379,10 @@ const showGoodsDetails = (i) => {
             <div class="list">
                 <div
                     class="item"
-                    v-for="item in list1"
-                    :key="item.id"
-                    :class="item.id == 1 ? 'active' : ''"
+                    v-for="(item, index) in list1"
+                    :key="index"
+                    :class="index == zhifu ? 'active' : ''"
+                    @click="chanegZhiFu(index)"
                 >
                     {{ item.text }}
                 </div>
@@ -354,9 +506,128 @@ const showGoodsDetails = (i) => {
             </div>
         </div>
         <!-- 订单相关的 -->
-        <a-drawer v-model:open="open" width="1000" class="custom-class" placement="right">
-            <ShippingInformation></ShippingInformation>
-        </a-drawer>
+        <a-modal v-model:open="open" :title="formState.title" :footer="null">
+            <a-form
+                labelAlign="left"
+                :model="formState"
+                name="basicsss"
+                :label-col="{ span: 7 }"
+                :wrapper-col="{ span: 17 }"
+                autocomplete="off"
+                @finish="handleFinish"
+                @finishFailed="handleFinishFailed"
+            >
+                <a-form-item
+                    :rules="[{ required: true, message: '姓名不能为空' }]"
+                    label="姓名"
+                    name="username"
+                >
+                    <a-input v-model:value.trim="formState.username" />
+                </a-form-item>
+                <a-form-item
+                    :rules="[{ required: true, message: '国家不能为空' }]"
+                    label="所在地区"
+                >
+                    <a-select
+                        :field-names="{
+                            label: 'AreaName',
+                            value: 'AreaName'
+                        }"
+                        v-model:value="formState.region"
+                        show-search
+                        :options="countList"
+                        @change="handleChange"
+                    ></a-select>
+                </a-form-item>
+                <a-form-item
+                    :rules="[{ required: true, message: '省市不能为空' }]"
+                    label="省市地址"
+                    name="date1"
+                >
+                    <a-cascader
+                        :field-names="{
+                            label: 'AreaName',
+                            value: 'AreaName',
+                            children: 'ChildList'
+                        }"
+                        expand-trigger="hover"
+                        v-model:value="formState.date1"
+                        :options="formState.statusList"
+                    />
+                </a-form-item>
+                <a-form-item
+                    :rules="[{ required: true, message: '详细地址不能为空' }]"
+                    label="详细地址"
+                    name="text"
+                >
+                    <a-textarea
+                        v-model:value="formState.text"
+                        :auto-size="{ minRows: 2, maxRows: 5 }"
+                    />
+                </a-form-item>
+                <a-form-item
+                    :rules="[
+                        { required: true, message: '邮编不能为空' },
+                        { pattern: /^[0-9]{6}$/, message: '邮编格式不正确' }
+                    ]"
+                    label="邮编"
+                    name="bankNmae"
+                >
+                    <a-input v-model:value="formState.bankNmae" />
+                </a-form-item>
+                <a-form-item
+                    :rules="[
+                        { required: true, message: '收货手机号不能为空' },
+                        { pattern: /^[0-9]{11}$/, message: '手机号格式不正确' }
+                    ]"
+                    label="收货手机号"
+                    name="tel"
+                >
+                    <a-input v-model:value="formState.tel" />
+                </a-form-item>
+                <a-form-item
+                    :rules="[{ required: true, message: '联系电话不能为空' }]"
+                    label="联系电话"
+                    name="phone"
+                >
+                    <a-input v-model:value="formState.phone" />
+                </a-form-item>
+                <a-form-item :wrapper-col="{ offset: 7, span: 17 }">
+                    <a-button type="primary" html-type="submit">保存</a-button>
+                </a-form-item>
+            </a-form>
+        </a-modal>
+        <a-modal v-model:open="removeOpen" title="删除地址" @cancel="closeModel" @ok="postAPi">
+        </a-modal>
+        <a-modal width="1000px" v-model:open="showAddress" :footer="null">
+            <a-table :pagination="false" :columns="shippingColumns" :data-source="addressList">
+                <template #bodyCell="{ column, record }">
+                    <template v-if="column.key === 'Address'">
+                        <div class="address">
+                            <span> {{ record.State + record.Sheng }}</span>
+                            <span>&nbsp;&nbsp;</span>
+                            <span> {{ record.Shi }}</span>
+                        </div>
+                    </template>
+                    <template v-if="column.key === 'AddressDetails'">
+                        <div class="address-details">
+                            <span> {{ record.Address }}</span>
+                        </div>
+                    </template>
+                    <template v-if="column.key === 'Tel'">
+                        <div class="tel">
+                            <span v-if="record.Tel"> {{ record.Tel }}</span>
+                            <span v-else> {{ record.Phone }}</span>
+                        </div>
+                    </template>
+                    <template v-if="column.key === 'status'">
+                        <div class="status">
+                            <span @click="changeAddress(record)">选择</span>
+                        </div>
+                    </template>
+                </template>
+            </a-table>
+        </a-modal>
     </div>
 </template>
 
@@ -411,6 +682,22 @@ const showGoodsDetails = (i) => {
                 }
             }
         }
+        .check-one {
+            .flex-row;
+            gap: 20px;
+            width: 148px;
+            border-radius: 10px;
+            padding: 14px 20px;
+            margin-top: 20px;
+            border: 1px solid #d9d9d9;
+            cursor: pointer;
+            &:hover {
+                color: #9a0000;
+            }
+            img {
+                width: 12px;
+            }
+        }
         .select {
             display: flex;
             align-items: flex-start;
@@ -461,17 +748,17 @@ const showGoodsDetails = (i) => {
             text-align: center;
             font-size: 14px;
         }
-        .check-one {
-            width: 141px;
-            position: relative;
-            margin-left: 38px;
-            img {
-                position: absolute;
-                top: 52%;
-                right: 17%;
-                width: 12px;
-            }
-        }
+        // .check-one {
+        //     width: 141px;
+        //     position: relative;
+        //     margin-left: 38px;
+        //     img {
+        //         position: absolute;
+        //         top: 52%;
+        //         right: 17%;
+        //         width: 12px;
+        //     }
+        // }
         :deep(.ant-select-selector) {
             .flex-row;
             border-radius: 10px;
@@ -550,6 +837,12 @@ const showGoodsDetails = (i) => {
         background-color: #fff;
         padding: 20px 16px;
         font-weight: 400;
+    }
+}
+.status {
+    cursor: pointer;
+    &:hover {
+        color: #9a0000;
     }
 }
 .check-list {

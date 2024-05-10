@@ -45,3 +45,7 @@ export const getGoodsListApi = async (params) =>
     instance.get(
         `Member/Auction/GoodsList?Cid=${params.Cid}&StartDateRange=${params.StartDateRange}&EndDateRange=${params.EndDateRange}&Brand=${params.Brand}&Kw=${params.Kw}&Status=${params.Status}&PageSize=${params.PageSize}&PageIndex=${params.PageIndex}`
     );
+
+//获取配送支付方式
+export const getZhiFu = async (params) =>
+    instance.get(`Member/Pay/GetPayBaseData?OrderType=${params}`);

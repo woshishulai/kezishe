@@ -86,7 +86,6 @@ const openModel = (biaoti, id) => {
 const openChangeParamsModel = (biaoti, item) => {
     console.log(item);
     changeParams.id = item.Id;
-    changeParams.title = biaoti;
     changeParams.username = item.NickName;
     changeParams.region = item.State;
     changeParams.date1 = [item.Sheng, item.Shi];
@@ -191,12 +190,17 @@ const handleFinishs = async () => {
         Default: changeParams.default
     };
     try {
-        let res = await addUserAddressInfo(params);
+        let res = await changeUserAddressInfo(params);
         let status;
         if (res.Tag == 1) {
             status = 'success';
             const index = address.value.findIndex((item) => item.Id === params.Id);
             address.value.splice(index, 1, params);
+            if (address.value.length >= 1) {
+                user.changeUserAddress(address.value[0]);
+            } else {
+                user.changeUserAddress();
+            }
             info(status, res.Message);
             closeModel();
         }
@@ -236,7 +240,7 @@ const handleFinishs = async () => {
                             <span @click="openModel('确定删除该地址吗', record.Id)">删除</span>
                             <span
                                 @click="changeDefault(record.Id)"
-                                :class="record.Default ? 'active' : ''"
+                                :class="record.Default == 1 ? 'active' : ''"
                                 >{{ record.Default == 1 ? '默认账号' : '设为默认' }}
                             </span>
                         </div>
@@ -450,7 +454,9 @@ const handleFinishs = async () => {
         span {
             padding: 5px 10px;
             cursor: pointer;
-
+            &:hover {
+                color: #9a0000;
+            }
             &.active {
                 background-color: #9a0000;
                 color: #fff;
