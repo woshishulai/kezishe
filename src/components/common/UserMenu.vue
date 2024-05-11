@@ -72,6 +72,7 @@ const handleClick = (e) => {
             style="width: 260px"
             mode="inline"
             :items="menuItems"
+            :key="menuItems"
             @click="handleClick"
         ></a-menu>
     </div>

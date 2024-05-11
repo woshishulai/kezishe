@@ -8,6 +8,7 @@ import { handleFinishFailed } from '@/utils/form/rules';
 import { shippingColumns } from '../../data';
 import { info } from '@/hooks/antd/message';
 import { getZhiFu } from '@/request/user/api';
+import { jingMaiColumns } from './data';
 import {
     getUserAddressApi,
     removeUserAddressApi,
@@ -15,62 +16,14 @@ import {
     addUserAddressInfo,
     getCountList
 } from '@/request/api';
-const jingMaiColumns = [
-    {
-        title: '订单编号',
-        dataIndex: 'Bn',
-        key: 'Bn',
-        align: 'center',
-        ellipsis: true
-    },
-    {
-        title: '商品编号',
-        dataIndex: 'Brand',
-        key: 'Brand',
-        align: 'center'
-    },
-    {
-        title: '藏品名称',
-        dataIndex: 'Title',
-        key: 'Title',
-        align: 'center',
-        ellipsis: true
-    },
-    {
-        title: '交易类型',
-        dataIndex: 'PingTai',
-        key: 'PingTai',
-        align: 'center',
-        ellipsis: true
-    },
-    {
-        title: '数量',
-        dataIndex: 'MPrice',
-        key: 'MPrice',
-        align: 'center',
-        ellipsis: true
-    },
-    {
-        title: '成交价格',
-        dataIndex: 'Ontime',
-        key: 'Ontime',
-        align: 'center',
-        ellipsis: true
-    },
-    {
-        title: '收藏证书',
-        dataIndex: 'Status',
-        key: 'Status',
-        align: 'center',
-        ellipsis: true
-    }
-];
+
 const router = useRouter();
 const route = useRoute();
 const user = useUserInfo();
-//明天请求支付接口
-const getZhifuFangShi = ref([]);
 
+const addId = (e, value) => {
+    formState.AreaType = value[0].AreaType;
+};
 const formState = reactive({
     Id: '', //数组的某一项
     title: '', //标题
@@ -81,7 +34,8 @@ const formState = reactive({
     text: '', //详细地址
     bankNmae: '', //邮编
     tel: '', //电话
-    phone: ''
+    phone: '',
+    AreaType: ''
 });
 const props = defineProps({
     fetchData: {
@@ -90,45 +44,55 @@ const props = defineProps({
     }
 });
 onMounted(async () => {
+    try {
+        await initCountList();
+        await getZhiFuInfoList();
+        await getAddressList();
+    } catch (error) {
+        console.error(error);
+    }
+});
+
+const getAddressList = async () => {
+    const res = await getUserAddressApi();
+    if (res.Tag !== 1) {
+        info('error', res.Message);
+        return;
+    }
+    addressList.value = res.Data;
+};
+const initCountList = async () => {
     const ress = await getCountList();
     if (ress.Tag !== 1) {
         info('error', ress.Message);
         return;
     }
-    const res = await getUserAddressApi();
-    addressList.value = res.Data;
     countList.value = ress.Data;
     formState.region = countList.value[0].AreaName;
     formState.statusList = countList.value[0].ChildList;
-});
-const list = [
-    {
-        id: '1',
-        text: '顺丰特快 (到付)'
-    },
-    {
-        id: '2',
-        text: '顺丰标快 (到付)'
-    },
-    {
-        id: '3',
-        text: '邮政EMS'
+};
+const getZhiFuInfoList = async () => {
+    try {
+        let res = await getZhiFu(1);
+        if (res.Tag !== 1) {
+            info('error', res.Message);
+            return;
+        }
+        peisongList.value = res.Data.DeliveryList;
+        zhiFuList.value = res.Data.PayList;
+        wuLiuList.value = res.Data.ExpressList;
+        console.log(res);
+    } catch (error) {
+        console.log(error);
     }
-];
-const list1 = [
-    {
-        id: '1',
-        text: '在线支付'
-    },
-    {
-        id: '2',
-        text: '柜台支付'
-    },
-    {
-        id: '3',
-        text: '在线汇款'
-    }
-];
+};
+//配送方式
+const peisongList = ref([]);
+//物流方式
+const wuLiuList = ref([]);
+//支付方式
+const zhiFuList = ref([]);
+
 //城市
 const countList = ref([]);
 const removeOpen = ref(false);
@@ -199,6 +163,7 @@ const handleFinish = async () => {
         Tel: formState.tel,
         Phone: formState.phone,
         Default: '0',
+        AreaType: formState.AreaType,
         Id: formState.Id
     };
     try {
@@ -244,7 +209,7 @@ const kuaidi = ref(0);
 const chanegKuaiDi = (index) => {
     kuaidi.value = index;
 };
-//快递公司
+//z公司
 const zhifu = ref(0);
 const chanegZhiFu = (index) => {
     zhifu.value = index;
@@ -252,13 +217,41 @@ const chanegZhiFu = (index) => {
 
 //我要保价
 const baojia = ref(true);
-
+const changeInput = (e) => {
+    if (!e.target.checked) {
+        iptValue.value = '';
+    }
+};
 //保价的价格
 const iptValue = ref('');
+
+const addPrice = () => {
+    baojia.value = true;
+};
 
 const checkList = ref({
     DelList: []
 });
+const submit = () => {
+    const query = {
+        OrderType: 1,
+        AddrId: user.userAddress.Id, //地址ID
+        DeliveryType: checkedStatus, //暂存还是上门
+        PayType: zhifu.value, //怎么支付
+        ExpressType: kuaidi.value, //物流方式，
+        IsInsured: baojia.value ? 1 : 0, //报价
+        InsuredPrice: iptValue.value,
+        AllLogisticsCost: '0', //运费
+        WaitChargeTotal: '0', //仓储费
+        KeepPriceTotal: '0', //保价费
+        AllCertFeeCost: '0', //收藏证书
+        AllCertyouhuiCost: '0', //收藏证书券抵扣金额
+        AllTotal: '990' //应付总额
+    };
+    console.log(query);
+    return;
+    emits('changeShowPage', 3, query);
+};
 //勾选框
 const showCheck = (e) => {
     if (getChecked(e.Bn)) {
@@ -313,13 +306,6 @@ const showGoodsDetails = (i) => {
             </div>
             <div class="check-one" @click="showAddressList">
                 更多地址
-                <!-- <a-select
-                    ref="select"
-                    placeholder="更多地址"
-                    class="item"
-                    v-model:value="address"
-                    :options="addressList"
-                ></a-select> -->
                 <img :src="getImageUrl('user/jingmai/icon8.svg')" alt="" />
             </div>
         </div>
@@ -330,42 +316,51 @@ const showGoodsDetails = (i) => {
         <div class="center">
             <div class="select">
                 <a-radio-group v-model:value="checkedStatus">
-                    <a-radio :value="1">
-                        <span class="radio">暂存</span>
+                    <a-radio :value="peisongList[0]?.Types">
+                        <span class="radio">{{ peisongList[0]?.Title }}</span>
                     </a-radio>
                 </a-radio-group>
-                <p
-                    >选择暂存,商品将进入未发货状态中合并发货或<span>一键转存</span>;
-                    暂存免60天仓储费,60天后正常收费,参照<span>仓储费收费标准</span>
-                </p>
+                <p v-html="peisongList[0]?.Contents"> </p>
             </div>
             <div class="kuai-di">
                 <div class="select">
                     <a-radio-group v-model:value="checkedStatus">
-                        <a-radio :value="2">
-                            <span class="radio">物流发货</span>
+                        <a-radio :value="peisongList[1]?.Types">
+                            <span class="radio">{{ peisongList[1]?.Title }}</span>
                         </a-radio>
                     </a-radio-group>
-                    <p>(藏品约3个工作日发货) </p>
+                    <p v-html="peisongList[1]?.Contents"> </p>
                 </div>
                 <div class="list">
-                    <div
-                        class="item"
-                        v-for="(item, index) in list"
-                        :key="index"
-                        :class="index == kuaidi ? 'active' : ''"
-                        @click="chanegKuaiDi(index)"
-                    >
-                        {{ item.text }}
+                    <div class="item" v-for="(item, index) in wuLiuList" :key="item.Types">
+                        <a-tooltip color="#9a0000">
+                            <template #title v-if="item.SubTitle != ''">
+                                <p>{{ item.SubTitle }}</p>
+                            </template>
+                            <p
+                                class="wuliu"
+                                :class="item.Types == kuaidi ? 'active' : ''"
+                                @click="chanegKuaiDi(item.Types)"
+                            >
+                                {{ item.Title }}
+                            </p>
+                        </a-tooltip>
+                        <img
+                            v-show="item.SubTitle == ''"
+                            style="cursor: pointer; margin-left: 10px"
+                            :src="getImageUrl('chengjiao/icon6.png')"
+                            alt=""
+                        />
                     </div>
                 </div>
             </div>
             <div class="select">
                 <a-radio-group v-model:value="checkedStatus">
-                    <a-radio :value="3">
-                        <span class="radio">上门提货</span>
+                    <a-radio :value="peisongList[2]?.Types">
+                        <span class="radio">{{ peisongList[2]?.Title }}</span>
                     </a-radio>
                 </a-radio-group>
+                <p>{{ peisongList[2]?.Contents }} </p>
             </div>
         </div>
         <!-- 支付方式 -->
@@ -377,14 +372,14 @@ const showGoodsDetails = (i) => {
         </div>
         <div class="center">
             <div class="list">
-                <div
-                    class="item"
-                    v-for="(item, index) in list1"
-                    :key="index"
-                    :class="index == zhifu ? 'active' : ''"
-                    @click="chanegZhiFu(index)"
-                >
-                    {{ item.text }}
+                <div class="item" v-for="(item, index) in zhiFuList" :key="item.Types">
+                    <p
+                        class="wuliu"
+                        :class="item.Types == zhifu ? 'active' : ''"
+                        @click="chanegZhiFu(item.Types)"
+                    >
+                        {{ item.Title }}
+                    </p>
                 </div>
             </div>
         </div>
@@ -396,8 +391,9 @@ const showGoodsDetails = (i) => {
             </h5>
         </div>
         <div class="center price-list">
-            <a-checkbox v-model:checked="baojia">我要保价</a-checkbox>
+            <a-checkbox @change="changeInput" v-model:checked="baojia">我要保价</a-checkbox>
             <a-input
+                @input="addPrice"
                 style="width: 150px; background-color: #f3f3f3; height: 40px; border-radius: 10px"
                 v-model:value="iptValue"
             />
@@ -420,6 +416,7 @@ const showGoodsDetails = (i) => {
             <h5>订单信息</h5>
             <p @click="emits('changeShowPage', 1)">返回修改</p>
         </div>
+        {{ props?.fetchData }}
         <a-table :pagination="false" :columns="jingMaiColumns" :dataSource="props?.fetchData">
             <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'Title'">
@@ -501,7 +498,7 @@ const showGoodsDetails = (i) => {
                         应付总额:<p class="price">￥<span>499.50</span></p
                         >元
                     </div>
-                    <a-button type="primary" @click="emits('changeShowPage', 3)">去付款</a-button>
+                    <a-button type="primary" @click="submit">去付款</a-button>
                 </div>
             </div>
         </div>
@@ -550,6 +547,7 @@ const showGoodsDetails = (i) => {
                             value: 'AreaName',
                             children: 'ChildList'
                         }"
+                        @change="addId"
                         expand-trigger="hover"
                         v-model:value="formState.date1"
                         :options="formState.statusList"
@@ -662,8 +660,9 @@ const showGoodsDetails = (i) => {
             }
         }
     }
+
     .center {
-        padding: 34px 50px 22px;
+        padding: 34px 50px;
         .address-default {
             .flex-row;
             justify-content: space-between;
@@ -731,15 +730,20 @@ const showGoodsDetails = (i) => {
             justify-content: flex-start;
             gap: 100px;
             .item {
-                width: 174px;
+                display: flex;
+                align-items: center;
+                width: 184px;
                 text-align: center;
-                padding: 15px 20px;
-                background-color: #eef3f8;
-                border: 1px solid transparent;
                 cursor: pointer;
-                &:hover,
-                &.active {
-                    border-color: #9a0000;
+                .wuliu {
+                    width: 100%;
+                    padding: 15px 20px;
+                    background-color: #eef3f8;
+                    &:hover,
+                    &.active {
+                        background: url('@img/user/jingmai/wlbg.jpg');
+                        background-size: 100% 100%;
+                    }
                 }
             }
         }

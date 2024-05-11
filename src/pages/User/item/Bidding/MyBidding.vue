@@ -45,9 +45,12 @@ const router = useRouter();
 const route = useRoute();
 const showModals = ref(null);
 const props = defineProps({});
-const showComponent = ref(2);
-const changeShowPage = (index) => {
+const showComponent = ref(1);
+const changeShowPage = (index, query) => {
     showComponent.value = index;
+    if (query) {
+        console.log(query);
+    }
 };
 const params = ref({
     Title: '',
@@ -135,7 +138,6 @@ const showCheck = (e) => {
     } else {
         all.value = false;
     }
-    console.log(checkList.value);
 };
 function getChecked(Bn) {
     const item = checkList.value.DelList.find((item) => item.Bn === Bn);
@@ -162,7 +164,6 @@ const getAll = () => {
 //支付
 const zhiFu = () => {
     showComponent.value = 2;
-    console.log(checkList.value.DelList);
 };
 </script>
 
@@ -210,8 +211,7 @@ const zhiFu = () => {
                 </template>
                 <!-- 快递取件码 -->
                 <template v-slot:active3>
-                    <!-- <QuJian v-show="showModals?.params?.titleCate == '未支付'"></QuJian> -->
-                    <QuJian></QuJian>
+                    <QuJian v-show="showModals?.params?.titleCate == '未支付'"></QuJian>
                 </template>
                 <template v-slot:active4>
                     <a-table :pagination="false" :columns="jingMaiColumns" :dataSource="fetchData">

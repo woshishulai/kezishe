@@ -14,6 +14,7 @@ import { shippingColumns } from '../../data';
 import { handleFinishFailed } from '@/utils/form/rules.js';
 import { message } from 'ant-design-vue';
 import { useUserInfo } from '@/store/store';
+import localeValues from 'ant-design-vue/es/locale/zh_CN';
 const countList = ref([]);
 const user = useUserInfo();
 const params = reactive({
@@ -46,7 +47,8 @@ const formState = reactive({
     text: '', //详细地址
     bankNmae: '', //邮编
     tel: '', //电话
-    phone: ''
+    phone: '',
+    AreaType: ''
 });
 onMounted(async () => {
     try {
@@ -78,6 +80,11 @@ onMounted(async () => {
         info('error', error);
     }
 });
+const addId = (e, value) => {
+    console.log(localeValues);
+    formState.AreaType = value[0].AreaType;
+    changeParams.AreaType = value[0].AreaType;
+};
 const openModel = (biaoti, id) => {
     params.open = true;
     params.title = biaoti;
@@ -95,6 +102,7 @@ const openChangeParamsModel = (biaoti, item) => {
     changeParams.phone = item.Phone;
     changeParams.title = biaoti;
     changeParams.default = item.Default;
+    changeParams.AreaType = item.AreaType;
     changeParams.open = true;
 };
 const closeModel = () => {
@@ -152,6 +160,7 @@ const handleFinish = async () => {
         Postal: formState.bankNmae,
         Tel: formState.tel,
         Phone: formState.phone,
+        AreaType: formState.AreaType,
         Default: '0'
     };
     try {
@@ -187,6 +196,7 @@ const handleFinishs = async () => {
         Postal: changeParams.Postal,
         Tel: changeParams.tel,
         Phone: changeParams.phone,
+        AreaType: changeParams.AreaType,
         Default: changeParams.default
     };
     try {
@@ -295,6 +305,7 @@ const handleFinishs = async () => {
                                 children: 'ChildList'
                             }"
                             expand-trigger="hover"
+                            @change="addId"
                             v-model:value="formState.date1"
                             :options="formState.statusList"
                         />
@@ -386,6 +397,7 @@ const handleFinishs = async () => {
                             value: 'AreaName',
                             children: 'ChildList'
                         }"
+                        @change="addId"
                         expand-trigger="hover"
                         v-model:value="changeParams.date1"
                         :options="formState.statusList"

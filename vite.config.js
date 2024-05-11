@@ -43,7 +43,8 @@ export default defineConfig({
     },
     resolve: {
         alias: {
-            '@': new URL('src', import.meta.url).pathname
+            '@': new URL('src', import.meta.url).pathname,
+            '@img': new URL('src/assets/img', import.meta.url).pathname
         }
     },
     css: {

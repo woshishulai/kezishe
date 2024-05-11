@@ -11,9 +11,19 @@ const props = defineProps({
         default: null
     }
 });
+const showModals = localStorage.getItem('showModal');
 const params = reactive({});
 watchEffect(() => {
     params.statusCate = props?.statusList ? props?.statusList[0]?.Key : '';
+    if (props?.titleList && props?.titleList.length >= 1) {
+        const some = props?.titleList.some((item) => item.cate == showModals);
+        if (some) {
+            params.titleCate = showModals;
+            return;
+        } else {
+            localStorage.removeItem('showModal');
+        }
+    }
     params.titleCate = props?.titleList ? props?.titleList[0]?.cate : '';
 });
 const changeTitleCate = (item) => {
@@ -24,6 +34,7 @@ const changeTitleCate = (item) => {
         delete params.reload;
     }
     params.titleCate = item.cate;
+    localStorage.setItem('showModal', item.cate);
 };
 const changeStatusCate = (item) => {
     params.statusCate = item.Key;
