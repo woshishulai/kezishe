@@ -52,3 +52,8 @@ export const getZhiFu = async (params) =>
 
 //获取快递价格
 export const getKuaiDi = async (data) => instance.post(`Member/Pay/EMSPostFeeStandard`, data);
+
+//获取我的关注
+export const getCartList = async (params) =>
+    instance.get(`Member/Collect/GetList?Cid=${params.Cid}&Kw=${params.Kw}&Status=${params.Status}&PageSize=${params.PageSize}&PageIndex=${params.PageSize}
+`);

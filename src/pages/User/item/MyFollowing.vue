@@ -1,38 +1,82 @@
 <script setup>
-import { ref, computed, reactive, onMounted, h } from 'vue';
+import { ref, computed, reactive, onMounted, h, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
+import { getCartList } from '@/request/user/api';
 import { SearchOutlined } from '@ant-design/icons-vue';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
-onMounted(() => {});
-const list = [
+const tableList = ref([]);
+const showModals = ref(null);
+const list = ref([
     {
         cate: '预展',
-        num: '7'
+        num: '7',
+        id: 1
     },
     {
-        cate: '竞买'
+        cate: '竞买',
+        id: 2
     },
     {
         cate: '成交',
-        num: '1294'
-    },
-    {
-        cate: '下架',
-        num: '4'
+        num: '1294',
+        id: 3
     },
     {
         cate: '未成交',
-        num: '8'
+        num: '8',
+        id: 7
+    },
+    {
+        cate: '下架',
+        num: '4',
+        id: 8
     },
     {
         cate: '购物',
-        num: ''
+        num: '',
+        id: 0
     }
-];
-const query = ref('预展');
+]);
+const query = reactive({
+    Cid: '',
+    Kw: '',
+    Status: 1,
+    PageSize: '',
+    PageIndex: '',
+    total: 1
+});
+const getTableList = async (page, pageSize) => {
+    query.PageIndex = page;
+    query.PageSize = pageSize;
+    try {
+        let res = await getCartList(query);
+        console.log(res);
+        if (res.Tag == 1) {
+            query.total = res.Data;
+            tableList.value = res.Data;
+        }
+    } catch (error) {}
+};
+onMounted(async () => {
+    // getTableList(1, 10);
+});
+
+watch(
+    () => showModals.value?.params?.titleCate,
+    () => {
+        const items = list.value.find((item) => item.cate == showModals.value?.params?.titleCate);
+        if (items.id) {
+            query.Cid = items.id;
+            query.total = 1;
+            tableList.value = [];
+            getTableList(1, 10);
+        }
+    }
+);
+
 const handClick = (item) => {
     query.value = item.cate;
 };
@@ -125,7 +169,6 @@ const options1 = ref([
     }
 ]);
 const loading = ref(false);
-const value = ref('');
 const value1 = ref('cate1');
 const handleChange = (value) => {
     console.log(`selected ${value}`);
@@ -151,7 +194,7 @@ const changeGuanZhu = (item) => {
     <div class="my-following">
         <div class="card-box">
             <div class="title"> 我的关注 </div>
-            <show-modal :titleList="list">
+            <show-modal :titleList="list" ref="showModals">
                 <template v-slot:active1>
                     <div class="search-cate">
                         <a-select
@@ -163,7 +206,7 @@ const changeGuanZhu = (item) => {
                             @change="handleChange"
                         ></a-select>
                         <a-input
-                            v-model:value="value"
+                            v-model:value="query.Kw"
                             style="width: 316px"
                             placeholder="名称和藏品"
                         />
