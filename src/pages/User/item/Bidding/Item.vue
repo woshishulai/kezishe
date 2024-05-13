@@ -1,6 +1,6 @@
 <script setup>
 import Header from './Header.vue';
-import { ref, computed, reactive, onMounted } from 'vue';
+import { ref, computed, reactive, onMounted, watchEffect } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
 import { useUserInfo } from '@/store/store';
@@ -16,9 +16,9 @@ import {
     addUserAddressInfo,
     getCountList
 } from '@/request/api';
+import { youHuiQuan, getKuaiDi } from '@/request/user/api';
 
 const router = useRouter();
-const route = useRoute();
 const user = useUserInfo();
 
 const addId = (e, value) => {
@@ -43,20 +43,80 @@ const props = defineProps({
         default: []
     }
 });
+const goodsLists = JSON.parse(localStorage.getItem('goodsList'));
 onMounted(async () => {
     try {
         await initCountList();
         await getZhiFuInfoList();
         await getAddressList();
+        await getYouHuiQuanList();
+        await getKuaiDiLists();
     } catch (error) {
         console.error(error);
     }
 });
+//快递价格
+const kuaidiPriceList = ref([]);
+const getKuaiDiLists = async () => {
+    const res = await getKuaiDi();
+    if (res.Tag !== 1) {
+        return;
+    }
+    kuaidiPriceList.value = res.Data;
+};
+
+//计算快递价格
+const goodsList = computed(() => {
+    let arr = [];
+    goodsLists?.forEach((item) => {
+        const existingIndex = arr.findIndex((group) => group[0]?.CTypeId === item.CTypeId);
+        if (existingIndex !== -1) {
+            arr[existingIndex].push(item);
+        } else {
+            arr.push([item]);
+        }
+    });
+    return arr;
+});
+const kuaidiPriceAll = computed(() => {
+    if (kuaidi.value != 3) {
+        return 0;
+    }
+    let totalPrice = 0;
+    goodsList.value.forEach((group) => {
+        const CTypeId = group[0]?.CTypeId;
+        const kuaidiItem = kuaidiPriceList.value.find(
+            (item) => item.CTypeId == CTypeId && item.AreaType == user.userAddress.AreaType
+        );
+        if (kuaidiItem) {
+            let num = group.length;
+            if (num <= kuaidiItem.FristNum) {
+                totalPrice += parseInt(kuaidiItem.FristFee);
+            } else {
+                let extraFees =
+                    Math.ceil((num - kuaidiItem.FristNum) / kuaidiItem.NextNum) *
+                    parseInt(kuaidiItem.NextFee);
+                totalPrice += parseInt(kuaidiItem.FristFee) + extraFees;
+            }
+        }
+    });
+
+    return totalPrice;
+});
+
+//优惠券数组
+const youhuiquanList = ref([]);
+const getYouHuiQuanList = async () => {
+    const res = await youHuiQuan();
+    if (res.Tag !== 1) {
+        return;
+    }
+    youhuiquanList.value = res.Data;
+};
 
 const getAddressList = async () => {
     const res = await getUserAddressApi();
     if (res.Tag !== 1) {
-        info('error', res.Message);
         return;
     }
     addressList.value = res.Data;
@@ -64,7 +124,6 @@ const getAddressList = async () => {
 const initCountList = async () => {
     const ress = await getCountList();
     if (ress.Tag !== 1) {
-        info('error', ress.Message);
         return;
     }
     countList.value = ress.Data;
@@ -75,7 +134,6 @@ const getZhiFuInfoList = async () => {
     try {
         let res = await getZhiFu(1);
         if (res.Tag !== 1) {
-            info('error', res.Message);
             return;
         }
         peisongList.value = res.Data.DeliveryList;
@@ -203,20 +261,40 @@ const emits = defineEmits(['changeShowPage']);
 const checked = ref(true);
 const addressList = ref([]);
 //选择的配送方式
+const checkedStatusLocalStorage = localStorage.getItem('checkedStatus');
 const checkedStatus = ref(0);
+checkedStatusLocalStorage
+    ? (checkedStatus.value = checkedStatusLocalStorage)
+    : (checkedStatus.value = 0);
+const changePeiSong = (e) => {
+    if (e.target.value != 2) {
+        kuaidi.value = 0;
+    }
+};
 //快递公司
+const kuaidis = localStorage.getItem('kuaidis');
 const kuaidi = ref(0);
+kuaidis ? (kuaidi.value = kuaidis) : (kuaidi.value = 0);
 const chanegKuaiDi = (index) => {
     kuaidi.value = index;
+    checkedStatus.value = peisongList.value[1].Types;
 };
 //z公司
+const zhifus = localStorage.getItem('zhifus');
 const zhifu = ref(0);
+zhifus ? (zhifu.value = zhifus) : (zhifu.value = 0);
 const chanegZhiFu = (index) => {
     zhifu.value = index;
 };
 
 //我要保价
 const baojia = ref(true);
+let baojias = localStorage.getItem('baojias');
+if (baojias) {
+    baojias = true;
+}
+baojias ? (baojia.value = baojias) : (baojia.value = true);
+
 const changeInput = (e) => {
     if (!e.target.checked) {
         iptValue.value = '';
@@ -224,33 +302,85 @@ const changeInput = (e) => {
 };
 //保价的价格
 const iptValue = ref('');
-
+const iptValues = localStorage.getItem('iptValues');
+iptValues ? (iptValue.value = iptValues) : (iptValue.value = '');
 const addPrice = () => {
     baojia.value = true;
 };
-
+const quan = ref(true);
+let quans = localStorage.getItem('quans');
+if (quans) {
+    quans = true;
+}
+quans ? (quan.value = quans) : (quan.value = true);
+const changeQuan = (e) => {
+    if (!e.target.checked) {
+        quanList.value = [];
+    }
+};
+const quanList = ref([]);
+const quanLists = localStorage.getItem('quanLists');
+quanLists ? (quanList.value = JSON.parse(quanLists)) : (quanList.value = []);
 const checkList = ref({
     DelList: []
 });
+const DelLists = localStorage.getItem('DelLists');
+DelLists ? (checkList.value.DelList = JSON.parse(DelLists)) : (checkList.value.DelList = []);
 const submit = () => {
+    if (!user.userAddress.Id) {
+        info('error', '请先添加地址');
+        return;
+    }
+    if (!checkedStatus.value && checkedStatus.value != 0) {
+        info('error', '请先选择配送方式');
+        return;
+    }
+    if (checkedStatus.value == 2 && (!kuaidi.value || kuaidi.value == 0)) {
+        info('error', '请先选择配送方式');
+        return;
+    }
+    if (zhifu.value == 0 || !zhifu.value) {
+        info('error', '请先选择支付方式');
+        return;
+    }
+    const OrderDatas = goodsLists.map((item) => {
+        let query = {
+            AuctionType: 1,
+            Aid: item.Aid, //藏品记录ID
+            Gid: item.Gid, //藏品ID
+            Title: item.Title, //藏品名称
+            MakePrice: item.MakePrice, //成交价
+            Nums: item.Nums, //数量
+            IsCret: checkList.value.DelList.some((items) => item.Bn == items.Bn) ? 1 : 0, //是否包含证书 默认 0 不包含 1 包含
+            CretPrice: 15 //证书价格
+        };
+        return query;
+    });
     const query = {
         OrderType: 1,
         AddrId: user.userAddress.Id, //地址ID
-        DeliveryType: checkedStatus, //暂存还是上门
+        DeliveryType: checkedStatus.value, //暂存还是上门
         PayType: zhifu.value, //怎么支付
         ExpressType: kuaidi.value, //物流方式，
         IsInsured: baojia.value ? 1 : 0, //报价
         InsuredPrice: iptValue.value,
-        AllLogisticsCost: '0', //运费
+        AllLogisticsCost: kuaidiPriceAll.value, //运费
         WaitChargeTotal: '0', //仓储费
         KeepPriceTotal: '0', //保价费
-        AllCertFeeCost: '0', //收藏证书
+        AllCertFeeCost: youhuiquanPrice.value, //收藏证书
         AllCertyouhuiCost: '0', //收藏证书券抵扣金额
-        AllTotal: '990' //应付总额
+        AllTotal: allPrice.value, //应付总额
+        OrderDatas
     };
-    console.log(query);
-    return;
     emits('changeShowPage', 3, query);
+    // localStorage.removeItem('checkedStatus');
+    // localStorage.removeItem('kuaidis');
+    // localStorage.removeItem('zhifus');
+    // localStorage.removeItem('baojias');
+    // localStorage.removeItem('iptValues');
+    // localStorage.removeItem('quans');
+    // localStorage.removeItem('quanLists');
+    // localStorage.removeItem('DelLists');
 };
 //勾选框
 const showCheck = (e) => {
@@ -277,6 +407,32 @@ const showGoodsDetails = (i) => {
         }
     });
 };
+const goodsAllPrice = computed(() => {
+    if (!goodsLists) return 0;
+    return goodsLists.reduce((acc, item) => acc + item.Nums * item.MakePrice, 0);
+});
+const youhuiquanPrice = computed(() => {
+    if (checkList.value.DelList.length < 1) return 0;
+    return checkList.value.DelList.length * 15;
+});
+const allPrice = computed(() => {
+    return (
+        goodsAllPrice.value + kuaidiPriceAll.value + youhuiquanPrice.value + Number(iptValue.value)
+    );
+});
+watchEffect(() => {
+    console.log('触发啦');
+    localStorage.setItem('checkedStatus', checkedStatus.value);
+    localStorage.setItem('kuaidis', kuaidi.value);
+    localStorage.setItem('zhifus', zhifu.value);
+    localStorage.setItem('baojias', baojia.value);
+    localStorage.setItem('iptValues', iptValue.value);
+    localStorage.setItem('quans', quan.value);
+    localStorage.setItem('quanLists', quanList.value);
+    if (checkList.value && checkList.value.DelList) {
+        localStorage.setItem('DelLists', JSON.stringify(checkList.value.DelList));
+    }
+});
 </script>
 
 <template>
@@ -315,7 +471,7 @@ const showGoodsDetails = (i) => {
         </div>
         <div class="center">
             <div class="select">
-                <a-radio-group v-model:value="checkedStatus">
+                <a-radio-group v-model:value="checkedStatus" @change="changePeiSong">
                     <a-radio :value="peisongList[0]?.Types">
                         <span class="radio">{{ peisongList[0]?.Title }}</span>
                     </a-radio>
@@ -324,7 +480,7 @@ const showGoodsDetails = (i) => {
             </div>
             <div class="kuai-di">
                 <div class="select">
-                    <a-radio-group v-model:value="checkedStatus">
+                    <a-radio-group v-model:value="checkedStatus" @change="changePeiSong">
                         <a-radio :value="peisongList[1]?.Types">
                             <span class="radio">{{ peisongList[1]?.Title }}</span>
                         </a-radio>
@@ -355,7 +511,7 @@ const showGoodsDetails = (i) => {
                 </div>
             </div>
             <div class="select">
-                <a-radio-group v-model:value="checkedStatus">
+                <a-radio-group v-model:value="checkedStatus" @change="changePeiSong">
                     <a-radio :value="peisongList[2]?.Types">
                         <span class="radio">{{ peisongList[2]?.Title }}</span>
                     </a-radio>
@@ -416,8 +572,7 @@ const showGoodsDetails = (i) => {
             <h5>订单信息</h5>
             <p @click="emits('changeShowPage', 1)">返回修改</p>
         </div>
-        {{ props?.fetchData }}
-        <a-table :pagination="false" :columns="jingMaiColumns" :dataSource="props?.fetchData">
+        <a-table :pagination="false" :columns="jingMaiColumns" :dataSource="goodsLists">
             <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'Title'">
                     <div class="goods-info" @click="showGoodsDetails(record)">
@@ -442,11 +597,15 @@ const showGoodsDetails = (i) => {
         <div class="center">
             <div class="details">
                 <div class="left">
+                    <!-- <div class="top-title" v-if="youhuiquanList.length"> -->
                     <div class="top-title">
-                        <a-checkbox v-model:checked="baojia"><h5>优惠券</h5></a-checkbox>
+                        <a-checkbox @change="changeQuan" v-model:checked="quan"
+                            ><h5>优惠券</h5></a-checkbox
+                        >
                         <a-dropdown placement="bottomLeft" :arrow="true">
                             <div class="top-title">
-                                <p>您已选择1张优惠券 ￥-20.00元</p>
+                                <p v-show="quanList.length < 1">选择优惠券</p>
+                                <p v-show="quanList.length >= 1">您已选择1张优惠券 ￥-20.00元</p>
                             </div>
                             <template #overlay>
                                 <div class="select-wrap">
@@ -476,15 +635,15 @@ const showGoodsDetails = (i) => {
                 <div class="right">
                     <div class="item">
                         <span>2件商品总额:</span>
-                        <span>499.50</span>
+                        <span>{{ goodsAllPrice }}</span>
                     </div>
                     <div class="item">
                         <span>运费:</span>
-                        <span>0.00</span>
+                        <span>{{ kuaidiPriceAll }}</span>
                     </div>
                     <div class="item">
                         <span>收藏证书:</span>
-                        <span>20.00</span>
+                        <span>{{ youhuiquanPrice }}</span>
                     </div>
                     <div class="item">
                         <span>优惠券:</span>
@@ -492,10 +651,11 @@ const showGoodsDetails = (i) => {
                     </div>
                     <div class="item">
                         <span>收藏证书优惠券:</span>
-                        <span>-20.00</span>
+                        <span>-0.00</span>
                     </div>
                     <div class="zong">
-                        应付总额:<p class="price">￥<span>499.50</span></p
+                        应付总额:<p class="price"
+                            >￥<span>{{ allPrice }}</span></p
                         >元
                     </div>
                     <a-button type="primary" @click="submit">去付款</a-button>

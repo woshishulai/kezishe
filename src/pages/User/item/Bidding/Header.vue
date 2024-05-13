@@ -68,7 +68,7 @@ onMounted(() => {});
         .icon-list {
             .flex-row;
             justify-content: space-between;
-            padding: 0 44px 0 52px;
+            padding: 0 42px 0 52px;
             img {
                 width: 30px;
             }

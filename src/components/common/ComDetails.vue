@@ -180,7 +180,7 @@ watch(
         }
 
         const priceAllList = props.goodsDtails?.offerData?.Jiajia;
-        const nowNewPrice = props.goodsDtails?.offerData?.MakePrice;
+        const nowNewPrice = props.goodsDtails?.BaseData?.BasePrice;
         if (!priceAllList || !priceAllList.length) {
             return;
         }
@@ -190,7 +190,7 @@ watch(
         }
         const getItem = priceAllList.find((item) => Number(item.Mmax) > nowNewPrice);
         startPrice.value = Number(getItem.Jiajia);
-        value.value = nowNewPrice + startPrice.value;
+        value.value = Number(nowNewPrice) + Number(startPrice.value);
         if (!props.goodsDtails?.recomData?.length) {
             return;
         }
@@ -353,7 +353,7 @@ watch(
                 <p class="price">成交价格:¥{{ props.goodsDtails?.offerData?.MakePrice }}</p>
             </div>
             <div class="prices" v-else>
-                <p class="num">¥ {{ props.goodsDtails?.offerData?.MakePrice }}</p>
+                <p class="num">¥ {{ props.goodsDtails?.BaseData?.BasePrice }}</p>
                 <div class="add-price">
                     <div class="change-price">
                         <a-button @click="reducePrice">-</a-button>
@@ -611,7 +611,7 @@ watch(
                         border: none;
                     }
                     .ant-input {
-                        width: 100px;
+                        min-width: 100px;
                         height: 52px;
                         flex: 1;
                         text-align: center;

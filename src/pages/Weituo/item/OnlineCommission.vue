@@ -6,6 +6,7 @@ import { getMenuListAPi, submitWeituoAPi } from '@/request/weituo/index';
 import { handleFinishFailed } from '@/utils/form/rules.js';
 import Upload from '@/pages/User/item/AccountManagement/item/Upload.vue';
 import { useUserInfo } from '@/store/store';
+import { info } from '@/hooks/antd/message';
 const user = useUserInfo();
 const open = ref(false);
 const openTitle = ref('请先登录在填写申请单');
@@ -81,9 +82,10 @@ onMounted(async () => {
 });
 const getFiles = (file) => {
     formState.value.UserFile = file;
+    console.log(file);
 };
-const handleOk = (e) => {
-    console.log(e);
+const handleOk = (e, er) => {
+    formState.value.remember = true;
     open.value = false;
 };
 
@@ -100,9 +102,12 @@ const onFinish = async (values) => {
             Content: formState.value.introduction,
             UserFile: formState.value.UserFile
         };
-        console.log(query);
         let res = await submitWeituoAPi(query);
-        console.log(res.Data);
+        if (res.Tag == 1) {
+            formState.value = {};
+            formState.value.remember == true;
+            info('status'), res.Message;
+        }
     } else {
         openTitle.value = '请先登录在填写申请单';
         open.value = true;
@@ -202,6 +207,7 @@ const onFinish = async (values) => {
                         <a-textarea v-model:value="formState.introduction" />
                     </a-form-item>
                     <a-form-item label="上传文档">
+                        <p v-show="formState.UserFile">上传成功预览地址{{ formState.UserFile }}</p>
                         <Upload @getFiles="getFiles" :fileModule="4"></Upload>
                     </a-form-item>
                     <a-form-item name="remember" :wrapper-col="{ offset: 3, span: 10 }">

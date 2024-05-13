@@ -28,15 +28,15 @@ export const jingMaiColumns = [
     },
     {
         title: '数量',
-        dataIndex: 'MPrice',
-        key: 'MPrice',
+        dataIndex: 'Nums',
+        key: 'Nums',
         align: 'center',
         ellipsis: true
     },
     {
-        title: '成交价格',
-        dataIndex: 'Ontime',
-        key: 'Ontime',
+        title: '当前价格',
+        dataIndex: 'MakePrice',
+        key: 'MakePrice',
         align: 'center',
         ellipsis: true
     },

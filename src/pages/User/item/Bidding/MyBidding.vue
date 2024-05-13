@@ -9,7 +9,8 @@ import {
     getYiDeBiaoApi,
     getWeiDeBiaoApi,
     getWeiZhiFuApi,
-    getBuZhiFuApi
+    getBuZhiFuApi,
+    sumbitOrder
 } from '@/request/jingmai';
 import QuJian from './QuJian.vue';
 import Item from './Item.vue';
@@ -45,12 +46,24 @@ const router = useRouter();
 const route = useRoute();
 const showModals = ref(null);
 const props = defineProps({});
+const showPaegs = localStorage.getItem('showPaegs');
 const showComponent = ref(1);
-const changeShowPage = (index, query) => {
-    showComponent.value = index;
+showPaegs ? (showComponent.value = showPaegs) : (showComponent.value = 1);
+const changeShowPage = async (index, query) => {
     if (query) {
-        console.log(query);
+        try {
+            let res = await sumbitOrder(query);
+            if (!res.Tag == 1) {
+                console.log(1234);
+                return;
+            } else {
+                showComponent.value = index;
+                localStorage.setItem('showPaegs', index);
+            }
+        } catch (error) {}
     }
+    showComponent.value = index;
+    localStorage.setItem('showPaegs', index);
 };
 const params = ref({
     Title: '',
@@ -107,12 +120,12 @@ watch(
             });
             params.value.total = 1;
             fetchData.value = [];
+            checkList.value.DelList = [];
             getFetchData(1, 10);
         }
     }
 );
 const showGoodsDetails = (i) => {
-    console.log(i);
     router.push({
         path: '/jingmai/goods-details',
         query: {
@@ -131,7 +144,11 @@ const showCheck = (e) => {
         let query = {
             Bn: e.Bn
         };
-        checkList.value.DelList.push(query);
+        if (showModals.value?.params?.titleCate == '未支付') {
+            checkList.value.DelList.push(e);
+        } else {
+            checkList.value.DelList.push(query);
+        }
     }
     if (checkList.value.DelList.length == fetchData.value.length) {
         all.value = true;
@@ -151,7 +168,11 @@ const getAll = () => {
             let query = {
                 Bn: item.Bn
             };
-            return query;
+            if (showModals.value?.params?.titleCate == '未支付') {
+                return item;
+            } else {
+                return query;
+            }
         });
         all.value = true;
         return;
@@ -163,16 +184,19 @@ const getAll = () => {
 };
 //支付
 const zhiFu = () => {
+    if (checkList.value.DelList.length < 1) {
+        info('warning', '请先选择要支付的订单吧');
+        return;
+    }
+    localStorage.setItem('showPaegs', 2);
+    const goodsList = JSON.stringify(checkList.value.DelList);
+    localStorage.setItem('goodsList', goodsList);
     showComponent.value = 2;
 };
 </script>
 
 <template>
-    <Item
-        @changeShowPage="changeShowPage"
-        :fetchData="fetchData"
-        v-show="showComponent == 2"
-    ></Item>
+    <Item @changeShowPage="changeShowPage" v-show="showComponent == 2"></Item>
     <div class="my-bidding" v-show="showComponent == 1">
         <div class="card-box">
             <div class="title"> 我的竞买 </div>

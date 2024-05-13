@@ -51,3 +51,6 @@ export const getBuZhiFuApi = (params) =>
     instance.get(
         `Member/UserAuction/NoPayList?Title=${params.Title}&Status=${params.Status}&Times=${params.Times}&PageIndex=${params.PageIndex}&PageSize=${params.PageSize}`
     );
+
+//未支付提交订单
+export const sumbitOrder = (data) => instance.post(`Member/Pay/OrderSave`, data);

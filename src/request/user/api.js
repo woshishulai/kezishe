@@ -49,3 +49,6 @@ export const getGoodsListApi = async (params) =>
 //获取配送支付方式
 export const getZhiFu = async (params) =>
     instance.get(`Member/Pay/GetPayBaseData?OrderType=${params}`);
+
+//获取快递价格
+export const getKuaiDi = async (data) => instance.post(`Member/Pay/EMSPostFeeStandard`, data);

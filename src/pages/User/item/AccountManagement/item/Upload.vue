@@ -47,8 +47,8 @@ const chooseImageUrl = async (e) => {
                 'Content-Type': 'multipart/form-data'
             }
         });
-        // emits('getFiles',response.data)
-        console.log('File uploaded successfully:', response.data);
+        emits('getFiles', res.Data.fullpath);
+        console.log('File uploaded successfully:', res, response);
     } catch (error) {
         console.error('Error uploading file:', error);
     }
