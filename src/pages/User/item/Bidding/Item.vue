@@ -1,6 +1,6 @@
 <script setup>
 import Header from './Header.vue';
-import { ref, computed, reactive, onMounted, watchEffect } from 'vue';
+import { ref, computed, reactive, onMounted, watchEffect, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
 import { useUserInfo } from '@/store/store';
@@ -111,7 +111,18 @@ const getYouHuiQuanList = async () => {
     if (res.Tag !== 1) {
         return;
     }
-    youhuiquanList.value = res.Data;
+    console.log(res);
+    youhuiquanList.value.CouponUserData = res.Data.CouponUserData.filter((item) => {
+        return item.Status == 0;
+    });
+    youhuiquanList.value.CouponData = res.Data.CouponData;
+    youhuiquanList.value.lengths = res.Data.CouponUserData.length;
+};
+const youhuiquanDetails = (item) => {
+    const getItem = youhuiquanList.value.CouponData.find(
+        (items) => (items.CouponId = item.CouponId)
+    );
+    return getItem.Title + getItem.Price;
 };
 
 const getAddressList = async () => {
@@ -254,8 +265,6 @@ const handleFinish = async () => {
 };
 //勾选框 优惠券
 const checkedss = ref(false);
-//下拉选择勾选框
-const selectCheckes = ref('');
 const emits = defineEmits(['changeShowPage']);
 //选择的地址
 const checked = ref(true);
@@ -316,6 +325,7 @@ quans ? (quan.value = quans) : (quan.value = true);
 const changeQuan = (e) => {
     if (!e.target.checked) {
         quanList.value = [];
+        selectCheckes.value = [];
     }
 };
 const quanList = ref([]);
@@ -326,6 +336,25 @@ const checkList = ref({
 });
 const DelLists = localStorage.getItem('DelLists');
 DelLists ? (checkList.value.DelList = JSON.parse(DelLists)) : (checkList.value.DelList = []);
+
+//下拉选择勾选框
+const selectCheckes = ref([]);
+const changeGetYouhuiquan = (e) => {
+    const index = selectCheckes.value.findIndex((item) => item == e);
+    if (index == -1) {
+        selectCheckes.value.push(e);
+    } else {
+        selectCheckes.value.splice(index, 1);
+    }
+};
+const getActives = (e) => {
+    const index = selectCheckes.value.findIndex((item) => item == e);
+    if (index == -1) {
+        return false;
+    } else {
+        return true;
+    }
+};
 const submit = () => {
     if (!user.userAddress.Id) {
         info('error', '请先添加地址');
@@ -363,10 +392,10 @@ const submit = () => {
         PayType: zhifu.value, //怎么支付
         ExpressType: kuaidi.value, //物流方式，
         IsInsured: baojia.value ? 1 : 0, //报价
-        InsuredPrice: iptValue.value,
+        InsuredPrice: iptValue.value, //保价金额 比如100万
         AllLogisticsCost: kuaidiPriceAll.value, //运费
-        WaitChargeTotal: '0', //仓储费
-        KeepPriceTotal: '0', //保价费
+        WaitChargeTotal: '0', //仓储费 未支付没有仓储费 未发货有
+        KeepPriceTotal: iptValue.value, //保价费
         AllCertFeeCost: youhuiquanPrice.value, //收藏证书
         AllCertyouhuiCost: '0', //收藏证书券抵扣金额
         AllTotal: allPrice.value, //应付总额
@@ -413,7 +442,11 @@ const goodsAllPrice = computed(() => {
 });
 const youhuiquanPrice = computed(() => {
     if (checkList.value.DelList.length < 1) return 0;
-    return checkList.value.DelList.length * 15;
+    if (checkList.value.DelList.length <= selectCheckes.value.length) return 0;
+    if (selectCheckes.value.length) {
+        return (checkList.value.DelList.length - selectCheckes.value.length) * 20;
+    }
+    return checkList.value.DelList.length * 20;
 });
 const allPrice = computed(() => {
     return (
@@ -431,6 +464,22 @@ watchEffect(() => {
     localStorage.setItem('quanLists', quanList.value);
     if (checkList.value && checkList.value.DelList) {
         localStorage.setItem('DelLists', JSON.stringify(checkList.value.DelList));
+    }
+});
+//最低报价最高报价
+const endPrice = ref(0);
+const startPrice = ref(0);
+//折扣比例
+const news = ref(0);
+watchEffect(() => {
+    console.log(kuaidi.value);
+    //计算报价费用
+    const item = wuLiuList.value.find((item) => item.Types == checkedStatus.value);
+    if (item) {
+        endPrice.value = item.MinCoverage || '';
+        startPrice.value = item.Maxcoverage || '';
+        news.value = item.InsuranceRate || '';
+        iptValue.value = endPrice.value || '';
     }
 });
 </script>
@@ -548,6 +597,7 @@ watchEffect(() => {
         </div>
         <div class="center price-list">
             <a-checkbox @change="changeInput" v-model:checked="baojia">我要保价</a-checkbox>
+            {{ endPrice }} - {{ startPrice }}
             <a-input
                 @input="addPrice"
                 style="width: 150px; background-color: #f3f3f3; height: 40px; border-radius: 10px"
@@ -604,8 +654,12 @@ watchEffect(() => {
                         >
                         <a-dropdown placement="bottomLeft" :arrow="true">
                             <div class="top-title">
-                                <p v-show="quanList.length < 1">选择优惠券</p>
-                                <p v-show="quanList.length >= 1">您已选择1张优惠券 ￥-20.00元</p>
+                                <p v-show="selectCheckes.length < 1">选择优惠券</p>
+                                <p v-show="selectCheckes.length >= 1"
+                                    >您已选择{{ selectCheckes.length }}张优惠券 ￥-{{
+                                        selectCheckes.length * 20
+                                    }}.00元</p
+                                >
                             </div>
                             <template #overlay>
                                 <div class="select-wrap">
@@ -618,12 +672,20 @@ watchEffect(() => {
                                                 0 5px 12px 4px rgba(0, 0, 0, 0.09);
                                         "
                                         class="title"
-                                        >共5张,可用5张,已选择1张</div
+                                        >共{{ youhuiquanList.lengths }}张,可用{{
+                                            youhuiquanList.CouponUserData.length
+                                        }}张,已选择{{ selectCheckes.length }}张</div
                                     >
                                     <div class="check-list">
-                                        <div class="check-item" v-for="item in 8" :key="item">
-                                            <a-checkbox v-model:checked="checked"
-                                                >免费收藏证书券{{ item }}</a-checkbox
+                                        <div
+                                            class="check-item"
+                                            v-for="item in youhuiquanList.CouponUserData"
+                                            :key="item"
+                                        >
+                                            <a-checkbox
+                                                :checked="getActives(item.Id)"
+                                                @change="changeGetYouhuiquan(item.Id)"
+                                                >{{ youhuiquanDetails(item) }}</a-checkbox
                                             >
                                         </div>
                                     </div>
@@ -942,6 +1004,9 @@ watchEffect(() => {
             .left {
                 .top-title {
                     .flex-row;
+                    p {
+                        margin-bottom: 1px;
+                    }
                 }
                 .title {
                     padding: 10px 16px;

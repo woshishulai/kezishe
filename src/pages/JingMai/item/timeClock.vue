@@ -1,36 +1,48 @@
 <script setup>
-import { ref, computed, reactive, onMounted, onUnmounted, watchEffect } from 'vue';
-import { useRouter, useRoute } from 'vue-router';
-import { getImageUrl } from '@/utils';
-const router = useRouter();
-const route = useRoute();
+import { ref, watchEffect, onUnmounted, defineProps } from 'vue';
 
-onMounted(() => {});
 const props = defineProps({
     time: {
         type: String,
         default: ''
+    },
+    TimeNow: {
+        type: String,
+        default: ''
     }
 });
+const emits = defineEmits(['fetchDataList']);
+
+const time = ref('');
+const endTimes = ref('');
+let interval;
+
+watchEffect(() => {
+    if (props?.TimeNow) {
+        time.value = Math.floor(new Date(props?.TimeNow).getTime() / 1000);
+    }
+    if (props?.time) {
+        endTimes.value = Math.floor(new Date(props?.time).getTime() / 1000);
+    }
+});
+
 const endTime = () => {
-    console.log('时间到了');
+    emits('fetchDataList');
 };
 
 const countdown = ref('');
 
 const calculateCountdown = () => {
-    const offerTime = props?.time;
-    if (!offerTime) return;
+    if (isNaN(time.value) || isNaN(endTimes.value)) {
+        console.log('无效的日期');
+        return;
+    }
 
-    // 获取用户本地时间
-    const userTime = new Date();
+    const currentTime = new Date().getTime() / 1000;
+    const difference = endTimes.value - currentTime;
 
-    const endTimeValue = new Date(offerTime); // 服务器时间
-    const currentTime = userTime;
-
-    const difference = endTimeValue - currentTime;
     if (difference > 0) {
-        const totalSeconds = Math.floor(difference / 1000);
+        const totalSeconds = Math.floor(difference);
 
         const hours = Math.floor(totalSeconds / (60 * 60));
         const minutes = Math.floor((totalSeconds % (60 * 60)) / 60);
@@ -48,8 +60,6 @@ const calculateCountdown = () => {
     }
 };
 
-let interval;
-
 watchEffect(() => {
     calculateCountdown();
     interval = setInterval(calculateCountdown, 1000);
@@ -61,7 +71,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <p>({{ countdown }})</p>
+    <div>
+        <p>({{ countdown }})</p>
+    </div>
 </template>
 
 <style scoped lang="less">

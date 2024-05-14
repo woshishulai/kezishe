@@ -51,7 +51,7 @@ const showGoodsDetails = (item) => {
     router.push({
         path: '/jingmai/goods-details',
         query: {
-            id: item.Id,
+            id: item.Id + '',
             show: route.query.show
         }
     });

@@ -3,11 +3,29 @@ import { ref, computed, reactive, onMounted, h } from 'vue';
 import { SearchOutlined } from '@ant-design/icons-vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
+import { getNotShippedList } from '@/request/user/api';
 import ShowModal from '@/components/common/user/ShowModal.vue';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
-onMounted(() => {});
+const query = reactive({
+    page: '',
+    pageIndex: '',
+    Bot: '',
+    AuctionType: '0',
+    DateRange: '0'
+});
+const getTableList = async (page = 1, pageIndex = 10) => {
+    query.page = page;
+    query.pageIndex = pageIndex;
+    try {
+        let res = await getNotShippedList(query);
+        console.log(res);
+    } catch (error) {}
+};
+onMounted(() => {
+    getTableList();
+});
 const columns = [
     {
         title: '藏品编号',

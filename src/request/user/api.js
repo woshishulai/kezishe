@@ -57,3 +57,8 @@ export const getKuaiDi = async (data) => instance.post(`Member/Pay/EMSPostFeeSta
 export const getCartList = async (params) =>
     instance.get(`Member/Collect/GetList?Cid=${params.Cid}&Kw=${params.Kw}&Status=${params.Status}&PageSize=${params.PageSize}&PageIndex=${params.PageSize}
 `);
+
+//获取未发货
+export const getNotShippedList = async (params) =>
+    instance.get(`Member/UserDeliver/UnDeliverList?Bot=${params.Bot}&AuctionType=${params.AuctionType}&DateRange=${params.DateRange}
+`);

@@ -4,7 +4,7 @@ import { useRouter, useRoute, routerKey } from 'vue-router';
 import { getImageUrl } from '@/utils';
 import { getAddress, addPriceApi, removePriceApi } from '@/request/jingmai/index';
 import Swiper from '@/pages/Chengjiao/details/Swiper.vue';
-import TimtClock from '@/pages/Jingmai/item/TimeClock.vue';
+import TimtClock from '@/pages/JingMai/item/TimeClock.vue';
 import Fixed from '@/pages/Chengjiao/details/Fixed.vue';
 import Item from '@/pages/Chengjiao/details/Item.vue';
 import FooterSwiper from '@/pages/Chengjiao/details/FooterSwiper.vue';
@@ -64,6 +64,9 @@ const isFirstPrice = ref(false);
 //更新 代理价
 const newFirstPrice = ref(false);
 const emits = defineEmits(['getGoodsDetailsFn']);
+const fetchDataList = () => {
+    emits('getGoodsDetailsFn');
+};
 //最低出价的范围
 const startPrice = ref(0);
 //出价的价格
@@ -180,7 +183,11 @@ watch(
         }
 
         const priceAllList = props.goodsDtails?.offerData?.Jiajia;
-        const nowNewPrice = props.goodsDtails?.BaseData?.BasePrice;
+        const nowNewPrice = props.goodsDtails?.offerData?.DaiLiInfo?.MPrice
+            ? props.goodsDtails?.offerData?.DaiLiInfo?.MPrice
+            : props.goodsDtails?.offerData?.MPrice
+              ? props.goodsDtails?.offerData?.MPrice
+              : props.goodsDtails?.BaseData?.BasePrice;
         if (!priceAllList || !priceAllList.length) {
             return;
         }
@@ -309,7 +316,11 @@ watch(
                     <div class="right-time" v-if="props.goodsDtails?.BaseData?.Status == 2">
                         <img :src="getImageUrl('chengjiao/icon5.png')" alt="" />
                         <p>{{ props.goodsDtails?.offerData?.Ontime }}</p>
-                        <TimtClock :time="props.goodsDtails?.offerData?.Ontime"></TimtClock>
+                        <TimtClock
+                            :time="props.goodsDtails?.BaseData?.Ontime"
+                            :TimeNow="props.goodsDtails?.BaseData?.TimeNow"
+                            @fetchDataList="fetchDataList"
+                        ></TimtClock>
                     </div>
                 </div>
                 <div class="center">
@@ -353,7 +364,13 @@ watch(
                 <p class="price">成交价格:¥{{ props.goodsDtails?.offerData?.MakePrice }}</p>
             </div>
             <div class="prices" v-else>
-                <p class="num">¥ {{ props.goodsDtails?.BaseData?.BasePrice }}</p>
+                <p class="num"
+                    >¥
+                    {{
+                        props.goodsDtails?.offerData?.MPrice ||
+                        props.goodsDtails?.BaseData?.BasePrice
+                    }}</p
+                >
                 <div class="add-price">
                     <div class="change-price">
                         <a-button @click="reducePrice">-</a-button>
