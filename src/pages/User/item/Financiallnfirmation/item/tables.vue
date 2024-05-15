@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, reactive, onMounted } from 'vue';
+import { ref, computed, reactive, onMounted, watchEffect } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
 import { handleFinishFailed } from '@/utils/form/rules';
@@ -7,7 +7,7 @@ import { createRecordRemittance, bankList } from '@/request/user/api';
 import { info } from '@/hooks/antd/message';
 const router = useRouter();
 const route = useRoute();
-const props = defineProps({});
+const props = defineProps(['orderId', 'allPrice']);
 const bankDataList = ref([]);
 const formState = reactive({});
 const formRef = ref();
@@ -19,6 +19,12 @@ onMounted(async () => {
     } catch (error) {
         info('error', error);
     }
+});
+watchEffect(() => {
+    formState.OrderNo = props?.orderId;
+});
+watchEffect(() => {
+    formState.Prices = props?.allPrice;
 });
 const resetForm = () => {
     formRef.value.resetFields();
@@ -37,12 +43,10 @@ const emits = defineEmits(['close']);
 const handleFinish = async () => {
     try {
         let res = await createRecordRemittance(formState);
-        console.log(res);
         if (res.Tag == 1) {
             for (let i in formState) {
                 formState[i] = '';
             }
-            info('success', '保存成功');
             emits('close');
         }
     } catch (error) {

@@ -3,11 +3,26 @@ import Header from './Header.vue';
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
+import Tables from '../Financiallnfirmation/item/tables.vue';
+const allPrice = localStorage.getItem('allPrice');
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
+const orderId = localStorage.getItem('orderId');
 const emits = defineEmits(['changeShowPage']);
-
+const isDraweComponent = ref(false);
+const afterOpenChange = (bool) => {
+    isDraweComponent.value = bool;
+    localStorage.removeItem('checkedStatus');
+    localStorage.removeItem('kuaidis');
+    localStorage.removeItem('zhifus');
+    localStorage.removeItem('baojias');
+    localStorage.removeItem('iptValues');
+    localStorage.removeItem('quans');
+    localStorage.removeItem('quanLists');
+    localStorage.removeItem('DelLists');
+    localStorage.setItem('showPaegs', 1);
+};
 onMounted(() => {});
 const jingMaiColumns = [
     {
@@ -38,15 +53,19 @@ const jingMaiColumns = [
         ellipsis: true
     }
 ];
+const showModals = ref(false);
+const changeAddPrice = () => {
+    isDraweComponent.value = true;
+};
 </script>
 
 <template>
     <div class="bank">
-        <Header num="3"></Header>
+        <Header num="2"></Header>
         <div class="title-nav">
             <h5>银行地址及汇款地址</h5>
         </div>
-        <a-table :pagination="false" :columns="jingMaiColumns" :dataSource="props?.fetchData">
+        <!-- <a-table :pagination="false" :columns="jingMaiColumns" :dataSource="props?.fetchData">
             <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'Title'">
                     <div class="goods-info" @click="showGoodsDetails(record)">
@@ -67,7 +86,16 @@ const jingMaiColumns = [
                     <span class="active">￥{{ record.MPrice || record.MakePrice }}</span>
                 </template>
             </template>
-        </a-table>
+        </a-table> -->
+        <a-modal
+            width="560px"
+            :closable="false"
+            v-model:open="isDraweComponent"
+            :footer="null"
+            centered
+        >
+            <Tables @close="afterOpenChange" :orderId="orderId" :allPrice="allPrice"></Tables>
+        </a-modal>
         <div class="element">
             <h5>注意事项</h5>
             <p class="labels">1.属性来控制元素的垂直对齐方式。如果你想让元素底部对齐，你可以设置v</p
@@ -82,13 +110,14 @@ const jingMaiColumns = [
             <div class="add">
                 <div class="btns">
                     <a-button type="primary" @click="emits('changeShowPage', 2)">返回修改</a-button>
-                    <a-button type="primary" @click="emits('changeShowPage', 4)"
-                        >填写汇款告知单</a-button
-                    ></div
+                    <a-button type="primary" @click="changeAddPrice">填写汇款告知单</a-button></div
                 >
                 <div class="text">
                     <p>应付金额</p>
-                    <p class="price">2,484.00元</p>
+                    <p class="price">
+                        {{ allPrice }}
+                        元</p
+                    >
                 </div>
             </div>
         </div>

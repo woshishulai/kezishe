@@ -7,6 +7,8 @@ import { info } from '@/hooks/antd/message';
 import { useUserInfo, usePassword } from '@/store/store';
 import { getCodeParams } from '@/request/api';
 import { encryptionPassword } from '@/hooks/user';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const user = useUserInfo();
 const newCodeParams = usePassword();
 let status = reactive({});
@@ -111,15 +113,23 @@ const changePassword = async (formState, passwordKey, newPasswordKey) => {
                 newCodeParams.codePasswords.PublicKey,
                 user.userInfo.UserId
             );
-            let res = await changeLoginPassWord(query);
+            let res;
+            if (passwordKey == 'oldLoginPassword') {
+                res = await changeLoginPassWord(query);
+            } else if (passwordKey == 'payPassword') {
+                res = await changePayPassWord(query);
+            }
             if (res.Tag == 1) {
                 Object.keys(formState).forEach((key) => {
                     formState[key] = '';
                 });
+                let item = localStorage.getItem('item4');
+                localStorage.removeItem('item4');
+                if (item) {
+                    router.push('/user/my-bidding');
+                }
             }
-        } catch (error) {
-            info('error', error);
-        }
+        } catch (error) {}
     }
 };
 
@@ -143,8 +153,8 @@ const onPayFinish = async () => {
                         :model="formState"
                         name="basicsssssss"
                         :rules="resetRules"
-                        :label-col="{ span: 7 }"
-                        :wrapper-col="{ span: 15 }"
+                        :label-col="{ span: 9 }"
+                        :wrapper-col="{ span: 14 }"
                         autocomplete="off"
                         @finish="onFinish"
                         @finishFailed="handleFinishFailed"
@@ -175,7 +185,7 @@ const onPayFinish = async () => {
                                 v-model:value="formState.confirmLoginPassword"
                             />
                         </a-form-item>
-                        <a-form-item :wrapper-col="{ offset: 7, span: 15 }">
+                        <a-form-item :wrapper-col="{ offset: 9, span: 14 }">
                             <a-button type="primary" html-type="submit">确认</a-button>
                         </a-form-item>
                     </a-form>
@@ -186,8 +196,8 @@ const onPayFinish = async () => {
                         :model="formState"
                         :rules="payPasswordRules"
                         name="bddddddasic"
-                        :label-col="{ span: 7 }"
-                        :wrapper-col="{ span: 15 }"
+                        :label-col="{ span: 9 }"
+                        :wrapper-col="{ span: 14 }"
                         autocomplete="off"
                         @finish="onPayFinish"
                         @finishFailed="handleFinishFailed"
@@ -218,7 +228,7 @@ const onPayFinish = async () => {
                                 v-model:value="formState.confirmPayPassword"
                             />
                         </a-form-item>
-                        <a-form-item :wrapper-col="{ offset: 7, span: 15 }">
+                        <a-form-item :wrapper-col="{ offset: 9, span: 14 }">
                             <a-button type="primary" html-type="submit">确认</a-button>
                         </a-form-item>
                     </a-form>
@@ -243,7 +253,7 @@ const onPayFinish = async () => {
 
         .change-login-password {
             flex: 1;
-            padding: 0 0 0 40px;
+            padding: 0 0 0 20px;
             border-right: 1px solid #dbdbdb;
         }
 

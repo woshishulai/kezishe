@@ -315,7 +315,7 @@ watch(
                     </p>
                     <div class="right-time" v-if="props.goodsDtails?.BaseData?.Status == 2">
                         <img :src="getImageUrl('chengjiao/icon5.png')" alt="" />
-                        <p>{{ props.goodsDtails?.offerData?.Ontime }}</p>
+                        <p>{{ props.goodsDtails?.BaseData?.Ontime }}</p>
                         <TimtClock
                             :time="props.goodsDtails?.BaseData?.Ontime"
                             :TimeNow="props.goodsDtails?.BaseData?.TimeNow"
@@ -358,12 +358,31 @@ watch(
             </div>
             <div class="statuss" v-if="props.goodsDtails?.BaseData?.Status == 3">
                 <div class="end-time">
-                    <p>成交时间:{{ props.goodsDtails?.offerData?.Ontime }}</p>
+                    <p>成交时间:{{ props.goodsDtails?.BaseData?.Ontime }}</p>
                     <!-- <img :src="getImageUrl('chengjiao/icon5.png')" alt="" /> -->
                 </div>
                 <p class="price">成交价格:¥{{ props.goodsDtails?.offerData?.MakePrice }}</p>
             </div>
-            <div class="prices" v-else>
+            <div
+                class="statuss"
+                v-if="
+                    props.goodsDtails?.BaseData?.Status == 7 ||
+                    props.goodsDtails?.BaseData?.Status == 8
+                "
+            >
+                <div class="end-time">
+                    <p>{{ props.goodsDtails?.BaseData?.Ontime }}</p>
+                    <!-- <img :src="getImageUrl('chengjiao/icon5.png')" alt="" /> -->
+                </div>
+            </div>
+            <div
+                class="prices"
+                v-if="
+                    props.goodsDtails?.BaseData?.Status != 3 &&
+                    props.goodsDtails?.BaseData?.Status != 7 &&
+                    props.goodsDtails?.BaseData?.Status != 8
+                "
+            >
                 <p class="num"
                     >¥
                     {{
@@ -486,7 +505,7 @@ watch(
             >查看详细</button
         >
     </div>
-    <Item v-if="route.query.show"></Item>
+    <Item v-if="route.query.show == true"></Item>
     <FooterSwiper></FooterSwiper>
     <Fixed></Fixed>
 </template>

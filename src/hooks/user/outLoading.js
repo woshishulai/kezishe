@@ -7,6 +7,7 @@ export const removeUserInfo = () => {
     user.removeUserInfo();
     user.removeUserNickName();
     user.removeUserTranslate();
+    localStorage.clear();
     setTimeout(() => {
         router.push('/login');
     }, 1500);

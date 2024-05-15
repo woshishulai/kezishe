@@ -1,6 +1,7 @@
 <script setup>
 import { ref, computed, reactive, onMounted, toRaw, watchEffect } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { yuEZhuanEDu } from '@/request/user/api';
 import { getImageUrl } from '@/utils';
 import Tables from './item/tables.vue';
 import TableDetails from './item/tableDetails.vue';
@@ -10,9 +11,11 @@ const route = useRoute();
 const props = defineProps({});
 const showModals = ref(null);
 const params = ref();
+const infos = ref('');
 const comInfo = ref({});
 onMounted(() => {
     params.value = showModals.value?.params;
+    getZhiFuDetails();
 });
 watchEffect(() => {});
 const formState = reactive({
@@ -22,6 +25,12 @@ const formState = reactive({
     resource: '1',
     desc: ''
 });
+const getZhiFuDetails = async () => {
+    try {
+        let res = await yuEZhuanEDu();
+        infos.value = res.Data;
+    } catch (error) {}
+};
 const onSubmit = () => {
     console.log('submit!', toRaw(formState));
 };
@@ -53,10 +62,10 @@ const afterOpenChanges = (bool) => {
     <div class="chongzhi">
         <div class="left-user-info">
             <div class="title">余额(¥)</div>
-            <div class="num">143.40 <span>元</span></div>
+            <div class="num">{{ infos?.Balance }} <span>元</span></div>
             <p>竞卖额度</p>
-            <p>¥453423</p>
-            <p>¥453423可用</p>
+            <p>¥{{ infos?.AvailableQuotas }}</p>
+            <p>¥{{ infos.Quota }}可用</p>
             <div class="bi">
                 <div>
                     <p class="label">涌币</p>

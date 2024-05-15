@@ -61,7 +61,7 @@ const showStampGoods = (i) => {
             Id: i.Id,
             SType: 1,
             Cate1: 2,
-            show: true
+            show: false
         }
     });
 };

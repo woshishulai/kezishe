@@ -16,6 +16,7 @@ import QuJian from './QuJian.vue';
 import Item from './Item.vue';
 import Item2 from './Item2.vue';
 import Item3 from './Item3.vue';
+import Item4 from './Item4.vue';
 import { info } from '@/hooks/antd/message';
 import { watch } from 'vue';
 const jingMaiList = ref([
@@ -43,7 +44,6 @@ const jingMaiList = ref([
     }
 ]);
 const router = useRouter();
-const route = useRoute();
 const showModals = ref(null);
 const props = defineProps({});
 const showPaegs = localStorage.getItem('showPaegs');
@@ -54,9 +54,18 @@ const changeShowPage = async (index, query) => {
         try {
             let res = await sumbitOrder(query);
             if (!res.Tag == 1) {
-                console.log(1234);
                 return;
             } else {
+                localStorage.setItem('orderId', res.Data.OrderNo);
+                localStorage.setItem('allPrice', res.Data.AllTotal);
+                // localStorage.removeItem('checkedStatus');
+                // localStorage.removeItem('kuaidis');
+                // localStorage.removeItem('zhifus');
+                // localStorage.removeItem('baojias');
+                // localStorage.removeItem('iptValues');
+                // localStorage.removeItem('quans');
+                // localStorage.removeItem('quanLists');
+                // localStorage.removeItem('DelLists');
                 showComponent.value = index;
                 localStorage.setItem('showPaegs', index);
             }
@@ -188,6 +197,15 @@ const zhiFu = () => {
         info('warning', '请先选择要支付的订单吧');
         return;
     }
+    localStorage.setItem('checkedStatus', 0);
+    localStorage.setItem('kuaidis', 0);
+    localStorage.setItem('zhifus', 0);
+    localStorage.setItem('baojias', true);
+    localStorage.setItem('iptValues', '');
+    localStorage.setItem('quanLists', '');
+    localStorage.setItem('DelLists', []);
+    localStorage.removeItem('allPrice');
+    localStorage.removeItem('orderId');
     localStorage.setItem('showPaegs', 2);
     const goodsList = JSON.stringify(checkList.value.DelList);
     localStorage.setItem('goodsList', goodsList);
@@ -196,7 +214,11 @@ const zhiFu = () => {
 </script>
 
 <template>
-    <Item @changeShowPage="changeShowPage" v-show="showComponent == 2"></Item>
+    <Item
+        :fetchData="checkList?.DelList"
+        @changeShowPage="changeShowPage"
+        v-show="showComponent == 2"
+    ></Item>
     <div class="my-bidding" v-show="showComponent == 1">
         <div class="card-box">
             <div class="title"> 我的竞买 </div>
@@ -308,6 +330,8 @@ const zhiFu = () => {
     </div>
     <Item2 @changeShowPage="changeShowPage" v-show="showComponent == 3"></Item2>
     <Item3 @changeShowPage="changeShowPage" v-show="showComponent == 4"></Item3>
+    <!-- //余额支付的 -->
+    <Item4 @changeShowPage="changeShowPage" v-show="showComponent == 5"></Item4>
 </template>
 
 <style scoped lang="less">

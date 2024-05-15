@@ -17,21 +17,22 @@ export default defineConfig({
     ],
     build: {
         // outDir: 'http',
-        rollupOptions: {
-            output: {
-                // manualChunks: {
-                //   vue: ['vue']
-                // }
-                manualChunks(id) {
-                    if (id.includes('node_modules')) {
-                        return 'vendor';
-                    }
-                    // else if (id.includes('src/pages')) {
-                    //   return 'pages'; // 将 src/views 目录下的模块打包到一个单独的块
-                    // }
-                }
-            }
-        },
+        // rollupOptions: {
+        //     output: {
+        //         // manualChunks: {
+        //         //   vue: ['vue']
+        //         // }
+        //         //打包分类的文件
+        //         manualChunks(id) {
+        //             if (id.includes('node_modules')) {
+        //                 return 'vendor';
+        //             }
+        //             // else if (id.includes('src/pages')) {
+        //             //   return 'pages'; // 将 src/views 目录下的模块打包到一个单独的块
+        //             // }
+        //         }
+        //     }
+        // },
         minify: 'terser',
         terserOptions: {
             // compress: {

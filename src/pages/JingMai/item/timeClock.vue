@@ -1,5 +1,5 @@
 <script setup>
-import { ref, watchEffect, onUnmounted, defineProps } from 'vue';
+import { ref, watchEffect, onMounted, onUnmounted, defineProps, defineEmits } from 'vue';
 
 const props = defineProps({
     time: {
@@ -38,7 +38,7 @@ const calculateCountdown = () => {
         return;
     }
 
-    const currentTime = new Date().getTime() / 1000;
+    const currentTime = time.value;
     const difference = endTimes.value - currentTime;
 
     if (difference > 0) {
@@ -60,14 +60,19 @@ const calculateCountdown = () => {
     }
 };
 
-watchEffect(() => {
-    calculateCountdown();
+onMounted(() => {
+    calculateCountdown(); // 在组件加载时调用一次
     interval = setInterval(calculateCountdown, 1000);
 });
 
 onUnmounted(() => {
     clearInterval(interval);
 });
+
+// 每秒更新时间值
+interval = setInterval(() => {
+    time.value = Math.floor(new Date().getTime() / 1000);
+}, 1000);
 </script>
 
 <template>

@@ -62,3 +62,9 @@ export const getCartList = async (params) =>
 export const getNotShippedList = async (params) =>
     instance.get(`Member/UserDeliver/UnDeliverList?Bot=${params.Bot}&AuctionType=${params.AuctionType}&DateRange=${params.DateRange}
 `);
+
+//获取支付信息
+export const getZhifuInfo = async (params) => instance.post(`Member/Pay/DefaultParam`);
+
+//获取支付信息
+export const ZhiFuApi = async (data) => instance.post(`Member/Pay/BalancePay`, data);

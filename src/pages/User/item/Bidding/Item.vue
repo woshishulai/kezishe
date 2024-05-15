@@ -43,7 +43,15 @@ const props = defineProps({
         default: []
     }
 });
-const goodsLists = JSON.parse(localStorage.getItem('goodsList'));
+const goodsLists = ref([]);
+watchEffect(() => {
+    if (props?.fetchData.length >= 1) {
+        goodsLists.value = props?.fetchData;
+    } else {
+        goodsLists.value = JSON.parse(localStorage.getItem('goodsList'));
+    }
+});
+
 onMounted(async () => {
     try {
         await initCountList();
@@ -68,7 +76,7 @@ const getKuaiDiLists = async () => {
 //计算快递价格
 const goodsList = computed(() => {
     let arr = [];
-    goodsLists?.forEach((item) => {
+    goodsLists.value?.forEach((item) => {
         const existingIndex = arr.findIndex((group) => group[0]?.CTypeId === item.CTypeId);
         if (existingIndex !== -1) {
             arr[existingIndex].push(item);
@@ -105,7 +113,11 @@ const kuaidiPriceAll = computed(() => {
 });
 
 //优惠券数组
-const youhuiquanList = ref([]);
+const youhuiquanList = ref({
+    CouponUserData: [],
+    lengths: '',
+    CouponData: {}
+});
 const getYouHuiQuanList = async () => {
     const res = await youHuiQuan();
     if (res.Tag !== 1) {
@@ -276,6 +288,7 @@ checkedStatusLocalStorage
     ? (checkedStatus.value = checkedStatusLocalStorage)
     : (checkedStatus.value = 0);
 const changePeiSong = (e) => {
+    zhifu.value = '';
     if (e.target.value != 2) {
         kuaidi.value = 0;
     }
@@ -287,6 +300,7 @@ kuaidis ? (kuaidi.value = kuaidis) : (kuaidi.value = 0);
 const chanegKuaiDi = (index) => {
     kuaidi.value = index;
     checkedStatus.value = peisongList.value[1].Types;
+    zhifu.value = 1;
 };
 //z公司
 const zhifus = localStorage.getItem('zhifus');
@@ -307,6 +321,8 @@ baojias ? (baojia.value = baojias) : (baojia.value = true);
 const changeInput = (e) => {
     if (!e.target.checked) {
         iptValue.value = '';
+    } else {
+        iptValue.value = endPrice.value;
     }
 };
 //保价的价格
@@ -315,13 +331,24 @@ const iptValues = localStorage.getItem('iptValues');
 iptValues ? (iptValue.value = iptValues) : (iptValue.value = '');
 const addPrice = () => {
     baojia.value = true;
+    if (!kuaidi.value) {
+        return;
+    } else {
+        if (iptValue.value > startPrice.value) {
+            iptValue.value = startPrice.value;
+            return;
+        }
+        if (iptValue.value < endPrice.value) {
+            iptValue.value = endPrice.value;
+        }
+    }
 };
-const quan = ref(true);
-let quans = localStorage.getItem('quans');
-if (quans) {
-    quans = true;
-}
-quans ? (quan.value = quans) : (quan.value = true);
+const quan = ref(false);
+// let quans = localStorage.getItem('quans');
+// if (quans) {
+//     quans = true;
+// }
+// quans ? (quan.value = quans) : (quan.value = true);
 const changeQuan = (e) => {
     if (!e.target.checked) {
         quanList.value = [];
@@ -340,15 +367,20 @@ DelLists ? (checkList.value.DelList = JSON.parse(DelLists)) : (checkList.value.D
 //下拉选择勾选框
 const selectCheckes = ref([]);
 const changeGetYouhuiquan = (e) => {
-    const index = selectCheckes.value.findIndex((item) => item == e);
+    const index = selectCheckes.value.findIndex((item) => item.Id == e.Id);
+    console.log(selectCheckes.value);
     if (index == -1) {
-        selectCheckes.value.push(e);
+        let query = {
+            Id: e.Id,
+            CouponId: e.CouponId
+        };
+        selectCheckes.value.push(query);
     } else {
         selectCheckes.value.splice(index, 1);
     }
 };
 const getActives = (e) => {
-    const index = selectCheckes.value.findIndex((item) => item == e);
+    const index = selectCheckes.value.findIndex((item) => item.Id == e.Id);
     if (index == -1) {
         return false;
     } else {
@@ -372,7 +404,7 @@ const submit = () => {
         info('error', '请先选择支付方式');
         return;
     }
-    const OrderDatas = goodsLists.map((item) => {
+    const OrderDatas = goodsLists.value.map((item) => {
         let query = {
             AuctionType: 1,
             Aid: item.Aid, //藏品记录ID
@@ -385,6 +417,7 @@ const submit = () => {
         };
         return query;
     });
+    const CouponData = selectCheckes.value;
     const query = {
         OrderType: 1,
         AddrId: user.userAddress.Id, //地址ID
@@ -395,21 +428,20 @@ const submit = () => {
         InsuredPrice: iptValue.value, //保价金额 比如100万
         AllLogisticsCost: kuaidiPriceAll.value, //运费
         WaitChargeTotal: '0', //仓储费 未支付没有仓储费 未发货有
-        KeepPriceTotal: iptValue.value, //保价费
+        KeepPriceTotal: iptValue.value / news.value, //保价费
         AllCertFeeCost: youhuiquanPrice.value, //收藏证书
-        AllCertyouhuiCost: '0', //收藏证书券抵扣金额
+        AllCertyouhuiCost: selectCheckes.value.length * 20, //收藏证书券抵扣金额
         AllTotal: allPrice.value, //应付总额
-        OrderDatas
+        OrderDatas,
+        CouponData
     };
-    emits('changeShowPage', 3, query);
-    // localStorage.removeItem('checkedStatus');
-    // localStorage.removeItem('kuaidis');
-    // localStorage.removeItem('zhifus');
-    // localStorage.removeItem('baojias');
-    // localStorage.removeItem('iptValues');
-    // localStorage.removeItem('quans');
-    // localStorage.removeItem('quanLists');
-    // localStorage.removeItem('DelLists');
+    quan.value = false;
+    if (zhifu.value == 1) {
+        emits('changeShowPage', 5, query);
+        return;
+    } else {
+        emits('changeShowPage', 3, query);
+    }
 };
 //勾选框
 const showCheck = (e) => {
@@ -437,9 +469,10 @@ const showGoodsDetails = (i) => {
     });
 };
 const goodsAllPrice = computed(() => {
-    if (!goodsLists) return 0;
-    return goodsLists.reduce((acc, item) => acc + item.Nums * item.MakePrice, 0);
+    if (!goodsLists.value) return 0;
+    return goodsLists.value.reduce((acc, item) => acc + item.Nums * item.MakePrice, 0);
 });
+//收藏证书需要支出的费用
 const youhuiquanPrice = computed(() => {
     if (checkList.value.DelList.length < 1) return 0;
     if (checkList.value.DelList.length <= selectCheckes.value.length) return 0;
@@ -448,19 +481,34 @@ const youhuiquanPrice = computed(() => {
     }
     return checkList.value.DelList.length * 20;
 });
+//收藏证书减少支出的费用
+const removeYouHuiQuan = computed(() => {
+    if (selectCheckes.value.length < 1) return 0;
+    if (checkList.value.DelList.length >= selectCheckes.value.length)
+        return selectCheckes.value.length * 20;
+    if (selectCheckes.value.length > checkList.value.DelList.length) {
+        return checkList.value.DelList.length * 20;
+    }
+});
 const allPrice = computed(() => {
-    return (
-        goodsAllPrice.value + kuaidiPriceAll.value + youhuiquanPrice.value + Number(iptValue.value)
-    );
+    if (!news.value) {
+        return goodsAllPrice.value + kuaidiPriceAll.value + youhuiquanPrice.value;
+    } else {
+        return (
+            goodsAllPrice.value +
+            kuaidiPriceAll.value +
+            youhuiquanPrice.value +
+            Number(iptValue.value) * news.value
+        );
+    }
 });
 watchEffect(() => {
-    console.log('触发啦');
     localStorage.setItem('checkedStatus', checkedStatus.value);
     localStorage.setItem('kuaidis', kuaidi.value);
     localStorage.setItem('zhifus', zhifu.value);
     localStorage.setItem('baojias', baojia.value);
     localStorage.setItem('iptValues', iptValue.value);
-    localStorage.setItem('quans', quan.value);
+    // localStorage.setItem('quans', quan.value);
     localStorage.setItem('quanLists', quanList.value);
     if (checkList.value && checkList.value.DelList) {
         localStorage.setItem('DelLists', JSON.stringify(checkList.value.DelList));
@@ -472,14 +520,22 @@ const startPrice = ref(0);
 //折扣比例
 const news = ref(0);
 watchEffect(() => {
-    console.log(kuaidi.value);
+    if (!kuaidi.value) {
+        iptValue.value = '';
+        news.value = '';
+        endPrice.value = '';
+        startPrice.value = '';
+    }
     //计算报价费用
-    const item = wuLiuList.value.find((item) => item.Types == checkedStatus.value);
-    if (item) {
-        endPrice.value = item.MinCoverage || '';
-        startPrice.value = item.Maxcoverage || '';
-        news.value = item.InsuranceRate || '';
-        iptValue.value = endPrice.value || '';
+    if (wuLiuList.value.length) {
+        const item = wuLiuList.value.find((item) => item.Types == kuaidi.value);
+        if (item) {
+            console.log(item);
+            endPrice.value = item.MinCoverage || '';
+            startPrice.value = item.Maxcoverage || '';
+            news.value = item.InsuranceRate || '';
+            iptValue.value = endPrice.value || '';
+        }
     }
 });
 </script>
@@ -578,13 +634,17 @@ watchEffect(() => {
         <div class="center">
             <div class="list">
                 <div class="item" v-for="(item, index) in zhiFuList" :key="item.Types">
-                    <p
+                    <a-button
                         class="wuliu"
                         :class="item.Types == zhifu ? 'active' : ''"
                         @click="chanegZhiFu(item.Types)"
+                        :disabled="
+                            (checkedStatus == 2 && item.Types != 1) ||
+                            (checkedStatus != 2 && item.Types == 1)
+                        "
                     >
                         {{ item.Title }}
-                    </p>
+                    </a-button>
                 </div>
             </div>
         </div>
@@ -604,7 +664,7 @@ watchEffect(() => {
                 v-model:value="iptValue"
             />
             元
-            <p>保价费:{{ iptValue }}元</p>
+            <p>保价费:{{ iptValue * news }}元</p>
             <a-tooltip color="#9a0000">
                 <template #title>
                     <div class="info-fuwu">
@@ -647,12 +707,11 @@ watchEffect(() => {
         <div class="center">
             <div class="details">
                 <div class="left">
-                    <!-- <div class="top-title" v-if="youhuiquanList.length"> -->
                     <div class="top-title">
                         <a-checkbox @change="changeQuan" v-model:checked="quan"
                             ><h5>优惠券</h5></a-checkbox
                         >
-                        <a-dropdown placement="bottomLeft" :arrow="true">
+                        <a-dropdown :open="quan" placement="bottomLeft" :arrow="true">
                             <div class="top-title">
                                 <p v-show="selectCheckes.length < 1">选择优惠券</p>
                                 <p v-show="selectCheckes.length >= 1"
@@ -672,19 +731,22 @@ watchEffect(() => {
                                                 0 5px 12px 4px rgba(0, 0, 0, 0.09);
                                         "
                                         class="title"
-                                        >共{{ youhuiquanList.lengths }}张,可用{{
-                                            youhuiquanList.CouponUserData.length
+                                        >共{{ youhuiquanList?.lengths }}张,可用{{
+                                            youhuiquanList?.CouponUserData.length
                                         }}张,已选择{{ selectCheckes.length }}张</div
                                     >
-                                    <div class="check-list">
+                                    <div
+                                        class="check-list"
+                                        v-if="youhuiquanList?.CouponUserData.length"
+                                    >
                                         <div
                                             class="check-item"
-                                            v-for="item in youhuiquanList.CouponUserData"
+                                            v-for="item in youhuiquanList?.CouponUserData"
                                             :key="item"
                                         >
                                             <a-checkbox
-                                                :checked="getActives(item.Id)"
-                                                @change="changeGetYouhuiquan(item.Id)"
+                                                :checked="getActives(item)"
+                                                @change="changeGetYouhuiquan(item)"
                                                 >{{ youhuiquanDetails(item) }}</a-checkbox
                                             >
                                         </div>
@@ -703,9 +765,13 @@ watchEffect(() => {
                         <span>运费:</span>
                         <span>{{ kuaidiPriceAll }}</span>
                     </div>
+                    <div class="item" v-show="kuaidi">
+                        <span>保价费:</span>
+                        <span>{{ iptValue * news }}</span>
+                    </div>
                     <div class="item">
                         <span>收藏证书:</span>
-                        <span>{{ youhuiquanPrice }}</span>
+                        <span>{{ checkList.DelList.length * 20 }}</span>
                     </div>
                     <div class="item">
                         <span>优惠券:</span>
@@ -713,7 +779,7 @@ watchEffect(() => {
                     </div>
                     <div class="item">
                         <span>收藏证书优惠券:</span>
-                        <span>-0.00</span>
+                        <span>-{{ removeYouHuiQuan }}.00</span>
                     </div>
                     <div class="zong">
                         应付总额:<p class="price"
@@ -1004,6 +1070,7 @@ watchEffect(() => {
             .left {
                 .top-title {
                     .flex-row;
+                    cursor: pointer;
                     p {
                         margin-bottom: 1px;
                     }
