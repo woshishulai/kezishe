@@ -758,7 +758,7 @@ watchEffect(() => {
                 </div>
                 <div class="right">
                     <div class="item">
-                        <span>2件商品总额:</span>
+                        <span>{{ goodsList.length }} 件商品总额:</span>
                         <span>{{ goodsAllPrice }}</span>
                     </div>
                     <div class="item">
@@ -789,6 +789,10 @@ watchEffect(() => {
                     <a-button type="primary" @click="submit">去付款</a-button>
                 </div>
             </div>
+        </div>
+        <div class="footer-label">
+            <img src="@/assets/img/user/jingmai/icon12.svg" alt="" />
+            商城订单在用户中心“竞买”查看，未支付的订单在支付期限过后自动关闭，藏品证书在未付状态下申请，且部分藏品(包括商城)不提供申请收藏证书。
         </div>
         <!-- 订单相关的 -->
         <a-modal v-model:open="open" :title="formState.title" :footer="null">
@@ -921,6 +925,15 @@ watchEffect(() => {
 .address-wrap {
     padding: 20px 16px;
     background-color: #fff;
+    .footer-label {
+        display: flex;
+        gap: 5px;
+        font-size: 14px;
+        color: #b11503;
+        img {
+            height: 12px;
+        }
+    }
     .title-nav {
         .flex-row;
         justify-content: space-between;

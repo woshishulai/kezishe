@@ -11,7 +11,7 @@ const props = defineProps({});
 const query = reactive({
     page: '',
     pageIndex: '',
-    Bot: '',
+    Bot: '0',
     AuctionType: '0',
     DateRange: '0'
 });
@@ -31,12 +31,6 @@ const columns = [
         title: '藏品编号',
         dataIndex: 'code',
         key: 'code',
-        align: 'center'
-    },
-    {
-        title: '藏品图片',
-        dataIndex: 'zhaopian',
-        key: 'zhaopian',
         align: 'center'
     },
     {

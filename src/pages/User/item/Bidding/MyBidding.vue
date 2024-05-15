@@ -67,6 +67,15 @@ const changeShowPage = async (index, query) => {
                 // localStorage.removeItem('quanLists');
                 // localStorage.removeItem('DelLists');
                 showComponent.value = index;
+                if (showModals.value?.params?.titleCate) {
+                    Object.keys(params.value).forEach((item) => {
+                        params.value[item] = '';
+                    });
+                    params.value.total = 1;
+                    fetchData.value = [];
+                    checkList.value.DelList = [];
+                    getFetchData(1, 10);
+                }
                 localStorage.setItem('showPaegs', index);
             }
         } catch (error) {}
