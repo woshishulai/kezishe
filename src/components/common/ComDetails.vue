@@ -278,7 +278,20 @@ watch(
                     </template>
                     <div
                         class="img-item"
-                        v-for="(item, index) in props.goodsDtails?.BaseData?.Atlas.split(';')"
+                        v-if="props.goodsDtails?.BaseData?.Atlas.split(';').length - 1 <= 1"
+                        :key="props.goodsDtails?.BaseData?.Atlas"
+                        @click="changeSwiperItem(0)"
+                    >
+                        <div class="imgs" :class="active == 0 ? 'active' : ''">
+                            <img :src="props.goodsDtails?.BaseData?.Atlas.split(';')[0]" alt="" />
+                        </div>
+                    </div>
+                    <div
+                        class="img-item"
+                        v-else
+                        v-for="(item, index) in (props.goodsDtails?.BaseData?.Atlas || '').split(
+                            ';'
+                        )"
                         :key="index"
                         @click="changeSwiperItem(index)"
                     >
@@ -375,6 +388,7 @@ watch(
                     <!-- <img :src="getImageUrl('chengjiao/icon5.png')" alt="" /> -->
                 </div>
             </div>
+
             <div
                 class="prices"
                 v-if="

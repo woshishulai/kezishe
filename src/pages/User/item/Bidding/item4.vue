@@ -1,6 +1,6 @@
 <script setup>
 import Header from './Header.vue';
-import { ref, computed, reactive, onMounted } from 'vue';
+import { ref, computed, reactive, onMounted, watchEffect } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { ZhiFuApi, getZhifuInfo } from '@/request/user/api';
 import { encryptionPassword } from '@/hooks/user';
@@ -12,7 +12,10 @@ const route = useRoute();
 const props = defineProps({});
 const emits = defineEmits(['changeShowPage']);
 const infos = ref({});
-const AllTotal = localStorage.getItem('allPrice');
+const AllTotal = ref('');
+watchEffect(() => {
+    AllTotal.value = localStorage.getItem('allPrice');
+});
 const newCodeParams = usePassword();
 const ipt = ref('');
 onMounted(async () => {
@@ -188,7 +191,7 @@ const changeShowItem = (index) => {
                 display: flex;
                 align-items: center;
                 justify-content: space-between;
-                width: 150px;
+                width: 200px;
                 padding: 10px 5px;
                 height: 48px;
                 cursor: pointer;
@@ -205,7 +208,7 @@ const changeShowItem = (index) => {
             .flexs {
                 display: flex;
                 align-items: center;
-                gap: 30px;
+                gap: 20px;
                 margin: 20px 0 0 30px;
                 &.active {
                     gap: 15px;
@@ -213,9 +216,11 @@ const changeShowItem = (index) => {
                         width: 200px;
                     }
                 }
-                .img-item {
-                    width: 150px;
+                .item {
                     text-align: center;
+                }
+                .img-item {
+                    width: 200px;
                     padding: 10px 0;
                     cursor: pointer;
                     height: 48px;
@@ -234,7 +239,7 @@ const changeShowItem = (index) => {
             }
 
             .ant-input-password {
-                width: 220px;
+                width: 200px;
             }
             .ant-btn {
                 flex: 1;

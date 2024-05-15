@@ -425,10 +425,10 @@ const submit = () => {
         PayType: zhifu.value, //怎么支付
         ExpressType: kuaidi.value, //物流方式，
         IsInsured: baojia.value ? 1 : 0, //报价
-        InsuredPrice: iptValue.value, //保价金额 比如100万
+        InsuredPrice: iptValue.value || '0', //保价金额 比如100万
         AllLogisticsCost: kuaidiPriceAll.value, //运费
         WaitChargeTotal: '0', //仓储费 未支付没有仓储费 未发货有
-        KeepPriceTotal: iptValue.value / news.value, //保价费
+        KeepPriceTotal: iptValue.value / news.value || '0', //保价费
         AllCertFeeCost: youhuiquanPrice.value, //收藏证书
         AllCertyouhuiCost: selectCheckes.value.length * 20, //收藏证书券抵扣金额
         AllTotal: allPrice.value, //应付总额
@@ -639,8 +639,8 @@ watchEffect(() => {
                         :class="item.Types == zhifu ? 'active' : ''"
                         @click="chanegZhiFu(item.Types)"
                         :disabled="
-                            (checkedStatus == 2 && item.Types != 1) ||
-                            (checkedStatus != 2 && item.Types == 1)
+                            (checkedStatus == 2 && item.Types != 1 && item.Types != 3) ||
+                            (checkedStatus != 2 && item.Types == 2)
                         "
                     >
                         {{ item.Title }}
@@ -649,13 +649,13 @@ watchEffect(() => {
             </div>
         </div>
         <!-- 是否保价 -->
-        <div class="title-nav">
+        <div class="title-nav" v-show="checkedStatus != 1">
             <h5>
                 是否保价
                 <div>(仅限物流发货)</div>
             </h5>
         </div>
-        <div class="center price-list">
+        <div class="center price-list" v-show="checkedStatus != 1">
             <a-checkbox @change="changeInput" v-model:checked="baojia">我要保价</a-checkbox>
             {{ endPrice }} - {{ startPrice }}
             <a-input

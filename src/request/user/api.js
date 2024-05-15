@@ -55,14 +55,21 @@ export const getKuaiDi = async (data) => instance.post(`Member/Pay/EMSPostFeeSta
 
 //获取我的关注
 export const getCartList = async (params) =>
-    instance.get(`Member/Collect/GetList?Cid=${params.Cid}&Kw=${params.Kw}&Status=${params.Status}&PageSize=${params.PageSize}&PageIndex=${params.PageSize}
+    instance.get(`Member/Collect/GetList?Cid=${params.Cid}&Kw=${params.Kw}&Status=${params.Status}&PageSize=${params.PageSize}&PageIndex=${params.PageIndex}
 `);
 
 //获取未发货
 export const getNotShippedList = async (params) =>
-    instance.get(`Member/UserDeliver/UnDeliverList?Bot=${params.Bot}&AuctionType=${params.AuctionType}&DateRange=${params.DateRange}
+    instance.get(`Member/UserDeliver/UnDeliverList?Bot=${params.Bot}&AuctionType=${params.AuctionType}&DateRange=${params.DateRange}&PageSize=${params.PageSize}&PageIndex=${params.PageIndex}
 `);
-
+//获取已发货
+export const yifahuoapi = async (params) =>
+    instance.get(`Member/UserDeliver/DeliverList?Bot=${params.Bot}&AuctionType=${params.AuctionType}&DateRange=${params.DateRange}&PageSize=${params.PageSize}&PageIndex=${params.PageIndex}
+`);
+//获取发货详情
+export const yifahuoDetailsapi = async (params) =>
+    instance.get(`Member/UserDeliver/DeliverInfo?DeliverNo=${params.DeliverNo}
+`);
 //获取支付信息
 export const getZhifuInfo = async (params) => instance.post(`Member/Pay/DefaultParam`);
 

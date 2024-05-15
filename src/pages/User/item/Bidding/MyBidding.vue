@@ -53,7 +53,8 @@ const changeShowPage = async (index, query) => {
     if (query) {
         try {
             let res = await sumbitOrder(query);
-            if (!res.Tag == 1) {
+            console.log(res);
+            if (res.Tag && !res.Tag == 1) {
                 return;
             } else {
                 localStorage.setItem('orderId', res.Data.OrderNo);
@@ -310,7 +311,7 @@ const zhiFu = () => {
                             </template>
                             <template v-if="column.key === 'MPrice'">
                                 <span class="active"
-                                    >￥{{ record.MPrice || record.MakePrice }}</span
+                                    >￥{{ record.MakePrice || record.MPrice }}元</span
                                 >
                             </template>
                         </template>

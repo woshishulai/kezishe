@@ -8,19 +8,31 @@ import ShowModal from '@/components/common/user/ShowModal.vue';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
+const tableList = ref([]);
 const query = reactive({
-    page: '',
-    pageIndex: '',
+    PageIndex: '',
+    PageSize: '',
     Bot: '0',
     AuctionType: '0',
-    DateRange: '0'
+    DateRange: '0',
+    total: 1
 });
-const getTableList = async (page = 1, pageIndex = 10) => {
-    query.page = page;
-    query.pageIndex = pageIndex;
+const showGoodsDetails = (i) => {
+    router.push({
+        path: '/jingmai/goods-details',
+        query: {
+            id: i.Gid
+        }
+    });
+};
+const getTableList = async (PageIndex = 1, PageSize = 10) => {
+    query.PageIndex = PageIndex;
+    query.PageSize = PageSize;
     try {
         let res = await getNotShippedList(query);
         console.log(res);
+        tableList.value = res.Data;
+        query.total = res.Total;
     } catch (error) {}
 };
 onMounted(() => {
@@ -29,51 +41,63 @@ onMounted(() => {
 const columns = [
     {
         title: '藏品编号',
-        dataIndex: 'code',
-        key: 'code',
+        dataIndex: 'Bn',
+        ellipsis: true,
+        width: 150,
+        key: 'Bn',
         align: 'center'
     },
     {
         title: '藏品名称',
-        dataIndex: 'name',
-        key: 'name',
+        ellipsis: true,
+        dataIndex: 'Title',
+        key: 'Title',
+        width: 200,
         align: 'center'
     },
     {
         title: '类型',
-        dataIndex: 'cate',
-        key: 'cate',
+        dataIndex: 'AuctionType',
+        ellipsis: true,
+        key: 'AuctionType',
         align: 'center'
     },
     {
         title: '成交日期',
-        dataIndex: 'time',
-        key: 'time',
+        dataIndex: 'Ontime',
+        ellipsis: true,
+        key: 'Ontime',
+        width: 200,
         align: 'center'
     },
     {
-        title: '成交价/价值',
-        dataIndex: 'chengjiao',
-        key: 'chengjiao',
+        title: '成交价/价格',
+        dataIndex: 'MakePrice',
+        key: 'MakePrice',
+        ellipsis: true,
         align: 'center'
     },
     {
         title: '仓储期',
-        dataIndex: 'cangchuqi',
-        key: 'cangchuqi',
+        dataIndex: 'CountdownTime',
+        key: 'CountdownTime',
+        ellipsis: true,
+        width: 150,
         align: 'center'
     },
     {
         title: '仓储费',
-        dataIndex: 'price',
-        align: 'center',
-        key: 'price'
+        dataIndex: 'ExceedStorageFee',
+        ellipsis: true,
+        align: 'DeliverNo',
+        key: 'ExceedStorageFee'
     },
     {
-        title: '收藏证书',
-        dataIndex: 'caozuo',
+        title: '是否收藏',
+        dataIndex: 'IsCret',
+        ellipsis: true,
         align: 'center',
-        key: 'caozuo'
+        key: 'IsCret'
     }
 ];
 const data = reactive([]);
@@ -192,13 +216,32 @@ const changeGuanZhu = (item) => {
                             onChange: onSelectChange
                         }"
                         :columns="columns"
-                        :data-source="data"
+                        :data-source="tableList"
                     >
                         <template #bodyCell="{ column, record }">
-                            <template v-if="column.key === 'zhaopian'">
-                                <div class="table-item-gooods-info">
-                                    <img :src="getImageUrl(record.zhaopian)" alt="" />
+                            <template v-if="column.key === 'Title'">
+                                <div class="goods-info" @click="showGoodsDetails(record)">
+                                    <img :src="record.CoverImg" alt="" />
+                                    <span>
+                                        {{ record.Title }}
+                                    </span>
                                 </div>
+                            </template>
+                            <template v-if="column.key === 'AuctionType'">
+                                {{
+                                    record.AuctionType == 1
+                                        ? '竞买'
+                                        : record.AuctionType == 2
+                                          ? '商城'
+                                          : record.AuctionType == 1
+                                            ? '积分兑换'
+                                            : record.AuctionType == 4
+                                              ? '委托退回'
+                                              : '全部'
+                                }}
+                            </template>
+                            <template v-if="column.key === 'IsCret'">
+                                {{ record.IsCret == 1 ? '包含' : '' }}
                             </template>
                         </template>
                     </a-table>
@@ -243,7 +286,7 @@ const changeGuanZhu = (item) => {
                             :loading="state.loading"
                             @click="start"
                         >
-                            一键专卖
+                            一键转卖
                         </a-button>
                     </div>
                     <p class="label"
@@ -254,12 +297,31 @@ const changeGuanZhu = (item) => {
                     >
                 </template>
             </show-modal>
+            <CatePage @fetch-list="getTableList" :paginations="query"></CatePage>
         </div>
     </div>
 </template>
 
 <style scoped lang="less">
 .my-logistics {
+    .goods-info {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-align: center;
+        gap: 3px;
+        width: 100%;
+        &:hover {
+            color: #9a0000;
+            cursor: pointer;
+        }
+        img {
+            height: 40px;
+        }
+        span {
+            flex: 1;
+        }
+    }
     .card-box {
         padding-bottom: 30px;
 

@@ -4,17 +4,50 @@ import { useRouter, useRoute } from 'vue-router';
 import { SearchOutlined } from '@ant-design/icons-vue';
 import { getImageUrl } from '@/utils';
 import CatePage from '@/components/common/CatePage.vue';
-import { dataSource } from '../SettlementDetails/data';
+import { yifahuoapi, yifahuoDetailsapi } from '@/request/user/api';
+import { timeOptions, cateOptions, seeOptions } from './data';
 import ShippedDetails from './ShippedDetails.vue';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
-onMounted(() => {});
+const tableList = ref([]);
+const details = ref({});
+const query = reactive({
+    PageIndex: '',
+    PageSize: '',
+    Bot: '',
+    AuctionType: '0',
+    DateRange: '0',
+    total: 1
+});
+const loading = ref(false);
+
+const getTableList = async (PageIndex = 1, PageSize = 10) => {
+    query.PageIndex = PageIndex;
+    query.PageSize = PageSize;
+    try {
+        let res = await yifahuoapi(query);
+        tableList.value = res.Data;
+        query.total = res.Total;
+    } catch (error) {}
+};
+const getDetails = async (id) => {
+    let params = {
+        DeliverNo: id
+    };
+    try {
+        let res = await yifahuoDetailsapi(params);
+        details.value = res.Data;
+        console.log(details.value);
+    } catch (error) {}
+};
+onMounted(() => {
+    getTableList();
+});
 const showModals = ref();
 const params = ref();
 watchEffect(() => {
     params.value = showModals.value?.params;
-    console.log(params.value?.titleCate);
 });
 const list = [
     {
@@ -27,67 +60,66 @@ const list = [
 const columns = [
     {
         title: '藏品编号',
-        dataIndex: 'code',
-        key: 'code',
-        align: 'center'
-    },
-    {
-        title: '类型',
-        key: 'cate',
-        dataIndex: 'cate',
-        align: 'center'
-    },
-    {
-        title: '藏品图片',
-        dataIndex: 'zhaopian',
-        key: 'zhaopian',
+        dataIndex: 'Bn',
+        ellipsis: true,
+        width: 180,
+        key: 'Bn',
         align: 'center'
     },
     {
         title: '藏品名称',
-        dataIndex: 'name',
-        key: 'name',
+        ellipsis: true,
+        dataIndex: 'Title',
+        key: 'Title',
+        width: 200,
+        align: 'center'
+    },
+    {
+        title: '类型',
+        dataIndex: 'AuctionType',
+        ellipsis: true,
+        key: 'AuctionType',
         align: 'center'
     },
     {
         title: '数量',
-        key: 'num',
-        dataIndex: 'num',
+        dataIndex: 'Nums',
+        ellipsis: true,
+        key: 'Nums',
         align: 'center'
     },
     {
         title: '商家',
-        dataIndex: 'laoban',
-        key: 'laoban',
+        dataIndex: 'PingTai',
+        key: 'PingTai',
+        ellipsis: true,
         align: 'center'
     },
     {
-        title: '成交价',
-        dataIndex: 'chengjiao',
-        key: 'chengjiao',
+        title: '金额/竞买积分',
+        dataIndex: 'MakePrice',
+        key: 'MakePrice',
+        ellipsis: true,
         align: 'center'
     },
     {
-        title: '结标时间',
-        dataIndex: 'time',
-        key: 'time',
-        align: 'center'
+        title: '发货单号',
+        dataIndex: 'DeliverNo',
+        ellipsis: true,
+        align: 'DeliverNo',
+        key: 'price'
     },
     {
-        title: '发货期限',
-        dataIndex: 'qixian',
-        key: 'qixian',
-        align: 'center'
-    },
-    {
-        title: '包含收藏证书',
-        dataIndex: 'zhengshu',
-        key: 'zhengshu',
-        align: 'center'
+        title: '剩余收货时间',
+        ellipsis: true,
+        dataIndex: '',
+        align: '',
+        key: ''
     },
     {
         title: '操作',
         dataIndex: 'caozuo',
+        ellipsis: true,
         align: 'center',
         key: 'caozuo'
     }
@@ -195,32 +227,29 @@ const start = () => {
 const onSelectChange = (selectedRowKeys) => {
     state.selectedRowKeys = selectedRowKeys;
 };
-const options1 = ref([
-    {
-        value: 'cate1',
-        label: '所有分类'
-    },
-    {
-        value: 'lucy',
-        label: 'Lucy'
-    },
-    {
-        value: 'yiminghe',
-        label: 'Yiminghe'
-    }
-]);
-const loading = ref(false);
+
 const value = ref('');
-const value1 = ref();
+const value1 = '0';
+//展示谁
 const showDetails = ref(true);
-const changeShowDeatails = () => {
+const ids = ref('0');
+const changeShowDeatails = (index) => {
     showDetails.value = false;
+    index ? getDetails(index) : '';
 };
 const handleChange = (value) => {
     console.log(`selected ${value}`);
 };
 const getGoodsList = () => {
     loading.value = true;
+};
+const showGoodsDetails = (i) => {
+    router.push({
+        path: '/jingmai/goods-details',
+        query: {
+            id: i.Gid
+        }
+    });
 };
 const changeGuanZhu = (item) => {
     console.log(item.key);
@@ -237,37 +266,36 @@ const changeGuanZhu = (item) => {
                     <div class="search-cate" v-if="params?.titleCate == list[0].cate">
                         <a-select
                             ref="select"
-                            placeholder="所有分类"
-                            v-model:value="value1"
+                            placeholder="所有时间"
+                            v-model:value="query.DateRange"
                             class="item"
-                            :options="options1"
-                            @change="handleChange"
+                            :options="timeOptions"
                         ></a-select>
                         <a-select
                             ref="select"
                             placeholder="所有时间"
-                            v-model:value="value1"
+                            v-model:value="query.AuctionType"
                             class="item"
-                            :options="options1"
+                            :options="cateOptions"
                             @change="handleChange"
                         ></a-select>
                         <a-select
                             ref="select"
-                            placeholder="所有类别"
+                            placeholder="请选择查看方式"
                             v-model:value="value1"
                             class="item"
-                            :options="options1"
+                            :options="seeOptions"
                             @change="handleChange"
                         ></a-select>
                         <a-input
-                            v-model:value="value"
+                            v-model:value="query.Bot"
                             class="item-input"
                             placeholder="名称和藏品"
                         />
                         <a-button
                             type="primary"
                             :loading="loading"
-                            @click="getGoodsList"
+                            @click="getTableList(1, 10)"
                             :icon="h(SearchOutlined)"
                             >搜索</a-button
                         >
@@ -278,11 +306,7 @@ const changeGuanZhu = (item) => {
                             style="width: 330px"
                             placeholder="名称和藏品"
                         />
-                        <a-button
-                            type="primary"
-                            :loading="loading"
-                            @click="getGoodsList"
-                            :icon="h(SearchOutlined)"
+                        <a-button type="primary" @click="getGoodsList" :icon="h(SearchOutlined)"
                             >搜索</a-button
                         >
                     </div>
@@ -291,41 +315,74 @@ const changeGuanZhu = (item) => {
                     <a-table
                         :pagination="false"
                         :columns="params?.titleCate == list[0].cate ? columns : cangChuColumns"
-                        :data-source="params?.titleCate == list[0].cate ? data : cangChuDataSource"
+                        :data-source="tableList"
                     >
                         <template #bodyCell="{ column, record }">
-                            <template v-if="column.key === 'zhaopian'">
-                                <div class="table-item-gooods-info">
-                                    <img :src="getImageUrl(record.zhaopian)" alt="" />
+                            <template v-if="column.key === 'Title'">
+                                <div class="goods-info" @click="showGoodsDetails(record)">
+                                    <img :src="record.CoverImg" alt="" />
+                                    <span>
+                                        {{ record.Title }}
+                                    </span>
                                 </div>
                             </template>
+
+                            <template v-if="column.key === 'AuctionType'">
+                                {{
+                                    record.AuctionType == 1
+                                        ? '竞买'
+                                        : record.AuctionType == 2
+                                          ? '商城'
+                                          : record.AuctionType == 1
+                                            ? '积分兑换'
+                                            : record.AuctionType == 4
+                                              ? '委托退回'
+                                              : '全部'
+                                }}
+                            </template>
                             <template v-if="column.key === 'caozuo'">
-                                <div class="btns" @click="changeShowDeatails"> 查看详情 </div>
+                                <div class="btns" @click="changeShowDeatails(record.DeliverNo)">
+                                    查看详情
+                                </div>
                             </template>
                         </template>
                     </a-table>
                     <div class="leng-details">
                         <span></span>
-                        <span>总计： {{ 256 }}项</span>
+                        <span>总计： {{ query.total }}项</span>
                     </div>
                 </template>
             </show-modal>
-            <CatePage></CatePage>
+            <CatePage @fetch-list="getTableList" :paginations="query"></CatePage>
         </div>
-        <ShippedDetails v-else></ShippedDetails>
+        <ShippedDetails v-else :details="details"></ShippedDetails>
     </div>
 </template>
 
 <style scoped lang="less">
 .my-bidding {
-    .table-item-gooods-info {
+    .goods-info {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-align: center;
+        gap: 3px;
+        width: 100%;
+        &:hover {
+            color: #9a0000;
+            cursor: pointer;
+        }
         img {
-            width: 50px;
+            height: 40px;
+        }
+        span {
+            flex: 1;
         }
     }
 
     .btns {
         color: #7dadef;
+        cursor: pointer;
     }
 
     .leng-details {
