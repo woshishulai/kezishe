@@ -75,6 +75,7 @@ const getGoodsList = () => {
                     </div>
                 </template>
                 <template v-slot:active3>
+                    参考数据
                     <a-table
                         :pagination="false"
                         :columns="HeTongColumns"

@@ -172,10 +172,10 @@ const onFinish = async (values) => {
         <div class="cen">
             <div class="title">
                 在线委托申请单
-                <div class="right-down">
+                <!-- <div class="right-down">
                     <img :src="getImageUrl('weituo/xianshang1.jpg')" alt="" />
                     下载委托模版
-                </div>
+                </div> -->
             </div>
             <a-modal v-model:open="open" :title="openTitle" @ok="handleOk"> </a-modal>
             <div class="cen-box">

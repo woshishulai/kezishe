@@ -428,7 +428,7 @@ const submit = () => {
         IsInsured: baojia.value ? 1 : 0, //报价
         InsuredPrice: iptValue.value || '0', //保价金额 比如100万
         AllLogisticsCost: kuaidiPriceAll.value, //运费
-        WaitChargeTotal: '0', //仓储费 未支付没有仓储费 未发货有
+        WaitChargeTotal: cangchu.value, //仓储费 未支付没有仓储费 未发货有
         KeepPriceTotal: iptValue.value / news.value || '0', //保价费
         AllCertFeeCost: youhuiquanPrice.value, //收藏证书
         AllCertyouhuiCost: selectCheckes.value.length * 20, //收藏证书券抵扣金额
@@ -444,6 +444,11 @@ const submit = () => {
         emits('changeShowPage', 3, query);
     }
 };
+//仓储费
+const cangchu = computed(() => {
+    if (!goodsLists.value) return 0;
+    return goodsLists.value.reduce((acc, item) => acc + item.ExceedStorageFee, 0);
+});
 //勾选框
 const showCheck = (e) => {
     if (getChecked(e.Bn)) {
