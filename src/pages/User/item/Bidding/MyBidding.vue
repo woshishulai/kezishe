@@ -341,7 +341,7 @@ const zhiFu = () => {
     <Item2 @changeShowPage="changeShowPage" v-show="showComponent == 3"></Item2>
     <Item3 @changeShowPage="changeShowPage" v-show="showComponent == 4"></Item3>
     <!-- //余额支付的 -->
-    <Item4 @changeShowPage="changeShowPage" v-show="showComponent == 5"></Item4>
+    <Item4 @changeShowPage="changeShowPage" v-if="showComponent == 5"></Item4>
 </template>
 
 <style scoped lang="less">

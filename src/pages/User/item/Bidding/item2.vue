@@ -21,7 +21,7 @@ const afterOpenChange = (bool) => {
     localStorage.removeItem('quans');
     localStorage.removeItem('quanLists');
     localStorage.removeItem('DelLists');
-    localStorage.setItem('showPaegs', 1);
+    deletes();
 };
 onMounted(() => {});
 const jingMaiColumns = [
@@ -56,6 +56,9 @@ const jingMaiColumns = [
 const showModals = ref(false);
 const changeAddPrice = () => {
     isDraweComponent.value = true;
+};
+const deletes = () => {
+    route.query.wuliu ? router.push('/user/logistics/') : emits('changeShowPage', 2);
 };
 </script>
 
@@ -109,7 +112,7 @@ const changeAddPrice = () => {
             >
             <div class="add">
                 <div class="btns">
-                    <a-button type="primary" @click="emits('changeShowPage', 2)">返回修改</a-button>
+                    <a-button type="primary" @click="deletes">返回修改</a-button>
                     <a-button type="primary" @click="changeAddPrice">填写汇款告知单</a-button></div
                 >
                 <div class="text">

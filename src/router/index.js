@@ -558,11 +558,12 @@ const router = createRouter({
 });
 // 添加全局前置守卫
 router.beforeEach((to, from, next) => {
+    //如果跳转到页面==现在的页面 就刷新当前页面
     // 获取用户信息的逻辑，可能是从全局状态管理或者其他地方获取
-    const user = useUserInfo();
+    // const user = useUserInfo();
     // const userInfo = user.userInfo ? user.userInfo : {}
     //消息提示
-    const info = (status, msg) => message[status](msg);
+    // const info = (status, msg) => message[status](msg);
     // console.log('我是router路由 用户的信息为', user.userInfo, 'userInfo对象为', userInfo);
     // console.log('我是router路由 用户的信息为', user.userInfo, 'userInfo对象为');
     // 如果用户未登录且要访问的页面不是登录页面，则重定向到登录页面

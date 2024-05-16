@@ -5,18 +5,10 @@ export const timeOptions = [
     },
     {
         value: '1',
-        label: '一周内'
-    },
-    {
-        value: '2',
-        label: '一月内'
-    },
-    {
-        value: '3',
         label: '三月内'
     },
     {
-        value: '4',
+        value: '2',
         label: '三月外'
     }
 ];

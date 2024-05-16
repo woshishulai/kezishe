@@ -1,8 +1,9 @@
 <script setup>
-import { ref, h, watch } from 'vue';
-import { useRouter } from 'vue-router';
+import { ref, h, watch, nextTick } from 'vue';
+import { useRouter, useRoute } from 'vue-router';
 import { userRoutes } from '@/router/index.js';
 const router = useRouter();
+const route = useRoute();
 const selectRouter = router.currentRoute._rawValue.fullPath;
 const segments = selectRouter.split('/');
 let desiredPath = '';
@@ -59,7 +60,13 @@ const menuItems = ref(generateMenuItems(userRoutes));
 
 const handleClick = (e) => {
     const routePath = `${e.key}`;
-    router.push(routePath);
+    if (routePath == route.path) {
+        nextTick(() => {
+            router.push(routePath);
+        });
+    } else {
+        router.push(routePath);
+    }
 };
 </script>
 

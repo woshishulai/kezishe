@@ -210,36 +210,15 @@ const cangChuDataSource = [
         zhaopian: 'register/logo.png'
     }
 ];
-const state = reactive({
-    selectedRowKeys: [],
-    // Check here to configure the default column
-    loading: false
-});
-const hasSelected = computed(() => state.selectedRowKeys.length > 0);
-const start = () => {
-    state.loading = true;
-    // ajax request after empty completing
-    setTimeout(() => {
-        state.loading = false;
-        state.selectedRowKeys = [];
-    }, 1000);
-};
-const onSelectChange = (selectedRowKeys) => {
-    state.selectedRowKeys = selectedRowKeys;
-};
-
 const value = ref('');
 const value1 = '0';
 //展示谁
 const showDetails = ref(true);
-const ids = ref('0');
 const changeShowDeatails = (index) => {
     showDetails.value = false;
     index ? getDetails(index) : '';
 };
-const handleChange = (value) => {
-    console.log(`selected ${value}`);
-};
+
 const getGoodsList = () => {
     loading.value = true;
 };
@@ -251,15 +230,10 @@ const showGoodsDetails = (i) => {
         }
     });
 };
-const changeGuanZhu = (item) => {
-    console.log(item.key);
-    data[item.key].caozuo = data[item.key].caozuo == '取消关注' ? '关注' : '取消关注';
-    console.log(data[item.key], data);
-};
 </script>
 <template>
     <div class="my-bidding">
-        <div class="card-box" v-if="showDetails">
+        <div class="card-box" v-show="showDetails">
             <div class="title"> 已发货 </div>
             <show-modal ref="showModals" :titleList="list">
                 <template v-slot:active2>
@@ -277,7 +251,6 @@ const changeGuanZhu = (item) => {
                             v-model:value="query.AuctionType"
                             class="item"
                             :options="cateOptions"
-                            @change="handleChange"
                         ></a-select>
                         <a-select
                             ref="select"
@@ -285,17 +258,17 @@ const changeGuanZhu = (item) => {
                             v-model:value="value1"
                             class="item"
                             :options="seeOptions"
-                            @change="handleChange"
                         ></a-select>
                         <a-input
                             v-model:value="query.Bot"
                             class="item-input"
+                            @keydown.enter="getTableList()"
                             placeholder="名称和藏品"
                         />
                         <a-button
                             type="primary"
                             :loading="loading"
-                            @click="getTableList(1, 10)"
+                            @click="getTableList()"
                             :icon="h(SearchOutlined)"
                             >搜索</a-button
                         >
@@ -355,7 +328,7 @@ const changeGuanZhu = (item) => {
             </show-modal>
             <CatePage @fetch-list="getTableList" :paginations="query"></CatePage>
         </div>
-        <ShippedDetails v-else :details="details"></ShippedDetails>
+        <ShippedDetails v-show="!showDetails" :details="details"></ShippedDetails>
     </div>
 </template>
 

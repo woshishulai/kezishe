@@ -19,6 +19,7 @@ import {
 import { youHuiQuan, getKuaiDi } from '@/request/user/api';
 
 const router = useRouter();
+const route = useRoute();
 const user = useUserInfo();
 
 const addId = (e, value) => {
@@ -406,20 +407,20 @@ const submit = () => {
     }
     const OrderDatas = goodsLists.value.map((item) => {
         let query = {
-            AuctionType: 1,
+            AuctionType: item.AuctionType,
             Aid: item.Aid, //藏品记录ID
             Gid: item.Gid, //藏品ID
             Title: item.Title, //藏品名称
             MakePrice: item.MakePrice, //成交价
             Nums: item.Nums, //数量
             IsCret: checkList.value.DelList.some((items) => item.Bn == items.Bn) ? 1 : 0, //是否包含证书 默认 0 不包含 1 包含
-            CretPrice: 15 //证书价格
+            CretPrice: 20 //证书价格
         };
         return query;
     });
     const CouponData = selectCheckes.value;
     const query = {
-        OrderType: 1,
+        OrderType: route.query.wuliu == 'true' ? 2 : 1,
         AddrId: user.userAddress.Id, //地址ID
         DeliveryType: checkedStatus.value, //暂存还是上门
         PayType: zhifu.value, //怎么支付
@@ -538,6 +539,9 @@ watchEffect(() => {
         }
     }
 });
+const deletes = () => {
+    route.query.wuliu ? router.push('/user/logistics/') : emits('changeShowPage', 1);
+};
 </script>
 
 <template>
@@ -575,7 +579,7 @@ watchEffect(() => {
             <h5>配送方式</h5>
         </div>
         <div class="center">
-            <div class="select">
+            <div class="select" v-show="!route.query.wuliu">
                 <a-radio-group v-model:value="checkedStatus" @change="changePeiSong">
                     <a-radio :value="peisongList[0]?.Types">
                         <span class="radio">{{ peisongList[0]?.Title }}</span>
@@ -680,7 +684,7 @@ watchEffect(() => {
         <!-- 订单信息 -->
         <div class="title-nav">
             <h5>订单信息</h5>
-            <p @click="emits('changeShowPage', 1)">返回修改</p>
+            <p @click="deletes">返回修改</p>
         </div>
         <a-table :pagination="false" :columns="jingMaiColumns" :dataSource="goodsLists">
             <template #bodyCell="{ column, record }">
@@ -696,7 +700,8 @@ watchEffect(() => {
                     <a-checkbox
                         @change.stop="showCheck(record)"
                         style="margin-right: 15px"
-                        :checked="getChecked(record.Bn)"
+                        :disabled="route.query?.wuliu == 'true' ? true : false"
+                        :checked="record.IsCret == 1 || getChecked(record.Bn)"
                     ></a-checkbox>
                 </template>
                 <template v-if="column.key === 'MPrice'">
@@ -707,7 +712,7 @@ watchEffect(() => {
         <div class="center">
             <div class="details">
                 <div class="left">
-                    <div class="top-title">
+                    <div class="top-title" v-show="!route.query.wuliu">
                         <a-checkbox @change="changeQuan" v-model:checked="quan"
                             ><h5>优惠券</h5></a-checkbox
                         >

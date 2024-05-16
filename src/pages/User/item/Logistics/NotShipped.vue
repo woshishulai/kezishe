@@ -5,6 +5,9 @@ import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
 import { getNotShippedList } from '@/request/user/api';
 import ShowModal from '@/components/common/user/ShowModal.vue';
+import { info } from '@/hooks/antd/message';
+import { timeOptions, cateOptions, seeOptions } from './data';
+
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
@@ -12,7 +15,7 @@ const tableList = ref([]);
 const query = reactive({
     PageIndex: '',
     PageSize: '',
-    Bot: '0',
+    Bot: '',
     AuctionType: '0',
     DateRange: '0',
     total: 1
@@ -35,10 +38,60 @@ const getTableList = async (PageIndex = 1, PageSize = 10) => {
         query.total = res.Total;
     } catch (error) {}
 };
+const checkList = ref({
+    DelList: []
+});
+//勾选框
+const showCheck = (e) => {
+    if (getChecked(e.Bn)) {
+        checkList.value.DelList = checkList.value.DelList.filter((item) => item.Bn !== e.Bn);
+    } else {
+        checkList.value.DelList.push(e);
+    }
+    console.log(checkList.value.DelList);
+};
+function getChecked(Bn) {
+    const item = checkList.value.DelList.find((item) => item.Bn === Bn);
+    return item !== undefined;
+}
+const fahuo = () => {
+    if (checkList.value.DelList.length < 1) {
+        info('warning', '请先选择要发货的订单吧');
+        return;
+    }
+    localStorage.setItem('checkedStatus', 0);
+    localStorage.setItem('kuaidis', 0);
+    localStorage.setItem('zhifus', 0);
+    localStorage.setItem('baojias', true);
+    localStorage.setItem('iptValues', '');
+    localStorage.setItem('quanLists', '');
+    localStorage.setItem('DelLists', []);
+    localStorage.removeItem('allPrice');
+    localStorage.removeItem('orderId');
+    localStorage.setItem('showPaegs', 2);
+    const goodsList = JSON.stringify(checkList.value.DelList);
+    localStorage.setItem('goodsList', goodsList);
+    router.push({
+        path: '/user/my-bidding',
+        query: {
+            wuliu: true
+        }
+    });
+};
+const removeCheckList = () => {
+    checkList.value.DelList = [];
+};
 onMounted(() => {
     getTableList();
 });
 const columns = [
+    {
+        width: 50,
+        title: '',
+        dataIndex: 'check',
+        key: 'check',
+        align: 'center'
+    },
     {
         title: '藏品编号',
         dataIndex: 'Bn',
@@ -121,46 +174,9 @@ const state = reactive({
     // Check here to configure the default column
     loading: false
 });
-const hasSelected = computed(() => state.selectedRowKeys.length > 0);
-const start = () => {
-    state.loading = true;
-    // ajax request after empty completing
-    setTimeout(() => {
-        state.loading = false;
-        state.selectedRowKeys = [];
-    }, 1000);
-};
-const onSelectChange = (selectedRowKeys) => {
-    state.selectedRowKeys = selectedRowKeys;
-};
-const options1 = ref([
-    {
-        value: 'cate1',
-        label: '所有分类'
-    },
-    {
-        value: 'lucy',
-        label: 'Lucy'
-    },
-    {
-        value: 'yiminghe',
-        label: 'Yiminghe'
-    }
-]);
 const loading = ref(false);
 const value = ref('');
-const value1 = ref('cate1');
-const handleChange = (value) => {
-    console.log(`selected ${value}`);
-};
-const getGoodsList = () => {
-    loading.value = true;
-};
-const changeGuanZhu = (item) => {
-    console.log(item.key);
-    data[item.key].caozuo = data[item.key].caozuo == '取消关注' ? '关注' : '取消关注';
-    console.log(data[item.key], data);
-};
+const value1 = ref('0');
 </script>
 
 <template>
@@ -172,53 +188,56 @@ const changeGuanZhu = (item) => {
                     <div class="search-cate">
                         <a-select
                             ref="select"
-                            placeholder="所有分类"
-                            v-model:value="value1"
+                            placeholder="所有时间"
+                            v-model:value="query.DateRange"
                             class="item"
-                            :options="options1"
-                            @change="handleChange"
+                            :options="timeOptions"
                         ></a-select>
                         <a-select
                             ref="select"
                             placeholder="所有时间"
-                            v-model:value="value1"
+                            v-model:value="query.AuctionType"
                             class="item"
-                            :options="options1"
-                            @change="handleChange"
+                            :options="cateOptions"
                         ></a-select>
                         <a-select
                             ref="select"
-                            placeholder="所有类别"
+                            placeholder="请选择查看方式"
                             v-model:value="value1"
                             class="item"
-                            :options="options1"
-                            @change="handleChange"
+                            :options="seeOptions"
                         ></a-select>
                         <a-input
-                            v-model:value="value"
+                            v-model:value="query.Bot"
                             class="item-input"
+                            @keydown.enter="getTableList()"
                             placeholder="名称和藏品"
                         />
                         <a-button
                             type="primary"
                             :loading="loading"
-                            @click="getGoodsList"
+                            @click="getTableList()"
                             :icon="h(SearchOutlined)"
                             >搜索</a-button
                         >
                     </div>
                 </template>
                 <template v-slot:active3>
-                    <a-table
-                        :pagination="false"
-                        :row-selection="{
-                            selectedRowKeys: state.selectedRowKeys,
-                            onChange: onSelectChange
-                        }"
-                        :columns="columns"
-                        :data-source="tableList"
-                    >
+                    <a-table :pagination="false" :columns="columns" :dataSource="tableList">
                         <template #bodyCell="{ column, record }">
+                            <template v-if="column.key === 'check'">
+                                <div class="title-item">
+                                    <a-checkbox
+                                        @change.stop="showCheck(record)"
+                                        style="margin-right: 15px"
+                                        :checked="getChecked(record.Bn)"
+                                    ></a-checkbox>
+                                </div>
+                            </template>
+
+                            <template v-if="column.key === 'Brand'">
+                                {{ record.Brand == 1 ? '竞买' : record.Brand == 2 ? '一口价' : '' }}
+                            </template>
                             <template v-if="column.key === 'Title'">
                                 <div class="goods-info" @click="showGoodsDetails(record)">
                                     <img :src="record.CoverImg" alt="" />
@@ -248,7 +267,7 @@ const changeGuanZhu = (item) => {
                     <div class="add-array">
                         <div>
                             <span>
-                                <template v-if="hasSelected">
+                                <template>
                                     {{
                                         `总计 ${data.length} 项 已选 ${state.selectedRowKeys.length} 项`
                                     }}
@@ -256,7 +275,7 @@ const changeGuanZhu = (item) => {
                             </span>
                         </div>
                         <span>
-                            <template v-if="hasSelected">
+                            <template>
                                 {{
                                     `未发货总数 ${data.length} 项 已选 ${state.selectedRowKeys.length} 项`
                                 }}
@@ -264,30 +283,13 @@ const changeGuanZhu = (item) => {
                         </span>
                     </div>
                     <div class="add-array">
-                        <a-button
-                            type="primary"
-                            :disabled="!hasSelected"
-                            :loading="state.loading"
-                            @click="start"
-                        >
+                        <a-button type="primary" :loading="state.loading" @click="removeCheckList">
                             撤销所有已选
                         </a-button>
-                        <a-button
-                            type="primary"
-                            :disabled="!hasSelected"
-                            :loading="state.loading"
-                            @click="start"
-                        >
+                        <a-button type="primary" :loading="state.loading" @click="fahuo">
                             已选发货
                         </a-button>
-                        <a-button
-                            type="primary"
-                            :disabled="!hasSelected"
-                            :loading="state.loading"
-                            @click="start"
-                        >
-                            一键转卖
-                        </a-button>
+                        <a-button type="primary" :loading="state.loading"> 一键转卖 </a-button>
                     </div>
                     <p class="label"
                         >藏品暂不开放支付后退货退款流程。如有退货，请收货后联系客服021-23099900</p

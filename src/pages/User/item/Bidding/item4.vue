@@ -12,10 +12,7 @@ const route = useRoute();
 const props = defineProps({});
 const emits = defineEmits(['changeShowPage']);
 const infos = ref({});
-const AllTotal = ref('');
-watchEffect(() => {
-    AllTotal.value = localStorage.getItem('allPrice');
-});
+const AllTotal = localStorage.getItem('allPrice');
 const newCodeParams = usePassword();
 const ipt = ref('');
 onMounted(async () => {
@@ -71,14 +68,14 @@ const submit = async () => {
             localStorage.removeItem('quans');
             localStorage.removeItem('quanLists');
             localStorage.removeItem('DelLists');
-            emits('changeShowPage', 1);
+            deletes();
         } else if (res.Message == '未设置支付密码，请先设置支付密码') {
             showChangePasswordBtn.value = true;
         }
     } catch (error) {}
 };
 const deletes = () => {
-    emits('changeShowPage', 1);
+    route.query.wuliu ? router.push('/user/logistics/') : emits('changeShowPage', 1);
 };
 const showChangePasswordBtn = ref(false);
 const changePassword = () => {
@@ -99,7 +96,7 @@ const changeShowItem = (index) => {
             <div class="element-item">
                 <div class="text-item"> 应付金额 </div>
                 <p class="label"
-                    >¥<span class="price">{{ AllTotal }}</span
+                    >¥<span class="price">{{ AllTotal ? AllTotal : '' }}</span
                     >元(含运费)</p
                 >
             </div>

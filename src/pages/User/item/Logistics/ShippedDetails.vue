@@ -4,166 +4,91 @@ import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
 const router = useRouter();
 const route = useRoute();
-const props = defineProps({});
+const props = defineProps(['details']);
 onMounted(() => {});
+
 const liucheng = [
     {
-        img: 'user/logistics/list1.png',
-        title: '已受理',
-        time: '2023-09-17'
+        img: 'user/logistics/list1.png'
     },
     {
-        img: 'user/logistics/list2.png',
-        title: '已出库',
-        time: '2023-09-18'
+        img: 'user/logistics/list2.png'
     },
     {
-        img: 'user/logistics/list3.png',
-        title: '已发货',
-        time: '2023-09-18'
+        img: 'user/logistics/list3.png'
     },
     {
-        img: 'user/logistics/list4.png',
-        title: '已收货',
-        time: '2023-10-07'
+        img: 'user/logistics/list4.png'
     }
 ];
-const fahuoList = [
-    {
-        title: '发货项数：',
-        label: '8项'
-    },
-    {
-        title: '发货价值：',
-        label: '17.377.20元'
-    },
-    {
-        title: '申请方式：',
-        label: '新建发货单 #2108258'
-    },
-    {
-        title: '申请时间：',
-        label: '2023-09-17（星期日） 下午13:00'
-    },
-    {
-        title: '备注：',
-        label: ''
-    }
-];
-const wuliuList = [
-    {
-        title: '物流形式：',
-        label: '物流发货'
-    },
-    {
-        title: '收货地址：',
-        label: '北京市西城区黄寺大街些'
-    },
-    {
-        title: '承运方: ',
-        label: '顺丰标快（到付）'
-    },
-    {
-        title: '报价价值：',
-        label: '无报价'
-    },
-    {
-        title: '承运单号：',
-        label: 'SF1659120534004'
-    }
-];
-const bushouList = [
-    {
-        title: '物流费：',
-        label: '0元'
-    },
-    {
-        title: '包装费：',
-        label: '0元'
-    },
-    {
-        title: '仓储费: ',
-        label: '0元'
-    },
-    {
-        title: '自淘费用：',
-        label: '0元'
-    }
-];
+const allPrice = computed(() => {
+    if (props.details?.GoodsList?.length < 1) return 0;
+    return props.details?.GoodsList?.reduce((acc, item) => acc + item.MakePrice, 0);
+});
+
 const columns = [
     {
         title: '商品编号',
-        key: 'goodsCode',
-        dataIndex: 'goodsCode'
+        key: 'Bn',
+        dataIndex: 'Bn',
+        align: 'center',
+        width: 180
     },
     {
         title: '藏品名称',
-        key: 'name',
-        dataIndex: 'name'
+        key: 'Title',
+        ellipsis: true,
+        width: 250,
+        dataIndex: 'Title',
+        align: 'center'
     },
     {
         title: '类型',
-        key: 'status',
-        dataIndex: 'status'
+        key: 'AuctionType',
+        dataIndex: 'AuctionType',
+        align: 'center'
     },
     {
         title: '成交价/积分',
-        key: 'price',
-        dataIndex: 'price'
+        key: 'MakePrice',
+        dataIndex: 'MakePrice',
+        align: 'center'
     },
     {
         title: '数量',
-        key: 'num',
-        dataIndex: 'num'
+        key: 'Nums',
+        dataIndex: 'Nums',
+        align: 'center'
     },
     {
         title: '包含收藏证书',
-        key: 'have',
-        dataIndex: 'have'
+        key: 'IsCret',
+        dataIndex: 'IsCret',
+        align: 'center'
     },
     {
         title: '时间',
         key: 'time',
-        dataIndex: 'time'
+        dataIndex: 'time',
+        align: 'center'
     }
 ];
-const dataSource = [
-    {
-        goodsCode: '480943458',
-        name: '纪特票新四套（部分票带边，色标）',
-        status: '竞买',
-        price: '355.20',
-        num: 1,
-        have: '有',
-        time: ''
-    },
-    {
-        goodsCode: '480943458',
-        name: '纪特票新四套（部分票带边，色标）',
-        status: '竞买',
-        price: '355.20',
-        num: 1,
-        have: '有',
-        time: ''
-    },
-    {
-        goodsCode: '480943458',
-        name: '纪特票新四套（部分票带边，色标）',
-        status: '竞买',
-        price: '355.20',
-        num: 1,
-        have: '有',
-        time: ''
-    }
-];
+const showGoodsDetails = (i) => {
+    router.push({
+        path: '/jingmai/goods-details',
+        query: {
+            id: i.Gid
+        }
+    });
+};
 </script>
 
 <template>
     <div class="shipped-details">
         <div class="card-box infos">
             <div class="title">
-                <p>发货申请单 {{ ' #2108258 ' }}</p>
-                <p>申请日期：{{ '2023-09-17' }}</p>
+                <p>发货申请单 {{ props.details?.ShipInfo?.ApplyType }}</p>
+                <p>申请日期：{{ props.details?.ShipInfo?.ApplyTime }}</p>
             </div>
             <div class="liucheng-list">
                 <div class="liucheng-item" v-for="(item, index) in liucheng" :key="index">
@@ -172,8 +97,8 @@ const dataSource = [
                             <img :src="getImageUrl(item.img)" alt="流程图片" />
                         </div>
                         <div class="right-text">
-                            <p>{{ item.title }}</p>
-                            <p>{{ item.time }}</p>
+                            <p>{{ props.details?.DeliverNodes?.[index]?.Title }}</p>
+                            <p>{{ props.details?.DeliverNodes?.[index]?.NodeTime }}</p>
                         </div>
                     </div>
                     <img class="nav" :src="getImageUrl('user/logistics/nav.png')" alt="" />
@@ -183,33 +108,111 @@ const dataSource = [
         <div class="card-box shipping">
             <div class="title"> 发货信息 </div>
             <div class="text-list">
-                <p class="text-item" v-for="(item, index) in fahuoList" :key="index">
-                    <span>{{ item.title }}</span>
-                    <span>{{ item.label }}</span>
+                <p class="text-item">
+                    <span>发货项数：</span>
+                    <span> {{ props.details?.ShipInfo?.SendNums }}项</span>
+                </p>
+                <p class="text-item">
+                    <span>发货价值：</span>
+                    <span> {{ props.details?.ShipInfo?.SendPrice }}元</span>
+                </p>
+                <p class="text-item">
+                    <span>申请方式：</span>
+                    <span> {{ props.details?.ShipInfo?.ApplyType }}</span>
+                </p>
+                <p class="text-item">
+                    <span>申请时间：</span>
+                    <span> {{ props.details?.ShipInfo?.ApplyTime }}</span>
+                </p>
+                <p class="text-item">
+                    <span>备注：</span>
+                    <span> {{ props.details?.ShipInfo?.Remarks }}</span>
                 </p>
             </div>
         </div>
         <div class="card-box shipping">
             <div class="title">物流信息</div>
             <div class="text-list">
-                <p class="text-item" v-for="(item, index) in wuliuList" :key="index">
-                    <span>{{ item.title }}</span>
-                    <span>{{ item.label }}</span>
-                    <span></span>
+                <p class="text-item">
+                    <span>物流形式：</span>
+                    <span>{{ props.details?.DeliverInfo?.DeliveryType }}</span>
+                </p>
+                <p class="text-item">
+                    <span>收货地址：</span>
+                    <span>{{ props.details?.DeliverInfo?.ExpressAddr }}</span>
+                </p>
+                <p class="text-item">
+                    <span>承运方: </span>
+                    <span>{{ props.details?.DeliverInfo?.ExpressCompany }}</span>
+                </p>
+                <p class="text-item">
+                    <span>保价价值：</span>
+                    <span>{{ props.details?.DeliverInfo?.InsuredValue }}元</span>
+                </p>
+                <p class="text-item">
+                    <span>承运单号：</span>
+                    <span>{{ props.details?.DeliverInfo?.ExpressNo }}</span>
                 </p>
             </div>
         </div>
         <div class="card-box">
             <div class="title">藏品清单</div>
-            <a-table :columns="columns" :dataSource="dataSource"></a-table>
+            <a-table
+                bordered
+                :pagination="false"
+                :columns="columns"
+                :dataSource="props.details?.GoodsList"
+            >
+                <template #bodyCell="{ column, record }">
+                    <template v-if="column.key === 'Title'">
+                        <div class="goods-info" @click="showGoodsDetails(record)">
+                            <img :src="record.CoverImg" alt="" />
+                            <span>
+                                {{ record.Title }}
+                            </span>
+                        </div>
+                    </template>
+                    <template v-if="column.key === 'AuctionType'">
+                        {{
+                            record.AuctionType == 1
+                                ? '竞买'
+                                : record.AuctionType == 2
+                                  ? '商城'
+                                  : record.AuctionType == 1
+                                    ? '积分兑换'
+                                    : record.AuctionType == 4
+                                      ? '委托退回'
+                                      : '全部'
+                        }}
+                    </template>
+                    <template v-if="column.key === 'IsCret'">
+                        {{ record.IsCret == 1 ? '包含' : '' }}
+                    </template>
+                </template>
+            </a-table>
+            <div class="leng-details">
+                <span></span>
+                <span>总计： {{ props.details?.GoodsList?.length }}项 价值{{ allPrice }}元</span>
+            </div>
         </div>
         <div class="card-box shipping">
-            <div class="title">物流信息</div>
+            <div class="title">补收费用</div>
             <div class="text-list">
-                <p class="text-item" v-for="(item, index) in bushouList" :key="index">
-                    <span>{{ item.title }}</span>
-                    <span>{{ item.label }}</span>
-                    <span></span>
+                <p class="text-item">
+                    <span>物流费：</span>
+                    <span>{{ props.details?.FeeInfo?.FeeLogistics }}元</span>
+                </p>
+                <p class="text-item">
+                    <span>包装费：</span>
+                    <span>{{ props.details?.FeeInfo?.FeePackaging }}元</span>
+                </p>
+                <p class="text-item">
+                    <span>仓储费：</span>
+                    <span>{{ props.details?.FeeInfo?.FeeStorage }}元</span>
+                </p>
+                <p class="text-item">
+                    <span>自淘费用：</span>
+                    <span>{{ props.details?.FeeInfo?.FeeSelfTao }}元</span>
                 </p>
             </div>
         </div>
@@ -218,6 +221,29 @@ const dataSource = [
 
 <style scoped lang="less">
 .shipped-details {
+    .goods-info {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-align: center;
+        gap: 3px;
+        width: 100%;
+        &:hover {
+            color: #9a0000;
+            cursor: pointer;
+        }
+        img {
+            height: 40px;
+        }
+        span {
+            flex: 1;
+        }
+    }
+    .leng-details {
+        .flex-row;
+        justify-content: space-between;
+        padding: 20px;
+    }
     .infos {
         .title {
             .flex-row;
@@ -236,7 +262,11 @@ const dataSource = [
                 flex: 1;
                 .flex-row;
                 gap: 10px;
-
+                &:last-child {
+                    .nav {
+                        display: none;
+                    }
+                }
                 .card-info {
                     flex: 1;
                     .flex-row;
