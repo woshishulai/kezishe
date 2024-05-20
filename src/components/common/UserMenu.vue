@@ -61,9 +61,22 @@ const menuItems = ref(generateMenuItems(userRoutes));
 const handleClick = (e) => {
     const routePath = `${e.key}`;
     if (routePath == route.path) {
-        nextTick(() => {
-            router.push(routePath);
-        });
+        router.go(0);
+        localStorage.removeItem('checkedStatus');
+        localStorage.removeItem('kuaidis');
+        localStorage.removeItem('zhifus');
+        localStorage.removeItem('baojias');
+        localStorage.removeItem('iptValues');
+        localStorage.removeItem('quans');
+        localStorage.removeItem('quanLists');
+        localStorage.removeItem('DelLists');
+        localStorage.removeItem('showModal');
+        localStorage.removeItem('showPaegs');
+        localStorage.removeItem('goodsList');
+
+        // nextTick(() => {
+        //     router.push(routePath);
+        // });
     } else {
         router.push(routePath);
     }

@@ -49,24 +49,25 @@ const props = defineProps({});
 const showPaegs = localStorage.getItem('showPaegs');
 const showComponent = ref(1);
 showPaegs ? (showComponent.value = showPaegs) : (showComponent.value = 1);
+const AllTotal = ref(0);
 const changeShowPage = async (index, query) => {
     if (query) {
         try {
             let res = await sumbitOrder(query);
-            console.log(res);
             if (res.Tag && !res.Tag == 1) {
                 return;
             } else {
                 localStorage.setItem('orderId', res.Data.OrderNo);
-                localStorage.setItem('allPrice', res.Data.AllTotal);
-                // localStorage.removeItem('checkedStatus');
-                // localStorage.removeItem('kuaidis');
-                // localStorage.removeItem('zhifus');
-                // localStorage.removeItem('baojias');
-                // localStorage.removeItem('iptValues');
-                // localStorage.removeItem('quans');
-                // localStorage.removeItem('quanLists');
-                // localStorage.removeItem('DelLists');
+                AllTotal.value = res.Data.AllTotal;
+                localStorage.removeItem('checkedStatus');
+                localStorage.removeItem('kuaidis');
+                localStorage.removeItem('zhifus');
+                localStorage.removeItem('baojias');
+                localStorage.removeItem('iptValues');
+                localStorage.removeItem('goodsList');
+                localStorage.removeItem('quans');
+                localStorage.removeItem('quanLists');
+                localStorage.removeItem('DelLists');
                 showComponent.value = index;
                 if (showModals.value?.params?.titleCate) {
                     Object.keys(params.value).forEach((item) => {
@@ -77,9 +78,11 @@ const changeShowPage = async (index, query) => {
                     checkList.value.DelList = [];
                     getFetchData(1, 10);
                 }
-                localStorage.setItem('showPaegs', index);
             }
-        } catch (error) {}
+        } catch (error) {
+            info('error', '请求错误');
+        }
+        return;
     }
     showComponent.value = index;
     localStorage.setItem('showPaegs', index);
@@ -266,9 +269,9 @@ const zhiFu = () => {
                     </div>
                 </template>
                 <!-- 快递取件码 -->
-                <template v-slot:active3>
+                <!-- <template v-slot:active3>
                     <QuJian v-show="showModals?.params?.titleCate == '未支付'"></QuJian>
-                </template>
+                </template> -->
                 <template v-slot:active4>
                     <a-table :pagination="false" :columns="jingMaiColumns" :dataSource="fetchData">
                         <template #bodyCell="{ column, record }">
@@ -341,7 +344,7 @@ const zhiFu = () => {
     <Item2 @changeShowPage="changeShowPage" v-show="showComponent == 3"></Item2>
     <Item3 @changeShowPage="changeShowPage" v-show="showComponent == 4"></Item3>
     <!-- //余额支付的 -->
-    <Item4 @changeShowPage="changeShowPage" v-if="showComponent == 5"></Item4>
+    <Item4 @changeShowPage="changeShowPage" :AllTotal="AllTotal" v-if="showComponent == 5"></Item4>
 </template>
 
 <style scoped lang="less">

@@ -242,7 +242,10 @@ watch(
                     />
                 </a-image-preview-group>
             </div>
-            <div class="swiper-img">
+            <div
+                class="swiper-img"
+                v-show="props.goodsDtails?.BaseData?.Atlas.split(';').length - 1 > 1"
+            >
                 <a-carousel
                     ref="carousel"
                     :after-change="handleAfterChange"
@@ -397,6 +400,11 @@ watch(
                     props.goodsDtails?.BaseData?.Status != 8
                 "
             >
+                <!-- <p class="num"
+              v-show=" props.goodsDtails?.BaseData?.Status == 1"
+                    >¥开始竞买时间
+                    </p
+                > -->
                 <p class="num"
                     >¥
                     {{
@@ -404,7 +412,7 @@ watch(
                         props.goodsDtails?.BaseData?.BasePrice
                     }}</p
                 >
-                <div class="add-price">
+                <div class="add-price" v-show="props.goodsDtails?.BaseData?.Status != 1">
                     <div class="change-price">
                         <a-button @click="reducePrice">-</a-button>
                         <a-input @blur="changePrice" v-model:value="value"></a-input>
@@ -425,10 +433,12 @@ watch(
                     </a-button>
                     <a-button v-if="newFirstPrice" @click="removeDaiLiPrice"> 取消代理 </a-button>
                 </div>
-                <p class="label">¥ {{ transactionPrice }}(成交价)</p>
-                <div class="info">
+                <p class="label" v-show="props.goodsDtails?.BaseData?.Status != 1"
+                    >¥ {{ transactionPrice }}(成交价)</p
+                >
+                <div class="info" v-show="props.goodsDtails?.BaseData?.Status != 1">
                     <p> ¥ {{ service }}(服务费率 {{ props.goodsDtails?.offerData?.TipsRate }}%) </p>
-                    <a-tooltip color="#9a0000">
+                    <a-tooltip color="#9a0000" v-show="props.goodsDtails?.BaseData?.Status != 1">
                         <template #title>
                             <div class="info-fuwu">
                                 <p>服务费基础服务费{{ props.goodsDtails?.offerData?.Tips }}</p>
@@ -443,7 +453,7 @@ watch(
                             alt=""
                         /> </a-tooltip
                 ></div>
-                <div class="info"
+                <div class="info" v-show="props.goodsDtails?.BaseData?.Status != 1"
                     >配送至:
                     <a-dropdown :trigger="['click']">
                         <a-cascader
@@ -461,7 +471,11 @@ watch(
                     ¥{{ userPriceInfo.addressPrice }} (本商品由壳子社北京仓库为您发货)</div
                 >
             </div>
-            <div class="record" :class="props.goodsDtails?.recomData?.length ? '' : 'active'">
+            <div
+                class="record"
+                v-show="props.goodsDtails?.BaseData?.Status != 1"
+                :class="props.goodsDtails?.recomData?.length ? '' : 'active'"
+            >
                 <div class="title-price">
                     出价记录({{ props.goodsDtails?.recomData?.length }})
                     <span class="more" @click="modal1Visible = true"> 更多 </span>

@@ -2,6 +2,8 @@
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
+import { shouhuoapi } from '@/request/user/api';
+import { info } from '@/hooks/antd/message';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps(['details']);
@@ -81,14 +83,30 @@ const showGoodsDetails = (i) => {
         }
     });
 };
+const shouHuo = async () => {
+    let query = {
+        DeliverNo: ''
+    };
+    try {
+        let res = await shouhuoapi(query);
+    } catch (error) {
+        info('error', '确认收货发生错误');
+    }
+};
 </script>
 
 <template>
     <div class="shipped-details">
         <div class="card-box infos">
-            <div class="title">
-                <p>发货申请单 {{ props.details?.ShipInfo?.ApplyType }}</p>
-                <p>申请日期：{{ props.details?.ShipInfo?.ApplyTime }}</p>
+            <div class="news">
+                <div class="title">
+                    <p>发货申请单 {{ props.details?.ShipInfo?.ApplyType }}</p>
+                    <p>申请日期：{{ props.details?.ShipInfo?.ApplyTime }}</p>
+                </div>
+                <div v-show="props.details?.DeliverNodes?.[2]?.IsOccor == 1">
+                    剩余X天确认收货
+                    <a-button type="primary" @click="shouHuo">确认收货</a-button>
+                </div>
             </div>
             <div class="liucheng-list">
                 <div class="liucheng-item" v-for="(item, index) in liucheng" :key="index">
@@ -244,13 +262,27 @@ const showGoodsDetails = (i) => {
         justify-content: space-between;
         padding: 20px;
     }
+    .news {
+        width: 100%;
+        border-bottom: 1px solid #ebebeb;
+        .flex-row;
+        justify-content: space-between;
+        .ant-btn {
+            height: 44px;
+            padding: 0;
+            line-height: 44px;
+            width: 100px;
+        }
+    }
     .infos {
         .title {
             .flex-row;
             gap: 30px;
+            font-size: 20px;
             justify-content: flex-start;
             font-weight: 500;
             color: #9a0000;
+            border: none;
         }
 
         .liucheng-list {

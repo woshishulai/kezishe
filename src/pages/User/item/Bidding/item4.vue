@@ -9,10 +9,9 @@ import { info } from '@/hooks/antd/message';
 import { getCodeParams } from '@/request/api';
 const router = useRouter();
 const route = useRoute();
-const props = defineProps({});
+const props = defineProps(['AllTotal']);
 const emits = defineEmits(['changeShowPage']);
 const infos = ref({});
-const AllTotal = localStorage.getItem('allPrice');
 const newCodeParams = usePassword();
 const ipt = ref('');
 onMounted(async () => {
@@ -54,7 +53,7 @@ const submit = async () => {
     let querys = encryptionPassword(pas, newCodeParams.codePasswords.PublicKey);
     const query = {
         OrderNo: localStorage.getItem('orderId'),
-        AllTotal: localStorage.getItem('allPrice'),
+        AllTotal: props?.AllTotal,
         PayPwd: querys.PayPwd
     };
     try {
@@ -68,6 +67,9 @@ const submit = async () => {
             localStorage.removeItem('quans');
             localStorage.removeItem('quanLists');
             localStorage.removeItem('DelLists');
+            localStorage.removeItem('showModal');
+            localStorage.removeItem('showPaegs');
+            localStorage.removeItem('goodsList');
             deletes();
         } else if (res.Message == '未设置支付密码，请先设置支付密码') {
             showChangePasswordBtn.value = true;
@@ -96,7 +98,7 @@ const changeShowItem = (index) => {
             <div class="element-item">
                 <div class="text-item"> 应付金额 </div>
                 <p class="label"
-                    >¥<span class="price">{{ AllTotal ? AllTotal : '' }}</span
+                    >¥<span class="price">{{ props?.AllTotal }}</span
                     >元(含运费)</p
                 >
             </div>

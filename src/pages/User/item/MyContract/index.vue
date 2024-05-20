@@ -2,13 +2,73 @@
 import { ref, computed, reactive, onMounted, h } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { SearchOutlined } from '@ant-design/icons-vue';
-import { getImageUrl } from '@/utils';
+import { getHeTongApi } from '@/request/user/api.js';
+import { timeStartOptions } from '../MyEntrustment/data';
 import { options2, options3, HeTongDataSource, HeTongColumns } from '../MyEntrustment/data';
 import CatePage from '@/components/common/CatePage.vue';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
 onMounted(() => {});
+const tableList = ref([]);
+const statusLists = [
+    {
+        value: '-1',
+        label: '全部'
+    },
+    {
+        value: '1',
+        label: '待受理'
+    },
+    {
+        value: '2',
+        label: '已受理'
+    },
+    {
+        value: '3',
+        label: '整理中'
+    },
+    {
+        value: '4',
+        label: '制图中'
+    },
+    {
+        value: '5',
+        label: '审核中'
+    },
+    {
+        value: '6',
+        label: '核查中'
+    },
+    {
+        value: '7',
+        label: '执行中'
+    },
+    {
+        value: '8',
+        label: '已执行'
+    }
+];
+const query = reactive({
+    Status: '-1', //默认状态
+    TimeRange: '0', //时间范围
+    Number: '',
+    PageSize: '10',
+    PageIndex: '1',
+    total: 1
+});
+const getTableList = async (page, pageSize) => {
+    query.PageIndex = page;
+    query.PageSize = pageSize;
+    try {
+        let newRes = await getGoodsListApi(query);
+        tableList.value = newRes.Data;
+        query.total = newRes.Total;
+        console.log(newRes, '我是返回的数据', query.total);
+    } catch (error) {
+        info('error');
+    }
+};
 const list = [
     {
         cate: '自营合同'
@@ -21,7 +81,6 @@ const state = reactive({
     selectedRowKeys: [],
     loading: false
 });
-const hasSelected = computed(() => state.selectedRowKeys.length > 0);
 const start = () => {
     state.loading = true;
     // ajax request after empty completing
@@ -30,7 +89,6 @@ const start = () => {
         state.selectedRowKeys = [];
     }, 1000);
 };
-const loading = ref(false);
 const value = ref('');
 const value1 = ref('cate1');
 const handleChange = (value) => {
@@ -51,25 +109,25 @@ const getGoodsList = () => {
                         <a-select
                             ref="select"
                             class="item"
-                            placeholder="所有时间"
-                            v-model:value="value1"
-                            :options="options2"
+                            placeholder="所有合同状态"
+                            v-model:value="query.Status"
+                            :options="statusLists"
                             @change="handleChange"
                         ></a-select>
                         <a-select
                             ref="select"
                             class="item"
-                            placeholder="全部状态"
-                            v-model:value="value1"
-                            :options="options3"
+                            placeholder="所有时间"
+                            v-model:value="query.TimeRange"
+                            :options="timeStartOptions"
                             @change="handleChange"
                         ></a-select>
-                        <a-input v-model:value="value" class="item-input" placeholder="合同号" />
-                        <a-button
-                            type="primary"
-                            :loading="loading"
-                            @click="getGoodsList"
-                            :icon="h(SearchOutlined)"
+                        <a-input
+                            v-model:value="query.Number"
+                            class="item-input"
+                            placeholder="合同号"
+                        />
+                        <a-button type="primary" @click="getGoodsList" :icon="h(SearchOutlined)"
                             >搜索</a-button
                         >
                     </div>

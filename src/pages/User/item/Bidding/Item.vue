@@ -407,7 +407,8 @@ const submit = () => {
     }
     const OrderDatas = goodsLists.value.map((item) => {
         let query = {
-            AuctionType: item.AuctionType,
+            AuctionType: 1,
+            // AuctionType: item.AuctionType,
             Aid: item.Aid, //藏品记录ID
             Gid: item.Gid, //藏品ID
             Title: item.Title, //藏品名称
@@ -428,7 +429,7 @@ const submit = () => {
         IsInsured: baojia.value ? 1 : 0, //报价
         InsuredPrice: iptValue.value || '0', //保价金额 比如100万
         AllLogisticsCost: kuaidiPriceAll.value, //运费
-        WaitChargeTotal: cangchu.value, //仓储费 未支付没有仓储费 未发货有
+        WaitChargeTotal: cangchu.value || '0', //仓储费 未支付没有仓储费 未发货有
         KeepPriceTotal: iptValue.value / news.value || '0', //保价费
         AllCertFeeCost: youhuiquanPrice.value, //收藏证书
         AllCertyouhuiCost: selectCheckes.value.length * 20, //收藏证书券抵扣金额

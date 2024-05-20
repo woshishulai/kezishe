@@ -46,6 +46,12 @@ export const getGoodsListApi = async (params) =>
         `Member/Auction/GoodsList?Cid=${params.Cid}&StartDateRange=${params.StartDateRange}&EndDateRange=${params.EndDateRange}&Brand=${params.Brand}&Kw=${params.Kw}&Status=${params.Status}&PageSize=${params.PageSize}&PageIndex=${params.PageIndex}`
     );
 
+//我的委托合同
+export const getHeTongApi = async (params) =>
+    instance.get(
+        `Member/Contract/List?Status=${params.Status}&TimeRange=${params.TimeRange}&Number=${params.Number}&PageSize=${params.PageSize}&PageIndex=${params.PageIndex}`
+    );
+
 //获取配送支付方式
 export const getZhiFu = async (params) =>
     instance.get(`Member/Pay/GetPayBaseData?OrderType=${params}`);
@@ -75,3 +81,6 @@ export const getZhifuInfo = async (params) => instance.post(`Member/Pay/DefaultP
 
 //获取支付信息
 export const ZhiFuApi = async (data) => instance.post(`Member/Pay/BalancePay`, data);
+
+//收货
+export const shouhuoapi = async (data) => instance.post(`/Member/UserDeliver/ConfirmReceipt`, data);

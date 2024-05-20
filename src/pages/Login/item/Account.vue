@@ -89,7 +89,7 @@ const handleFinish = async () => {
                 </template>
                 <a-input
                     v-model:value.trim="formState.username"
-                    placeholder="用户名"
+                    placeholder="请输入手机号码"
                     id="login-account"
                 >
                     <template #prefix>

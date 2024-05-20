@@ -12,6 +12,8 @@ import {
 } from './data';
 import { getGoodsCateApi, getSelectCateApi, getGoodsListApi } from '@/request/user/api.js';
 import { info } from '@/hooks/antd/message';
+import { useRouter } from 'vue-router';
+const router = useRouter();
 const props = defineProps({});
 const tableList = ref([]);
 const navList = ref([]);
@@ -58,8 +60,8 @@ const getSelectCate = async () => {
     } catch (error) {}
 };
 const getTableList = async (page, pageSize) => {
-    query.PageSize = pageSize;
     query.PageIndex = page;
+    query.PageSize = pageSize;
     try {
         let newRes = await getGoodsListApi(query);
         tableList.value = newRes.Data;
@@ -73,13 +75,13 @@ onMounted(() => {
     Promise.all([getNavCateList(), getSelectCate()]).then(() => {});
 });
 const showGoodsDetails = (i) => {
-    // console.log(i);
-    // router.push({
-    //     path: '/jingmai/goods-details',
-    //     query: {
-    //         id: i.Id
-    //     }
-    // });
+    console.log(i);
+    router.push({
+        path: '/jingmai/goods-details',
+        query: {
+            id: i.Id
+        }
+    });
 };
 const columnsList = ref([]);
 const params = ref({});
@@ -163,11 +165,14 @@ const statusText = (value) => {
                         <a-input
                             name="shulai"
                             v-model:value="query.Kw"
-                            @keydown.enter="getTableList"
+                            @keydown.enter="getTableList(1, 10)"
                             class="item-input"
                             placeholder="名称和藏品"
                         />
-                        <a-button type="primary" @click="getTableList" :icon="h(SearchOutlined)"
+                        <a-button
+                            type="primary"
+                            @click="getTableList(1, 10)"
+                            :icon="h(SearchOutlined)"
                             >搜索</a-button
                         >
                     </div>

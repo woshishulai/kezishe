@@ -265,16 +265,16 @@ const JingMaiColumns = [
     {
         title: '起始价',
         ellipsis: true,
-        dataIndex: 'MakePrice',
-        key: 'MakePrice',
+        dataIndex: 'BasePrice',
+        key: 'BasePrice',
         align: 'center',
         width: 200
     },
     {
         title: '结标价',
         ellipsis: true,
-        dataIndex: 'BasePrice',
-        key: 'BasePrice',
+        dataIndex: 'MakePrice',
+        key: 'MakePrice',
         align: 'center',
         width: 200
     },
