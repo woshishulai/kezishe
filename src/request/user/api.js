@@ -52,6 +52,9 @@ export const getHeTongApi = async (params) =>
         `Member/Contract/List?Status=${params.Status}&TimeRange=${params.TimeRange}&Number=${params.Number}&PageSize=${params.PageSize}&PageIndex=${params.PageIndex}`
     );
 
+//我的委托合同详情
+export const getHeTongDetailsApi = async (params) =>
+    instance.get(`Member/Contract/Detail?Number=${params}`);
 //获取配送支付方式
 export const getZhiFu = async (params) =>
     instance.get(`Member/Pay/GetPayBaseData?OrderType=${params}`);

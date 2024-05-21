@@ -63,23 +63,20 @@ const menuItems = ref(generateMenuItems(userRoutes));
 
 const handleClick = (e) => {
     const routePath = `${e.key}`;
-    if (routePath == route.path) {
-        router.go(0);
-        localStorage.removeItem('checkedStatus');
-        localStorage.removeItem('kuaidis');
-        localStorage.removeItem('zhifus');
-        localStorage.removeItem('baojias');
-        localStorage.removeItem('iptValues');
-        localStorage.removeItem('quans');
-        localStorage.removeItem('quanLists');
-        localStorage.removeItem('DelLists');
-        localStorage.removeItem('showModal');
-        localStorage.removeItem('showPaegs');
-        localStorage.removeItem('goodsList');
-
-        // nextTick(() => {
-        //     router.push(routePath);
-        // });
+    if (routePath === route.path) {
+        router.replace({ path: routePath, query: { refresh: Math.random() } }).then(() => {
+            localStorage.removeItem('checkedStatus');
+            localStorage.removeItem('kuaidis');
+            localStorage.removeItem('zhifus');
+            localStorage.removeItem('baojias');
+            localStorage.removeItem('iptValues');
+            localStorage.removeItem('quans');
+            localStorage.removeItem('quanLists');
+            localStorage.removeItem('DelLists');
+            localStorage.removeItem('showModal');
+            localStorage.removeItem('showPaegs');
+            localStorage.removeItem('goodsList');
+        });
     } else {
         router.push(routePath);
     }

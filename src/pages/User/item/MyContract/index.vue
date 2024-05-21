@@ -7,6 +7,7 @@ import { timeStartOptionss } from '../MyEntrustment/data';
 import { options2, options3, HeTongDataSource, HeTongColumns } from '../MyEntrustment/data';
 import { info } from '@/hooks/antd/message';
 import CatePage from '@/components/common/CatePage.vue';
+import Details from './Details.vue';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
@@ -106,7 +107,7 @@ watch(
 );
 const showDetails = (Number) => {
     router.push({
-        path: '/user/my-entrustment/my-contract-details',
+        path: '/user/my-entrustment/my-contract',
         query: {
             Number
         }
@@ -115,7 +116,8 @@ const showDetails = (Number) => {
 </script>
 
 <template>
-    <div class="my-entrustment">
+    <Details v-if="route.query.Number"></Details>
+    <div v-else class="my-entrustment">
         <div class="card-box">
             <div class="title"> 我的合同 </div>
             <show-modal :titleList="list" ref="showModals">

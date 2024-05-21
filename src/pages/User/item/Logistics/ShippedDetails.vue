@@ -1,14 +1,30 @@
 <script setup>
-import { ref, computed, reactive, onMounted } from 'vue';
+import { ref, computed, reactive, onMounted, watchEffect } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
 import { shouhuoapi } from '@/request/user/api';
+import { yifahuoDetailsapi } from '@/request/user/api';
 import { info } from '@/hooks/antd/message';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps(['details']);
+const details = ref();
 onMounted(() => {});
-
+const getDetails = async (id) => {
+    if (!id) {
+        return;
+    }
+    let params = {
+        DeliverNo: id
+    };
+    try {
+        let res = await yifahuoDetailsapi(params);
+        details.value = res.Data;
+    } catch (error) {}
+};
+watchEffect(() => {
+    getDetails(route.query.Number);
+});
 const liucheng = [
     {
         img: 'user/logistics/list1.png'
@@ -24,8 +40,8 @@ const liucheng = [
     }
 ];
 const allPrice = computed(() => {
-    if (props.details?.GoodsList?.length < 1) return 0;
-    return props.details?.GoodsList?.reduce((acc, item) => acc + item.MakePrice, 0);
+    if (details.value?.GoodsList?.length < 1) return 0;
+    return details.value?.GoodsList?.reduce((acc, item) => acc + item.MakePrice, 0);
 });
 
 const columns = [
@@ -100,10 +116,10 @@ const shouHuo = async () => {
         <div class="card-box infos">
             <div class="news">
                 <div class="title">
-                    <p>发货申请单 {{ props.details?.ShipInfo?.ApplyType }}</p>
-                    <p>申请日期：{{ props.details?.ShipInfo?.ApplyTime }}</p>
+                    <p>发货申请单 {{ details?.ShipInfo?.ApplyType }}</p>
+                    <p>申请日期：{{ details?.ShipInfo?.ApplyTime }}</p>
                 </div>
-                <div v-show="props.details?.DeliverNodes?.[2]?.IsOccor == 1">
+                <div v-show="details?.DeliverNodes?.[2]?.IsOccor == 1">
                     剩余X天确认收货
                     <a-button type="primary" @click="shouHuo">确认收货</a-button>
                 </div>
@@ -115,8 +131,8 @@ const shouHuo = async () => {
                             <img :src="getImageUrl(item.img)" alt="流程图片" />
                         </div>
                         <div class="right-text">
-                            <p>{{ props.details?.DeliverNodes?.[index]?.Title }}</p>
-                            <p>{{ props.details?.DeliverNodes?.[index]?.NodeTime }}</p>
+                            <p>{{ details?.DeliverNodes?.[index]?.Title }}</p>
+                            <p>{{ details?.DeliverNodes?.[index]?.NodeTime }}</p>
                         </div>
                     </div>
                     <img class="nav" :src="getImageUrl('user/logistics/nav.png')" alt="" />
@@ -128,23 +144,23 @@ const shouHuo = async () => {
             <div class="text-list">
                 <p class="text-item">
                     <span>发货项数：</span>
-                    <span> {{ props.details?.ShipInfo?.SendNums }}项</span>
+                    <span> {{ details?.ShipInfo?.SendNums }}项</span>
                 </p>
                 <p class="text-item">
                     <span>发货价值：</span>
-                    <span> {{ props.details?.ShipInfo?.SendPrice }}元</span>
+                    <span> {{ details?.ShipInfo?.SendPrice }}元</span>
                 </p>
                 <p class="text-item">
                     <span>申请方式：</span>
-                    <span> {{ props.details?.ShipInfo?.ApplyType }}</span>
+                    <span> {{ details?.ShipInfo?.ApplyType }}</span>
                 </p>
                 <p class="text-item">
                     <span>申请时间：</span>
-                    <span> {{ props.details?.ShipInfo?.ApplyTime }}</span>
+                    <span> {{ details?.ShipInfo?.ApplyTime }}</span>
                 </p>
                 <p class="text-item">
                     <span>备注：</span>
-                    <span> {{ props.details?.ShipInfo?.Remarks }}</span>
+                    <span> {{ details?.ShipInfo?.Remarks }}</span>
                 </p>
             </div>
         </div>
@@ -153,23 +169,23 @@ const shouHuo = async () => {
             <div class="text-list">
                 <p class="text-item">
                     <span>物流形式：</span>
-                    <span>{{ props.details?.DeliverInfo?.DeliveryType }}</span>
+                    <span>{{ details?.DeliverInfo?.DeliveryType }}</span>
                 </p>
                 <p class="text-item">
                     <span>收货地址：</span>
-                    <span>{{ props.details?.DeliverInfo?.ExpressAddr }}</span>
+                    <span>{{ details?.DeliverInfo?.ExpressAddr }}</span>
                 </p>
                 <p class="text-item">
                     <span>承运方: </span>
-                    <span>{{ props.details?.DeliverInfo?.ExpressCompany }}</span>
+                    <span>{{ details?.DeliverInfo?.ExpressCompany }}</span>
                 </p>
                 <p class="text-item">
                     <span>保价价值：</span>
-                    <span>{{ props.details?.DeliverInfo?.InsuredValue }}元</span>
+                    <span>{{ details?.DeliverInfo?.InsuredValue }}元</span>
                 </p>
                 <p class="text-item">
                     <span>承运单号：</span>
-                    <span>{{ props.details?.DeliverInfo?.ExpressNo }}</span>
+                    <span>{{ details?.DeliverInfo?.ExpressNo }}</span>
                 </p>
             </div>
         </div>
@@ -179,7 +195,7 @@ const shouHuo = async () => {
                 bordered
                 :pagination="false"
                 :columns="columns"
-                :dataSource="props.details?.GoodsList"
+                :dataSource="details?.GoodsList"
             >
                 <template #bodyCell="{ column, record }">
                     <template v-if="column.key === 'Title'">
@@ -210,7 +226,7 @@ const shouHuo = async () => {
             </a-table>
             <div class="leng-details">
                 <span></span>
-                <span>总计： {{ props.details?.GoodsList?.length }}项 价值{{ allPrice }}元</span>
+                <span>总计： {{ details?.GoodsList?.length }}项 价值{{ allPrice }}元</span>
             </div>
         </div>
         <div class="card-box shipping">
@@ -218,19 +234,19 @@ const shouHuo = async () => {
             <div class="text-list">
                 <p class="text-item">
                     <span>物流费：</span>
-                    <span>{{ props.details?.FeeInfo?.FeeLogistics }}元</span>
+                    <span>{{ details?.FeeInfo?.FeeLogistics }}元</span>
                 </p>
                 <p class="text-item">
                     <span>包装费：</span>
-                    <span>{{ props.details?.FeeInfo?.FeePackaging }}元</span>
+                    <span>{{ details?.FeeInfo?.FeePackaging }}元</span>
                 </p>
                 <p class="text-item">
                     <span>仓储费：</span>
-                    <span>{{ props.details?.FeeInfo?.FeeStorage }}元</span>
+                    <span>{{ details?.FeeInfo?.FeeStorage }}元</span>
                 </p>
                 <p class="text-item">
                     <span>自淘费用：</span>
-                    <span>{{ props.details?.FeeInfo?.FeeSelfTao }}元</span>
+                    <span>{{ details?.FeeInfo?.FeeSelfTao }}元</span>
                 </p>
             </div>
         </div>

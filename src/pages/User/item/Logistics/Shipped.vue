@@ -31,16 +31,7 @@ const getTableList = async (PageIndex = 1, PageSize = 10) => {
         query.total = res.Total;
     } catch (error) {}
 };
-const getDetails = async (id) => {
-    let params = {
-        DeliverNo: id
-    };
-    try {
-        let res = await yifahuoDetailsapi(params);
-        details.value = res.Data;
-        console.log(details.value);
-    } catch (error) {}
-};
+
 onMounted(() => {
     getTableList();
 });
@@ -213,10 +204,13 @@ const cangChuDataSource = [
 const value = ref('');
 const value1 = '0';
 //展示谁
-const showDetails = ref(true);
-const changeShowDeatails = (index) => {
-    showDetails.value = false;
-    index ? getDetails(index) : '';
+const changeShowDeatails = (Number) => {
+    router.push({
+        path: route.path,
+        query: {
+            Number
+        }
+    });
 };
 
 const getGoodsList = () => {
@@ -233,7 +227,8 @@ const showGoodsDetails = (i) => {
 </script>
 <template>
     <div class="my-bidding">
-        <div class="card-box" v-show="showDetails">
+        <ShippedDetails v-if="route.query.Number"></ShippedDetails>
+        <div class="card-box" v-else>
             <div class="title"> 已发货 </div>
             <show-modal ref="showModals" :titleList="list">
                 <template v-slot:active2>
@@ -328,10 +323,8 @@ const showGoodsDetails = (i) => {
             </show-modal>
             <CatePage @fetch-list="getTableList" :paginations="query"></CatePage>
         </div>
-        <ShippedDetails v-show="!showDetails" :details="details"></ShippedDetails>
     </div>
 </template>
-
 <style scoped lang="less">
 .my-bidding {
     .goods-info {
