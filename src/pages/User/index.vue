@@ -45,6 +45,9 @@ onMounted(() => {});
             .user-item {
                 flex: 1;
             }
+            :deep(.ant-btn-default) {
+                background-color: #85909b;
+            }
         }
     }
 }

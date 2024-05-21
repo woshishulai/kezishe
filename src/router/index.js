@@ -163,6 +163,15 @@ const userRoutes = [
                         }
                     },
                     {
+                        path: 'my-contract-details',
+                        component: () => import('@/pages/User/item/MyContract/Details.vue'),
+                        isShowMenu: false,
+                        meta: {
+                            name: '合同详情',
+                            icon: CaretRightOutlined
+                        }
+                    },
+                    {
                         path: 'settlement-details',
                         component: () => import('@/pages/User/item/SettlementDetails/index.vue'),
                         meta: {

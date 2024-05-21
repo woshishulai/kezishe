@@ -218,12 +218,6 @@ const statusText = (value) => {
                                         <span>{{ statusText(record.SettleStatus) }}</span>
                                     </div>
                                 </template>
-                                <template v-if="column.key === 'jiesuanzhuangtai'">
-                                    <div class="jiesuanzhuangtai">
-                                        <span>{{ record.jiesuanzhuangtai.title }}</span>
-                                        <span>({{ record.jiesuanzhuangtai.num }})</span>
-                                    </div>
-                                </template>
                             </template>
                         </a-table>
                     </div>
@@ -267,7 +261,7 @@ const statusText = (value) => {
 
     .status {
         &.active {
-            color: #9a0000;
+            color: #a11111;
         }
     }
 }

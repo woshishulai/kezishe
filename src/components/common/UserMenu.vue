@@ -29,7 +29,10 @@ const generateMenuItems = (routes, parentRoutePath = '/user/') => {
                     // 排除个人中心路由
                     return null;
                 }
-
+                if (childRoute.isShowMenu == false) {
+                    // 排除不展示
+                    return null;
+                }
                 const childMenuItem = {
                     key: getPathWithoutParams(parentPath + childRoute.path), // 忽略参数部分
                     label: childRoute.meta.name,

@@ -93,11 +93,33 @@ const timeStartOptions = [
     },
     {
         value: '3',
-        label: '3月内'
+        label: '三月内'
     },
     {
         value: '4',
         label: '三月外'
+    }
+];
+const timeStartOptionss = [
+    {
+        value: '0',
+        label: '全部'
+    },
+    {
+        value: '1',
+        label: '一日内'
+    },
+    {
+        value: '2',
+        label: '七日内'
+    },
+    {
+        value: '30',
+        label: '一月内'
+    },
+    {
+        value: '40',
+        label: '一月外'
     }
 ];
 const timeEndOptions = [
@@ -520,26 +542,32 @@ const ShippingColumnsJieSuan = [
 const HeTongColumns = [
     {
         title: '合同编号',
-        key: 'hetongbianhao',
-        dataIndex: 'hetongbianhao',
+        key: 'Number',
+        dataIndex: 'Number',
         align: 'center'
     },
     {
         title: '登录日期',
-        key: 'dengluriqi',
-        dataIndex: 'dengluriqi',
+        key: 'CreateTime',
+        dataIndex: 'CreateTime',
         align: 'center'
     },
     {
         title: '藏品数量',
-        key: 'nums',
-        dataIndex: 'nums',
+        key: 'GoodsCount',
+        dataIndex: 'GoodsCount',
         align: 'center'
     },
     {
         title: '当前状态',
-        key: 'status',
-        dataIndex: 'status',
+        key: 'Status',
+        dataIndex: 'Status',
+        align: 'center'
+    },
+    {
+        title: '',
+        key: 'Details',
+        dataIndex: 'Details',
         align: 'center'
     }
 ];
@@ -587,6 +615,7 @@ export {
     options2,
     options3,
     timeStartOptions,
+    timeStartOptionss,
     timeEndOptions,
     sellingPriceList,
     statusLists,

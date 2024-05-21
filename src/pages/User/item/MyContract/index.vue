@@ -1,16 +1,32 @@
 <script setup>
-import { ref, computed, reactive, onMounted, h } from 'vue';
+import { ref, computed, reactive, onMounted, h, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { SearchOutlined } from '@ant-design/icons-vue';
 import { getHeTongApi } from '@/request/user/api.js';
-import { timeStartOptions } from '../MyEntrustment/data';
+import { timeStartOptionss } from '../MyEntrustment/data';
 import { options2, options3, HeTongDataSource, HeTongColumns } from '../MyEntrustment/data';
+import { info } from '@/hooks/antd/message';
 import CatePage from '@/components/common/CatePage.vue';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
-onMounted(() => {});
+const showModals = ref(null);
 const tableList = ref([]);
+const statusInfo = (index) => {
+    let statuses = {
+        '-1': '全部',
+        1: '待受理',
+        2: '已受理',
+        3: '整理中',
+        4: '制图中',
+        5: '审核中',
+        6: '核查中',
+        7: '执行中',
+        8: '已执行'
+    };
+    return statuses[index] || '未知状态';
+};
+
 const statusLists = [
     {
         value: '-1',
@@ -57,14 +73,16 @@ const query = reactive({
     PageIndex: '1',
     total: 1
 });
-const getTableList = async (page, pageSize) => {
+const getTableList = async (page = 1, pageSize = 10) => {
     query.PageIndex = page;
     query.PageSize = pageSize;
     try {
-        let newRes = await getGoodsListApi(query);
+        let newRes;
+        if (showModals.value?.params?.titleCate == '自营合同') {
+            newRes = await getHeTongApi(query);
+        }
         tableList.value = newRes.Data;
         query.total = newRes.Total;
-        console.log(newRes, '我是返回的数据', query.total);
     } catch (error) {
         info('error');
     }
@@ -77,25 +95,22 @@ const list = [
         cate: '商城合同'
     }
 ];
-const state = reactive({
-    selectedRowKeys: [],
-    loading: false
-});
-const start = () => {
-    state.loading = true;
-    // ajax request after empty completing
-    setTimeout(() => {
-        state.loading = false;
-        state.selectedRowKeys = [];
-    }, 1000);
-};
-const value = ref('');
-const value1 = ref('cate1');
-const handleChange = (value) => {
-    console.log(`selected ${value}`);
-};
-const getGoodsList = () => {
-    loading.value = true;
+
+watch(
+    () => showModals.value?.params?.titleCate,
+    () => {
+        query.total = 1;
+        tableList.value = [];
+        getTableList();
+    }
+);
+const showDetails = (Number) => {
+    router.push({
+        path: '/user/my-entrustment/my-contract-details',
+        query: {
+            Number
+        }
+    });
 };
 </script>
 
@@ -103,7 +118,7 @@ const getGoodsList = () => {
     <div class="my-entrustment">
         <div class="card-box">
             <div class="title"> 我的合同 </div>
-            <show-modal :titleList="list">
+            <show-modal :titleList="list" ref="showModals">
                 <template v-slot:active2>
                     <div class="search-cate">
                         <a-select
@@ -112,45 +127,58 @@ const getGoodsList = () => {
                             placeholder="所有合同状态"
                             v-model:value="query.Status"
                             :options="statusLists"
-                            @change="handleChange"
                         ></a-select>
                         <a-select
                             ref="select"
                             class="item"
                             placeholder="所有时间"
                             v-model:value="query.TimeRange"
-                            :options="timeStartOptions"
-                            @change="handleChange"
+                            :options="timeStartOptionss"
                         ></a-select>
                         <a-input
                             v-model:value="query.Number"
                             class="item-input"
+                            @keydown.enter="getTableList()"
                             placeholder="合同号"
                         />
-                        <a-button type="primary" @click="getGoodsList" :icon="h(SearchOutlined)"
-                            >搜索</a-button
-                        >
+                        <a-button @click="getTableList()" :icon="h(SearchOutlined)">搜索</a-button>
                     </div>
                 </template>
                 <template v-slot:active3>
-                    参考数据
-                    <a-table
-                        :pagination="false"
-                        :columns="HeTongColumns"
-                        :dataSource="HeTongDataSource"
-                    >
+                    <a-table :pagination="false" :columns="HeTongColumns" :dataSource="tableList">
                         <template #bodyCell="{ column, record }">
-                            <template v-if="column.key === `status`">
-                                <div v-if="record.status == '已执行'">{{ record.status }}</div>
-                                <div v-else style="color: red">{{ record.status }}</div>
+                            <template v-if="column.key === `Status`">
+                                <p :class="record.Status == 2 ? 'active' : ''">
+                                    {{ statusInfo(record.Status) }}
+                                </p>
+                            </template>
+                            <template v-if="column.key === `Details`">
+                                <p class="details" @click="showDetails(record.Number)">
+                                    查看详情
+                                </p>
                             </template>
                         </template>
                     </a-table>
                 </template>
             </show-modal>
-            <CatePage></CatePage>
+            <CatePage :paginations="query" @fetchList="getTableList"></CatePage>
         </div>
     </div>
 </template>
 
-<style scoped lang="less"></style>
+<style scoped lang="less">
+:deep(.ant-table-wrapper) {
+    .ant-table-thead > tr > th {
+        background-color: #eef3f8;
+    }
+    .active {
+        color: #a11111;
+    }
+    .details {
+        cursor: pointer;
+        &:hover {
+            color: #a11111;
+        }
+    }
+}
+</style>
