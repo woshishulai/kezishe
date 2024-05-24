@@ -60,7 +60,7 @@ defineExpose({
                 :key="item.cate"
             >
                 <span>{{ item.cate }}</span>
-                <span v-if="item.num">({{ item.showText }} {{ item.num }})</span>
+                <span v-if="item.num">({{ item.showText }}{{ item.num }})</span>
             </p>
         </div>
         <slot name="active2"></slot>

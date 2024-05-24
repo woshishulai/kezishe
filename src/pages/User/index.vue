@@ -48,6 +48,12 @@ onMounted(() => {});
             :deep(.ant-btn-default) {
                 background-color: #85909b;
             }
+
+            :deep(.ant-table-tbody) {
+                .ant-table-cell {
+                    font-size: 14px;
+                }
+            }
         }
     }
 }

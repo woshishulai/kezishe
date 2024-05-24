@@ -9,59 +9,46 @@ const route = useRoute();
 const props = defineProps({});
 const tableList = ref([]);
 const showModals = ref(null);
-const list = ref([
-    {
-        cate: '预展',
-        num: '7',
-        id: 1
-    },
-    {
-        cate: '竞买',
-        id: 2
-    },
-    {
-        cate: '成交',
-        num: '1294',
-        id: 3
-    },
-    {
-        cate: '未成交',
-        num: '8',
-        id: 7
-    },
-    {
-        cate: '下架',
-        num: '4',
-        id: 8
-    },
-    {
-        cate: '购物',
-        num: '',
-        id: 0
-    }
-]);
+const options1 = ref([]);
+const list = ref([]);
 const query = reactive({
     Cid: '',
     Kw: '',
-    Status: 1,
+    Status: '',
     PageSize: '',
     PageIndex: '',
     total: 1
 });
-const getTableList = async (page, pageSize) => {
+const getTableList = async (page = 1, pageSize = 10) => {
     query.PageIndex = page;
     query.PageSize = pageSize;
     try {
         let res = await getCartList(query);
-        console.log(res);
         if (res.Tag == 1) {
-            query.total = res.Data;
-            tableList.value = res.Data;
+            tableList.value = res.Data.GoodsList;
+            options1.value = res.Data.BidderType;
+            options1.value.unshift({
+                Value: '全部',
+                Key: ''
+            });
+            let arr = res.Data.GoodsStatusList;
+            let newArr = arr.map((item) => {
+                let query = {
+                    num: item.Count,
+                    cate: item.Value,
+                    id: item.Key
+                };
+                return query;
+            });
+            if (JSON.stringify(list.value) !== JSON.stringify(newArr)) {
+                list.value = newArr;
+            }
+            query.total = res.Total;
         }
     } catch (error) {}
 };
 onMounted(async () => {
-    // getTableList(1, 10);
+    getTableList();
 });
 
 watch(
@@ -69,7 +56,7 @@ watch(
     () => {
         const items = list.value.find((item) => item.cate == showModals.value?.params?.titleCate);
         if (items.id) {
-            query.Cid = items.id;
+            query.Status = items.id;
             query.total = 1;
             tableList.value = [];
             getTableList(1, 10);
@@ -83,65 +70,82 @@ const handClick = (item) => {
 const columns = [
     {
         title: '藏品编号',
-        dataIndex: 'code',
-        key: 'code',
-        align: 'center'
+        dataIndex: 'Bn',
+        key: 'Bn',
+        align: 'center',
+        width: 200
     },
     {
         title: '藏品名称',
-        dataIndex: 'name',
-        key: 'name',
-        align: 'center'
-    },
-    {
-        title: '藏品图片',
-        dataIndex: 'zhaopian',
-        key: 'zhaopian',
-        align: 'center'
-    },
-    {
-        title: '商家',
-        dataIndex: 'laoban',
-        key: 'laoban',
-        align: 'center'
+        dataIndex: 'Title',
+        key: 'Title',
+        align: 'center',
+        width: 300,
+        ellipsis: true
     },
     {
         title: '时间',
-        dataIndex: 'time',
-        key: 'time',
+        dataIndex: 'OnTime',
+        key: 'OnTime',
+        width: 250,
         align: 'center'
     },
     {
         title: '价格',
-        dataIndex: 'price',
+        dataIndex: 'MPrice',
         align: 'center',
-        key: 'price'
+        key: 'MPrice'
+    },
+    {
+        title: '未知状态',
+        dataIndex: 'Status',
+        align: 'center',
+        key: 'Status'
     },
     {
         title: '操作',
         dataIndex: 'caozuo',
         align: 'center',
-        key: 'caozuo'
+        key: 'caozuo',
+        width: 120
     }
 ];
-const data = reactive([]);
-for (let i = 0; i < 10; i++) {
-    data.push({
-        key: i,
-        code: '63932729',
-        name: '清朝瓷器',
-        laoban: '壳子社',
-        time: '2023.10.02',
-        price: '1.00',
-        zhaopian: 'register/logo.png',
-        caozuo: i % 2 == 0 ? '取消关注' : '关注'
+
+const showGoodsDetails = (i) => {
+    router.push({
+        path: '/jingmai/goods-details',
+        query: {
+            id: i.Gid
+        }
     });
-}
-const state = reactive({
-    selectedRowKeys: [],
-    // Check here to configure the default column
-    loading: false
+};
+const checkList = ref({
+    DelList: []
 });
+//勾选框
+const showCheck = (e) => {
+    if (getChecked(e.Bn)) {
+        checkList.value.DelList = checkList.value.DelList.filter((item) => item.Bn !== e.Bn);
+    } else {
+        let query = {
+            Bn: e.Bn
+        };
+        if (showModals.value?.params?.titleCate == '未支付') {
+            checkList.value.DelList.push(e);
+        } else {
+            checkList.value.DelList.push(query);
+        }
+    }
+    if (checkList.value.DelList.length == fetchData.value.length) {
+        all.value = true;
+    } else {
+        all.value = false;
+    }
+};
+function getChecked(Bn) {
+    const item = checkList.value.DelList.find((item) => item.Bn === Bn);
+    return item !== undefined;
+}
 const hasSelected = computed(() => state.selectedRowKeys.length > 0);
 const start = () => {
     state.loading = true;
@@ -154,33 +158,14 @@ const start = () => {
 const onSelectChange = (selectedRowKeys) => {
     state.selectedRowKeys = selectedRowKeys;
 };
-const options1 = ref([
-    {
-        value: 'cate1',
-        label: '所有分类'
-    },
-    {
-        value: 'lucy',
-        label: 'Lucy'
-    },
-    {
-        value: 'yiminghe',
-        label: 'Yiminghe'
-    }
-]);
 const loading = ref(false);
-const value1 = ref('cate1');
 const handleChange = (value) => {
     console.log(`selected ${value}`);
 };
 const getGoodsList = () => {
     loading.value = true;
 };
-const changeGuanZhu = (item) => {
-    console.log(item.key);
-    data[item.key].caozuo = data[item.key].caozuo == '取消关注' ? '关注' : '取消关注';
-    console.log(data[item.key], data);
-};
+
 // const changeGuanZhu = (item) => {
 //   const index = data.findIndex(d => d.key === item.key);
 //   if (index !== -1) {
@@ -194,68 +179,64 @@ const changeGuanZhu = (item) => {
     <div class="my-following">
         <div class="card-box">
             <div class="title"> 我的关注 </div>
-            <show-modal :titleList="list" ref="showModals">
+            <show-modal :title-list="list" ref="showModals">
                 <template v-slot:active1>
                     <div class="search-cate">
                         <a-select
                             ref="select"
                             placeholder="所有分类"
-                            v-model:value="value1"
+                            v-model:value="query.Cid"
                             style="width: 220px"
+                            :field-names="{ label: 'Value', value: 'Key', options: 'children' }"
                             :options="options1"
-                            @change="handleChange"
                         ></a-select>
                         <a-input
                             v-model:value="query.Kw"
                             style="width: 316px"
                             placeholder="名称和藏品"
                         />
-                        <a-button
-                            type="primary"
-                            :loading="loading"
-                            @click="getGoodsList"
-                            :icon="h(SearchOutlined)"
-                            >搜索</a-button
-                        >
+                        <a-button @click="getTableList()" :icon="h(SearchOutlined)">搜索</a-button>
                     </div>
                 </template>
                 <template v-slot:active3>
-                    参考数据
-                    <a-table
-                        :pagination="false"
-                        :row-selection="{
-                            selectedRowKeys: state.selectedRowKeys,
-                            onChange: onSelectChange
-                        }"
-                        :columns="columns"
-                        :data-source="data"
-                    >
+                    <a-table :pagination="false" :columns="columns" :data-source="tableList">
                         <template #bodyCell="{ column, record }">
-                            <template v-if="column.key === 'zhaopian'">
-                                <div class="table-item-gooods-info">
-                                    <img :src="getImageUrl(record.zhaopian)" alt="" />
+                            <template v-if="column.key == 'Bn'">
+                                <div class="title-item">
+                                    <a-checkbox
+                                        @change.stop="showCheck(record)"
+                                        style="margin-right: 15px"
+                                        :checked="getChecked(record.Bn)"
+                                    ></a-checkbox>
+                                    <p> {{ record.Bn }}</p>
+                                </div>
+                            </template>
+                            <template v-if="column.key === 'Title'">
+                                <div class="goods-info" @click="showGoodsDetails(record)">
+                                    <img :src="record.CoverImg" alt="" />
+                                    <a-tooltip>
+                                        <template #title> {{ record.Title }} </template>
+                                        <span style="width: 100px">
+                                            {{ record.Title }}
+                                        </span>
+                                    </a-tooltip>
                                 </div>
                             </template>
                             <template v-if="column.key === 'caozuo'">
-                                <div class="btns" @click="changeGuanZhu(record)">
-                                    {{ record.caozuo == '取消关注' ? '取消关注' : '关注' }}
-                                </div>
+                                <div class="btns" @click="changeGuanZhu(record)"> 取消关注 </div>
                             </template>
                         </template>
                     </a-table>
                     <div class="add-array">
-                        <a-button
-                            type="primary"
-                            :disabled="!hasSelected"
-                            :loading="state.loading"
-                            @click="start"
-                        >
-                            选择
-                        </a-button>
+                        <span>全选</span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                        <span></span>
                         <span style="margin-left: 8px">
-                            <template v-if="hasSelected">
+                            <template>
                                 {{
-                                    `总计 ${data.length} 项 已选 ${state.selectedRowKeys.length} 项`
+                                    `总计 ${tableList.length} 项 已选 ${checkList.DelList.length} 项`
                                 }}
                             </template>
                         </span>
@@ -270,6 +251,34 @@ const changeGuanZhu = (item) => {
 <style scoped lang="less">
 /* 在这里添加你的 Less 样式 */
 .my-following {
+    :deep(.ant-table-wrapper .ant-table-thead > tr > th) {
+        background-color: #fff;
+    }
+    :deep(.ant-table-wrapper .ant-table .ant-table-tbody > tr > td) {
+        border-bottom: 1px dashed #d5dce4;
+        border-top: none;
+    }
+    .title-item {
+        display: flex;
+    }
+    .goods-info {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        text-align: center;
+        gap: 3px;
+        width: 100%;
+        &:hover {
+            color: #9a0000;
+            cursor: pointer;
+        }
+        img {
+            height: 40px;
+        }
+        span {
+            flex: 1;
+        }
+    }
     .card-box {
         .table-item-gooods-info {
             img {
@@ -278,10 +287,17 @@ const changeGuanZhu = (item) => {
         }
 
         .btns {
-            cursor: pointer;
-            padding: 10px 0;
+            width: 90px;
+            height: 34px;
+            font-size: 14px;
             border-radius: 6px;
+            line-height: 34px;
             background-color: #eef3f8;
+            cursor: pointer;
+            border: 1px solid #d9e1e7;
+            &:hover {
+                color: #9a0000;
+            }
         }
     }
 }
