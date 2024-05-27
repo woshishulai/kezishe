@@ -11,6 +11,10 @@ const props = defineProps({
     fileModule: {
         type: Number,
         default: 3
+    },
+    title: {
+        type: String,
+        default: '文档'
     }
 });
 let imageUrl = ref('');
@@ -68,7 +72,7 @@ const chooseImageUrl = async (e) => {
             <input class="ipt" @change="chooseImageUrl" type="file" />
             <div class="upload-btn">
                 <span>+</span>
-                <h5>上传</h5>
+                <h5>上传{{ props?.title }}</h5>
             </div>
         </div>
     </div>
@@ -82,10 +86,10 @@ const chooseImageUrl = async (e) => {
 .upload-wrap {
     .flex-row;
     justify-content: flex-start;
-    gap: 5px;
+    gap: 16px;
     .upload {
         position: relative;
-        width: 200px;
+
         .ipt {
             position: absolute;
             width: 100%;
@@ -95,7 +99,9 @@ const chooseImageUrl = async (e) => {
         }
         .upload-btn {
             .flex-col;
-            padding: 20px 80px;
+            // padding: 20px 80px;
+            width: 310px;
+            height: 216px;
             background-color: #f1f5f8;
             color: #6d6d6d;
 
@@ -105,7 +111,6 @@ const chooseImageUrl = async (e) => {
 
             h5 {
                 font-size: 20px;
-                width: 46px;
             }
         }
     }

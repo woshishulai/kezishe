@@ -7,6 +7,31 @@ import 'dayjs/locale/zh-cn';
 dayjs.locale('zh-cn');
 const locale = zhCN;
 const Loading = useLoading();
+onMounted(() => {
+    cx();
+    window.addEventListener('resize', function () {
+        cx();
+    });
+    function cx() {
+        var Wth = document.documentElement.clientWidth;
+        var app = document.querySelector('#app');
+        if (Wth < 1400) {
+            if (navigator.userAgent.indexOf('Firefox') != -1) {
+                //判断当前浏览器是否是火狐浏览器
+                // app.style.width = "1450px";
+                // document.documentElement.style.transform =
+                //   "scale(" + Wth / 1450 + ")";
+                // // document.body.style.overflow = "hidden";
+                // document.documentElement.style.transformOrigin = "left top 0px";
+            } else {
+                document.documentElement.style.zoom = (Wth / 1450) * 100 + '%';
+            }
+        } else {
+            // app.style.width = '100%';
+            document.documentElement.style.zoom = '100%';
+        }
+    }
+});
 </script>
 <template>
     <div class="app">

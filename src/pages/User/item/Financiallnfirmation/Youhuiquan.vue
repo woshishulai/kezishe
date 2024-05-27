@@ -7,128 +7,78 @@ import { youHuiQuan } from '@/request/user/api';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
-const list = ref([]);
+const tableList = ref([]);
+
 onMounted(async () => {
     try {
         let res = await youHuiQuan();
         console.log(res);
+        tableList.value = res.Data;
     } catch (error) {
         info('error', error);
     }
 });
 
-const sharedOnCell = (_, index) => {
-    if (index === 4) {
-        return {
-            colSpan: 0
-        };
-    }
-};
-const data = [
-    {
-        key: '1',
-        name: 'John Brown',
-        age: 32,
-        tel: '0575-22098909',
-        phone: 18889898989,
-        address: 'New York No. 1 Lake Park'
-    },
-    {
-        key: '2',
-        name: 'Jim Green',
-        tel: '0571-22098333',
-        phone: 18889898888,
-        age: 42,
-        address: 'London No. 1 Lake Park'
-    },
-    {
-        key: '3',
-        name: 'Joe Black',
-        age: 32,
-        tel: '0575-22098909',
-        phone: 18900010002,
-        address: 'Sidney No. 1 Lake Park'
-    },
-    {
-        key: '4',
-        name: 'Jim Red',
-        age: 18,
-        tel: '0575-22098909',
-        phone: 18900010002,
-        address: 'London No. 2 Lake Park'
-    },
-    {
-        key: '5',
-        name: 'Jake White',
-        age: 18,
-        tel: '0575-22098909',
-        phone: 18900010002,
-        address: 'Dublin No. 2 Lake Park'
-    }
-];
 const columns = [
     {
-        title: 'Name',
-        dataIndex: 'name',
-        customCell: (_, index) => ({
-            colSpan: index < 4 ? 1 : 5
-        })
+        title: '优惠券ID',
+        dataIndex: 'CouponId',
+        key: 'CouponId',
+        align: 'center'
     },
     {
-        title: 'Age',
-        dataIndex: 'age',
-        customCell: sharedOnCell
+        title: '优惠券名称',
+        dataIndex: 'Title',
+        key: 'Title',
+        align: 'center',
+
+        ellipsis: true
     },
     {
-        title: 'Home phone',
-        colSpan: 2,
-        dataIndex: 'tel',
-        customCell: (_, index) => {
-            if (index === 2) {
-                return {
-                    rowSpan: 2
-                };
-            }
-            // These two are merged into above cell
-            if (index === 3) {
-                return {
-                    rowSpan: 0
-                };
-            }
-            if (index === 4) {
-                return {
-                    colSpan: 0
-                };
-            }
-        }
+        title: '抵扣金额',
+        dataIndex: 'Price',
+        key: 'Price',
+        align: 'center',
+
+        ellipsis: true
     },
     {
-        title: 'Phone',
-        colSpan: 0,
-        dataIndex: 'phone',
-        customCell: sharedOnCell
+        title: '无门槛',
+        dataIndex: 'UseCondition',
+        key: 'UseCondition',
+        align: 'center'
     },
     {
-        title: 'Address',
-        dataIndex: 'address',
-        customCell: sharedOnCell
+        title: '有效开始时间',
+        dataIndex: 'StartTime',
+        align: 'center',
+        key: 'StartTime'
+    },
+    {
+        title: '有效截止时间',
+        dataIndex: 'EndTime',
+        align: 'center',
+        key: 'EndTime'
+    },
+    {
+        title: '使用说明',
+        dataIndex: 'UseScope',
+        align: 'center',
+        key: 'UseScope',
+        width: 120
     }
 ];
 </script>
 
 <template>
-    <div class="youhuiquan">
-        <a-table :columns="columns" :data-source="data" bordered>
-            <template #bodyCell="{ column, text }">
-                <template v-if="column.dataIndex === 'name'">
-                    <a href="javascript:;">{{ text }}</a>
-                </template>
-            </template>
+    <div class="card-box">
+        <a-table :pagination="false" :columns="columns" :data-source="tableList.CouponUserData">
         </a-table>
     </div>
 </template>
 
 <style scoped lang="less">
-.youhuanquan {
+.card-box {
+    padding-top: 30px;
 }
 </style>

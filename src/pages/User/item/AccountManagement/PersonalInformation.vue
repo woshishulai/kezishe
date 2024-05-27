@@ -20,7 +20,7 @@ const formState = ref({
     Birthday: '',
     IdType: '',
     IdNumbers: '',
-    IdImage: ''
+    IdImage: []
 });
 const formState1 = ref({
     Mobile: user.userInfo.Mobile || '',
@@ -76,7 +76,7 @@ const getEmailCode = () => {
     }
 };
 const getFiles = (file) => {
-    formState.value.IdImage = file;
+    formState.value.IdImage.push(file);
 };
 
 const handleFinish = async () => {
@@ -87,7 +87,7 @@ const handleFinish = async () => {
         Birthday: formState.value.Birthday,
         IdType: formState.value.IdType,
         IdNumbers: formState.value.IdNumbers,
-        IdImage: formState.value.IdImage
+        IdImage: formState.value.IdImage.join(',')
     };
     try {
         let res = await changeUserInfo(params);
@@ -140,35 +140,37 @@ const onFinish = async () => {
                 <a-form
                     labelAlign="left"
                     ref="formRef"
+                    style="width: 771px"
                     :rules="userInfoRules"
                     @finish="handleFinish"
                     @finishFailed="handleFinishFailed"
                     :model="formState"
-                    :label-col="{ span: 6 }"
+                    :label-col="{ span: 4 }"
                     :wrapper-col="{ span: 19 }"
                     :hide-required-mark="true"
                     autocomplete="off"
                 >
                     <a-form-item label="姓名" has-feedback name="RealName">
-                        <a-input v-model:value.trim="formState.RealName" />
+                        <a-input v-model:value.trim="formState.RealName" style="width: 427.5px" />
                     </a-form-item>
-                    <a-form-item label="性别" name="gender">
+                    <a-form-item label="性别" name="Gender">
                         <a-radio-group v-model:value.trim="formState.Gender">
                             <a-radio value="1">男</a-radio>
                             <a-radio value="2">女</a-radio>
                         </a-radio-group>
                     </a-form-item>
-                    <a-form-item label="出生年月" name="date1">
+                    <a-form-item label="出生年月" name="Birthday">
                         <a-date-picker
                             value-format="YYYY-MM-DD"
                             v-model:value="formState.Birthday"
-                            style="width: 100%"
+                            style="width: 427.5px"
                         />
                     </a-form-item>
-                    <a-form-item label="证件类型" has-feedback name="region" class="card-cate">
+                    <a-form-item label="证件类型" has-feedback name="IdType" class="card-cate">
                         <a-select
                             v-model:value.trim="formState.IdType"
                             placeholder="请选择证件类型"
+                            style="width: 427.5px"
                         >
                             <a-select-option value="1">身份证</a-select-option>
                             <a-select-option value="2">护照</a-select-option>
@@ -178,6 +180,7 @@ const onFinish = async () => {
                     </a-form-item>
                     <a-form-item label="证件号码" name="IdNumbers">
                         <a-input
+                            style="width: 427.5px"
                             :class="
                                 isAddActive(user.userTranslate.userProfileInfos, '身份证件')
                                     ? ''
@@ -186,14 +189,15 @@ const onFinish = async () => {
                             v-model:value.trim="formState.IdNumbers"
                         />
                     </a-form-item>
-                    <a-form-item label="证件照片" class="upload-wrap">
-                        <Upload @getFiles="getFiles"></Upload>
+                    <a-form-item label="证件照片" class="upload-wrap" name="IdImage">
+                        <Upload title="照片" @getFiles="getFiles"></Upload>
                     </a-form-item>
-                    <a-form-item :wrapper-col="{ span: 19, offset: 5 }">
+                    <a-form-item :wrapper-col="{ span: 10, offset: 4 }">
                         <a-button html-type="submit" type="primary">保存基本信息</a-button>
                     </a-form-item>
                 </a-form>
             </div>
+            <div class="footer-fix"></div>
         </div>
         <div class="card-box">
             <div class="title">联系信息</div>
@@ -201,11 +205,12 @@ const onFinish = async () => {
                 <a-form
                     labelAlign="left"
                     ref="formRef"
+                    style="width: 771px"
                     @finish="onFinish"
                     @finishFailed="handleFinishFailed"
                     :rules="changeUserInfoCallRules"
                     :model="formState1"
-                    :label-col="{ span: 6 }"
+                    :label-col="{ span: 4 }"
                     :wrapper-col="{ span: 19 }"
                     autocomplete="off"
                     :hide-required-mark="true"
@@ -213,6 +218,7 @@ const onFinish = async () => {
                     <a-form-item hide-required-mark="false" label="手机" name="Mobile">
                         <div class="flex">
                             <a-input
+                                style="width: 427.5px"
                                 v-model:value="formState1.TelPhone"
                                 :class="
                                     isAddActive(user.userTranslate.userProfileInfos, '手机号码')
@@ -223,9 +229,10 @@ const onFinish = async () => {
                             <a-button
                                 v-if="!isAddActive(user.userTranslate.userProfileInfos, '手机号码')"
                                 @click="getCode"
+                                style="background-color: #e1e7ec; color: #333; border-radius: 5px"
                                 :disabled="countdown > 0"
                             >
-                                <span v-if="countdown === 0">获取验证码</span>
+                                <span v-if="countdown === 0">验证码</span>
                                 <span v-else>{{ countdown }}</span></a-button
                             >
                         </div>
@@ -237,34 +244,40 @@ const onFinish = async () => {
                         name="code"
                     >
                         <div class="flex">
-                            <a-input v-model:value.trim="formState1.code" />
+                            <a-input v-model:value.trim="formState1.code" style="width: 427.5px" />
                         </div>
                     </a-form-item>
                     <a-form-item label="邮箱" name="email">
                         <div class="flex">
                             <a-input
+                                style="width: 427.5px"
                                 :class="
                                     user.userTranslate.userProfileInfos?.[2].IsAuth ? 'active' : ''
                                 "
                                 v-model:value.trim="formState1.email"
                             />
-                            <a-button @click="getEmailCode" :disabled="emailCountDown > 0">
-                                <span v-if="emailCountDown === 0">获取验证码</span>
+                            <a-button
+                                @click="getEmailCode"
+                                style="background-color: #e1e7ec; color: #333; border-radius: 5px"
+                                :disabled="emailCountDown > 0"
+                            >
+                                <span v-if="emailCountDown === 0">发送验证邮件</span>
                                 <span v-else>{{ emailCountDown }}</span></a-button
                             >
                         </div>
                     </a-form-item>
-                    <a-form-item hide-required-mark="false" label="邮箱验证码" name="emailCode">
-                        <a-input v-model:value.trim="formState1.emailCode" />
+                    <a-form-item hide-required-mark="false" label="验证码" name="emailCode">
+                        <a-input style="width: 427.5px" v-model:value.trim="formState1.emailCode" />
                     </a-form-item>
                     <a-form-item label="电话" name="Mobile">
-                        <a-input v-model:value.trim="formState1.Mobile" />
+                        <a-input style="width: 427.5px" v-model:value.trim="formState1.Mobile" />
                     </a-form-item>
-                    <a-form-item :wrapper-col="{ span: 19, offset: 6 }">
-                        <a-button html-type="submit" type="primary">保存基本信息</a-button>
+                    <a-form-item :wrapper-col="{ span: 10, offset: 4 }">
+                        <a-button html-type="submit" type="primary">保存联系信息</a-button>
                     </a-form-item>
                 </a-form>
             </div>
+            <div class="footer-fix"></div>
         </div>
         <!-- <div class="card-box">
             <div class="title">收藏信息</div>
@@ -294,7 +307,35 @@ const onFinish = async () => {
     align-items: flex-start;
     gap: 30px;
 
+    :deep(.ant-btn-primary) {
+        background-color: #a4b0bc;
+        border-radius: 5px;
+        margin-top: 30px;
+    }
+    :deep(.ant-select-selector) {
+        border-radius: 4px;
+    }
+    :deep(.ant-picker) {
+        border-radius: 4px;
+    }
+    :deep(.ant-input) {
+        border-radius: 4px;
+    }
+    :deep(.ant-input-affix-wrapper) {
+        border-radius: 4px;
+    }
     .card-box {
+        position: relative;
+        .footer-fix {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 107px;
+            right: 0;
+            background-color: #f1f5f8;
+            z-index: 1;
+            border-radius: 0 0 10px 10px;
+        }
         .user-id {
             padding: 40px;
             .flex-row;
@@ -303,9 +344,10 @@ const onFinish = async () => {
         }
 
         .form-wrap {
-            width: 500px;
-            padding: 50px 0 30px 50px;
-
+            width: 1000px;
+            padding: 50px 0 0 50px;
+            position: relative;
+            z-index: 3;
             .ant-radio-group {
                 .flex-row;
                 justify-content: flex-start;
@@ -349,6 +391,7 @@ const onFinish = async () => {
         }
         .flex {
             .flex-row;
+            justify-content: flex-start;
             gap: 10px;
         }
     }

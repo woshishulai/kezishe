@@ -1,9 +1,10 @@
 <script setup>
 import { ref, computed, reactive, onMounted, h, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { getImageUrl } from '@/utils';
 import { getCartList } from '@/request/user/api';
+import { savaGoodsApi } from '@/request/jingmai';
 import { SearchOutlined } from '@ant-design/icons-vue';
+import { info } from '@/hooks/antd/message';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
@@ -64,9 +65,6 @@ watch(
     }
 );
 
-const handClick = (item) => {
-    query.value = item.cate;
-};
 const columns = [
     {
         title: '藏品编号',
@@ -136,7 +134,7 @@ const showCheck = (e) => {
             checkList.value.DelList.push(query);
         }
     }
-    if (checkList.value.DelList.length == fetchData.value.length) {
+    if (checkList.value.DelList.length == tableList.value.length) {
         all.value = true;
     } else {
         all.value = false;
@@ -146,33 +144,44 @@ function getChecked(Bn) {
     const item = checkList.value.DelList.find((item) => item.Bn === Bn);
     return item !== undefined;
 }
-const hasSelected = computed(() => state.selectedRowKeys.length > 0);
-const start = () => {
-    state.loading = true;
-    // ajax request after empty completing
-    setTimeout(() => {
-        state.loading = false;
-        state.selectedRowKeys = [];
-    }, 1000);
+const changeGuanZhu = async (Gid) => {
+    const query = {
+        Types: 1,
+        Gid: Gid
+    };
+    try {
+        let res = await savaGoodsApi(query);
+        console.log(res);
+        if (res.Tag == 1) {
+            let index = tableList.value.findIndex((item) => item.Gid == Gid);
+            tableList.value.splice(index, 1);
+            info('success', res.Message);
+        }
+        console.log(res);
+    } catch (error) {}
 };
-const onSelectChange = (selectedRowKeys) => {
-    state.selectedRowKeys = selectedRowKeys;
+//全选
+const all = ref(false);
+const getAll = () => {
+    if (!all.value) {
+        checkList.value.DelList = tableList.value.map((item) => {
+            let query = {
+                Bn: item.Bn
+            };
+            if (showModals.value?.params?.titleCate == '未支付') {
+                return item;
+            } else {
+                return query;
+            }
+        });
+        all.value = true;
+        return;
+    } else {
+        checkList.value.DelList = [];
+        all.value = false;
+        return;
+    }
 };
-const loading = ref(false);
-const handleChange = (value) => {
-    console.log(`selected ${value}`);
-};
-const getGoodsList = () => {
-    loading.value = true;
-};
-
-// const changeGuanZhu = (item) => {
-//   const index = data.findIndex(d => d.key === item.key);
-//   if (index !== -1) {
-//     data[index].caozuo = data[index].caozuo === '取消关注' ? '关注' : '取消关注';
-//     console.log(data[index].key, data);
-//   }
-// }
 </script>
 
 <template>
@@ -204,7 +213,7 @@ const getGoodsList = () => {
                             <template v-if="column.key == 'Bn'">
                                 <div class="title-item">
                                     <a-checkbox
-                                        @change.stop="showCheck(record)"
+                                        @change.stop="showCheck(record.Bn)"
                                         style="margin-right: 15px"
                                         :checked="getChecked(record.Bn)"
                                     ></a-checkbox>
@@ -223,23 +232,19 @@ const getGoodsList = () => {
                                 </div>
                             </template>
                             <template v-if="column.key === 'caozuo'">
-                                <div class="btns" @click="changeGuanZhu(record)"> 取消关注 </div>
+                                <div class="btns" @click="changeGuanZhu(record.Gid)">
+                                    取消关注
+                                </div>
                             </template>
                         </template>
                     </a-table>
-                    <div class="add-array">
-                        <span>全选</span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span></span>
-                        <span style="margin-left: 8px">
-                            <template>
-                                {{
-                                    `总计 ${tableList.length} 项 已选 ${checkList.DelList.length} 项`
-                                }}
-                            </template>
-                        </span>
+                    <div class="footer" v-show="tableList.length != 999">
+                        <a-checkbox @change="getAll()" style="margin-right: 15px" :checked="all">
+                            &nbsp; 全选 &nbsp;
+                        </a-checkbox>
+                        <span class="all hover">取消关注</span>
+                        <span class="all">总计{{ tableList.length }} 项</span>
+                        <span class="all">已选{{ checkList.DelList.length }}项</span>
                     </div>
                 </template>
             </show-modal>
@@ -251,6 +256,18 @@ const getGoodsList = () => {
 <style scoped lang="less">
 /* 在这里添加你的 Less 样式 */
 .my-following {
+    .footer {
+        padding: 20px 20px;
+        border-bottom: 1px solid #f0f0f0;
+        font-size: 16px;
+        .hover:hover {
+            cursor: pointer;
+            color: #9a0000;
+        }
+        .all {
+            margin-right: 30px;
+        }
+    }
     :deep(.ant-table-wrapper .ant-table-thead > tr > th) {
         background-color: #fff;
     }

@@ -101,7 +101,7 @@ const showGoodsDetails = (i) => {
 };
 const shouHuo = async () => {
     let query = {
-        DeliverNo: ''
+        DeliverNo: '' //发货单号
     };
     try {
         let res = await shouhuoapi(query);

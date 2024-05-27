@@ -59,6 +59,7 @@ const showItem = (item, index) => {
 .wrap {
     padding-bottom: 80px;
     background: url('@/assets/img/weituo/bg.png');
+    background-size: 100% 100%;
     .con-main-wrap {
         .flex-row;
         align-items: stretch;
@@ -119,6 +120,7 @@ const showItem = (item, index) => {
         }
         .right-wrap {
             flex: 1;
+            width: 0;
             min-height: 1000px;
             :deep(.title) {
                 text-align: center;

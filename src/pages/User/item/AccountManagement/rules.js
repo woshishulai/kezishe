@@ -12,6 +12,43 @@ export const userInfoRules = {
             trigger: 'change'
         }
     ],
+    Gender: [
+        {
+            required: true,
+            message: '请选择您的性别',
+            trigger: 'change'
+        },
+        {
+            validator: (_, value) => {
+                if (value == 0) {
+                    return Promise.reject(new Error('请选择您的性别'));
+                }
+                return Promise.resolve();
+            },
+            trigger: 'change'
+        }
+    ],
+    Birthday: [
+        {
+            required: true,
+            message: '请完善您的出生日期',
+            trigger: 'change'
+        }
+    ],
+    IdType: [
+        {
+            required: true,
+            message: '请选择您的身份类型',
+            trigger: 'change'
+        }
+    ],
+    IdImage: [
+        {
+            required: true,
+            message: '请上传您的身份证件',
+            trigger: 'change'
+        }
+    ],
     IdNumbers: [
         {
             required: true,
