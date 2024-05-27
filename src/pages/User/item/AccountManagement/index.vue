@@ -21,5 +21,19 @@ onMounted(() => {});
 </template>
 
 <style scoped lang="less">
-/* 在这里添加你的 Less 样式 */
+:deep(.ant-btn-primary) {
+    border-radius: 5px;
+}
+:deep(.ant-select-selector) {
+    border-radius: 4px;
+}
+:deep(.ant-picker) {
+    border-radius: 4px;
+}
+:deep(.ant-input) {
+    border-radius: 4px;
+}
+:deep(.ant-input-affix-wrapper) {
+    border-radius: 4px;
+}
 </style>

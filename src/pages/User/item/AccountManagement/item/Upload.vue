@@ -5,6 +5,9 @@ import { getImageUrl } from '@/utils';
 import { getOssALiBaBaApi } from '@/request/api';
 import { message } from 'ant-design-vue';
 import axios from 'axios';
+import { info } from '@/hooks/antd/message';
+import { watch } from 'vue';
+import { watchEffect } from 'vue';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({
@@ -15,22 +18,32 @@ const props = defineProps({
     title: {
         type: String,
         default: '文档'
+    },
+    userImageUrl: {
+        type: String || Array,
+        default: '' || []
     }
 });
-let imageUrl = ref('');
+let imageUrl = ref([]);
+let urls = ref([]);
+watchEffect(() => {
+    imageUrl.value = props?.userImageUrl.split(',');
+    urls.value = props?.userImageUrl.split(',');
+});
+
 onMounted(() => {});
 const emits = defineEmits(['getFiles']);
 const chooseImageUrl = async (e) => {
-    const MAX_FILE_SIZE = 2 * 1024 * 1024;
+    const MAX_FILE_SIZE = 5 * 1024 * 1024;
     const file = e.target.files[0];
     if (file.size > MAX_FILE_SIZE) {
-        console.error('File size exceeds the maximum limit.');
+        info('error', '文件大小不可大于5MB');
         return;
     }
     const reader = new FileReader();
     reader.readAsDataURL(e?.target.files[0]);
     reader.onload = function () {
-        imageUrl.value = reader.result;
+        imageUrl.value.push(reader.result);
     };
     let params = {
         fileModule: props.fileModule,
@@ -51,23 +64,37 @@ const chooseImageUrl = async (e) => {
                 'Content-Type': 'multipart/form-data'
             }
         });
-        emits('getFiles', res.Data.fullpath);
-        console.log('File uploaded successfully:', res, response);
+
+        urls.value.push(res.Data.fullpath);
+        let url = urls.value.join(',');
+        emits('getFiles', url);
     } catch (error) {
         console.error('Error uploading file:', error);
     }
+};
+const removes = (index) => {
+    imageUrl.value.splice(index, 1);
+    urls.value.splice(index, 1);
 };
 </script>
 
 <template>
     <div class="upload-wrap">
-        <img
+        <div
             class="preview"
             v-if="props.fileModule == 3"
-            :class="imageUrl ? 'active' : ''"
-            :src="imageUrl"
-            alt=""
-        />
+            v-for="(item, index) in imageUrl"
+            :key="index"
+            :class="imageUrl.length ? 'active' : ''"
+        >
+            <img class="show-img" :src="item" alt="" />
+            <img
+                class="remove"
+                :src="getImageUrl('user/info/error.jpg')"
+                alt=""
+                @click="removes(index)"
+            />
+        </div>
         <div class="upload">
             <input class="ipt" @change="chooseImageUrl" type="file" />
             <div class="upload-btn">
@@ -85,6 +112,7 @@ const chooseImageUrl = async (e) => {
 <style scoped lang="less">
 .upload-wrap {
     .flex-row;
+    flex-wrap: wrap;
     justify-content: flex-start;
     gap: 16px;
     .upload {
@@ -115,9 +143,21 @@ const chooseImageUrl = async (e) => {
         }
     }
     .preview {
+        position: relative;
         display: none;
         width: 150px;
         height: 118px;
+        .show-img {
+            max-width: 100%;
+            max-height: 100%;
+        }
+        .remove {
+            cursor: pointer;
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            width: 13px;
+        }
         &.active {
             display: block;
         }

@@ -20,7 +20,7 @@ const formState = ref({
     Birthday: '',
     IdType: '',
     IdNumbers: '',
-    IdImage: []
+    IdImage: ''
 });
 const formState1 = ref({
     Mobile: user.userInfo.Mobile || '',
@@ -76,7 +76,7 @@ const getEmailCode = () => {
     }
 };
 const getFiles = (file) => {
-    formState.value.IdImage.push(file);
+    formState.value.IdImage = file;
 };
 
 const handleFinish = async () => {
@@ -87,7 +87,7 @@ const handleFinish = async () => {
         Birthday: formState.value.Birthday,
         IdType: formState.value.IdType,
         IdNumbers: formState.value.IdNumbers,
-        IdImage: formState.value.IdImage.join(',')
+        IdImage: formState.value.IdImage
     };
     try {
         let res = await changeUserInfo(params);
@@ -190,7 +190,11 @@ const onFinish = async () => {
                         />
                     </a-form-item>
                     <a-form-item label="证件照片" class="upload-wrap" name="IdImage">
-                        <Upload title="照片" @getFiles="getFiles"></Upload>
+                        <Upload
+                            :userImageUrl="formState.IdImage"
+                            title="照片"
+                            @getFiles="getFiles"
+                        ></Upload>
                     </a-form-item>
                     <a-form-item :wrapper-col="{ span: 10, offset: 4 }">
                         <a-button html-type="submit" type="primary">保存基本信息</a-button>
@@ -306,24 +310,12 @@ const onFinish = async () => {
     .flex-col;
     align-items: flex-start;
     gap: 30px;
-
     :deep(.ant-btn-primary) {
         background-color: #a4b0bc;
         border-radius: 5px;
         margin-top: 30px;
     }
-    :deep(.ant-select-selector) {
-        border-radius: 4px;
-    }
-    :deep(.ant-picker) {
-        border-radius: 4px;
-    }
-    :deep(.ant-input) {
-        border-radius: 4px;
-    }
-    :deep(.ant-input-affix-wrapper) {
-        border-radius: 4px;
-    }
+
     .card-box {
         position: relative;
         .footer-fix {

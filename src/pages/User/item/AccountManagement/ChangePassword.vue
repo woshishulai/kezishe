@@ -185,7 +185,7 @@ const onPayFinish = async () => {
                                 v-model:value="formState.confirmLoginPassword"
                             />
                         </a-form-item>
-                        <a-form-item :wrapper-col="{ offset: 9, span: 14 }">
+                        <a-form-item :wrapper-col="{ offset: 9, span: 6 }">
                             <a-button type="primary" html-type="submit">确认</a-button>
                         </a-form-item>
                     </a-form>
@@ -228,7 +228,7 @@ const onPayFinish = async () => {
                                 v-model:value="formState.confirmPayPassword"
                             />
                         </a-form-item>
-                        <a-form-item :wrapper-col="{ offset: 9, span: 14 }">
+                        <a-form-item :wrapper-col="{ offset: 9, span: 6 }">
                             <a-button type="primary" html-type="submit">确认</a-button>
                         </a-form-item>
                     </a-form>

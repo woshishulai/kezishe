@@ -259,7 +259,7 @@ const handleFinishs = async () => {
             </a-table>
         </div>
         <div class="card-box">
-            <div class="title">新增快递收货地址信息</div>
+            <div class="title" style="font-size: 16px">新增快递收货地址信息</div>
             <div class="form-wrap">
                 <a-form
                     labelAlign="left"
@@ -276,7 +276,7 @@ const handleFinishs = async () => {
                         label="姓名"
                         name="username"
                     >
-                        <a-input v-model:value.trim="formState.username" />
+                        <a-input style="width: 240px" v-model:value.trim="formState.username" />
                     </a-form-item>
                     <a-form-item
                         :rules="[{ required: true, message: '国家不能为空' }]"
@@ -347,7 +347,7 @@ const handleFinishs = async () => {
                     >
                         <a-input v-model:value="formState.phone" />
                     </a-form-item>
-                    <a-form-item :wrapper-col="{ offset: 3, span: 10 }">
+                    <a-form-item :wrapper-col="{ offset: 3, span: 3 }">
                         <a-button type="primary" html-type="submit">保存</a-button>
                     </a-form-item>
                 </a-form>
@@ -440,7 +440,7 @@ const handleFinishs = async () => {
                 >
                     <a-input v-model:value="changeParams.phone" />
                 </a-form-item>
-                <a-form-item :wrapper-col="{ offset: 6, span: 18 }">
+                <a-form-item :wrapper-col="{ offset: 6, span: 3 }">
                     <a-button type="primary" html-type="submit">保存</a-button>
                 </a-form-item>
             </a-form>
@@ -466,11 +466,14 @@ const handleFinishs = async () => {
         span {
             padding: 5px 10px;
             cursor: pointer;
-            &:hover {
-                color: #9a0000;
-            }
+            width: 94px;
+            height: 32px;
             &.active {
-                background-color: #9a0000;
+                border-width: 1px;
+                border-color: rgb(154, 0, 0);
+                border-style: solid;
+                border-radius: 4px;
+                background-color: rgb(227, 61, 52);
                 color: #fff;
             }
         }

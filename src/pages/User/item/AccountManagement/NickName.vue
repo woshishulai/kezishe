@@ -202,7 +202,7 @@ const changeDefault = async (query) => {
             </a-table>
         </div>
         <div class="card-box">
-            <div class="title">新增个人昵称</div>
+            <div class="title" style="font-size: 16px">新增个人昵称</div>
             <div class="form-wrap">
                 <a-form
                     labelAlign="left"
@@ -231,7 +231,7 @@ const changeDefault = async (query) => {
                             :auto-size="{ minRows: 2, maxRows: 5 }"
                         />
                     </a-form-item>
-                    <a-form-item :wrapper-col="{ offset: 3, span: 10 }">
+                    <a-form-item :wrapper-col="{ offset: 3, span: 3 }">
                         <a-button type="primary" html-type="submit">保存</a-button>
                     </a-form-item>
                 </a-form>
@@ -259,9 +259,14 @@ const changeDefault = async (query) => {
         span {
             padding: 5px 10px;
             cursor: pointer;
-
+            width: 94px;
+            height: 32px;
             &.active {
-                background-color: #9a0000;
+                border-width: 1px;
+                border-color: rgb(154, 0, 0);
+                border-style: solid;
+                border-radius: 4px;
+                background-color: rgb(227, 61, 52);
                 color: #fff;
             }
         }
