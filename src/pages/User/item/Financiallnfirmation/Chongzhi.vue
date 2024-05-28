@@ -63,9 +63,9 @@ const afterOpenChanges = (bool) => {
         <div class="left-user-info">
             <div class="title">余额(¥)</div>
             <div class="num">{{ infos?.Balance }} <span>元</span></div>
-            <p>竞卖额度</p>
-            <p>¥{{ infos?.AvailableQuotas }}</p>
-            <p>¥{{ infos.Quota }}可用</p>
+            <p>竞买额度</p>
+            <p>¥{{ infos?.Quota }}</p>
+            <p>¥{{ infos.AvailableQuotas }}可用</p>
             <div class="bi">
                 <div>
                     <p class="label">涌币</p>

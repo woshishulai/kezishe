@@ -206,7 +206,11 @@ const onFinish = async (values) => {
                     <a-form-item name="introduction" label="内容">
                         <a-textarea v-model:value="formState.introduction" />
                     </a-form-item>
-                    <a-form-item label="上传文档">
+                    <a-form-item
+                        label="上传文档"
+                        name="UserFile"
+                        :rules="[{ required: true, message: '文档不可为空' }]"
+                    >
                         <p v-show="formState.UserFile">上传成功预览地址{{ formState.UserFile }}</p>
                         <Upload @getFiles="getFiles" :fileModule="4"></Upload>
                     </a-form-item>

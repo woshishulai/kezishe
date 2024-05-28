@@ -268,6 +268,14 @@ const getAll = () => {
             margin-right: 30px;
         }
     }
+    :deep(.ant-checkbox .ant-checkbox-inner) {
+        background-color: #eef3f8;
+        border-radius: 4px;
+    }
+    :deep(.ant-checkbox-checked .ant-checkbox-inner) {
+        background-color: #949ca6;
+        border: none;
+    }
     :deep(.ant-table-wrapper .ant-table-thead > tr > th) {
         background-color: #fff;
     }

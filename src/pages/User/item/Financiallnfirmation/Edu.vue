@@ -16,6 +16,41 @@ const showModals = ref(null);
 const props = defineProps({});
 const params = ref();
 const formState = reactive({});
+//总钱数
+const priceEdu = computed(() => {
+    if (
+        infos.value.details1 &&
+        infos.value.details1.Balance !== undefined &&
+        formState.AdjustQuota &&
+        Number(formState.AdjustQuota) > Number(infos.value.details1.AvailableQuotas)
+    ) {
+        let num = Number(formState.AdjustQuota) - Number(infos.value.details1.AvailableQuotas);
+        let price = num / infos.value.details1?.BiLi;
+        console.log('zhgeli', price);
+        let result = infos.value.details1?.Balance - price;
+        return result !== undefined ? result.toFixed(2) : undefined;
+    } else {
+        console.log(222);
+        return infos.value.details1 && infos.value.details1?.Balance !== undefined
+            ? Number(infos.value.details1?.Balance).toFixed(2)
+            : undefined;
+    }
+});
+const priceEdus = computed(() => {
+    if (
+        infos.value.details2 &&
+        infos.value.details2?.Balance !== undefined &&
+        formState.ReduceQuota
+    ) {
+        const balance = Number(infos.value.details2?.Balance);
+        const reduceQuota = Number(formState.ReduceQuota);
+        return (formState.ReduceQuota < 50 ? balance : balance + reduceQuota / 50).toFixed(2);
+    } else {
+        return infos.value.details2?.Balance;
+    }
+});
+
+//额度转钱比例
 const infos = ref({
     details1: {},
     details2: {}
@@ -57,13 +92,38 @@ watch(
     (news) => {
         params.value = news;
         if (news == list[0].cate) {
+            formState.ReduceQuota = '';
             params.value = showModals.value?.params;
             detailsInfo1();
         } else if (news == list[1].cate) {
+            formState.AdjustQuota = '';
             params.value = showModals.value?.params;
             detailsInfo2();
         } else if (news == list[2].cate) {
             params.value = showModals.value?.params;
+        }
+    }
+);
+watch(
+    () => formState.AdjustQuota,
+    (newValue, oldValue) => {
+        const maxQuota = Number(
+            (
+                infos.value.details1.BiLi * infos.value.details1.Balance +
+                infos.value.details1.Quota
+            ).toFixed(2)
+        );
+        if (newValue > maxQuota) {
+            formState.AdjustQuota = maxQuota;
+        }
+    }
+);
+
+watch(
+    () => formState.ReduceQuota,
+    (newValue, oldValue) => {
+        if (Number(formState.ReduceQuota) > Number(infos.value.details2?.TransBalanceQuota)) {
+            formState.ReduceQuota = Number(infos.value.details2?.TransBalanceQuota);
         }
     }
 );
@@ -110,22 +170,20 @@ const handleFinishss = async () => {
         <div class="edu">
             <div class="left-user-info">
                 <div class="title">账户余额(¥)</div>
-                <div class="num"
-                    >{{
-                        params?.titleCate == list[0].cate
-                            ? infos.details1.Balance
-                            : infos.details2.Balance
-                    }}
-                    <span>元</span></div
+                <div class="num" v-show="params?.titleCate == '余额转额度'"
+                    >{{ priceEdu }} <span>元</span></div
+                >
+                <div class="num" v-show="params?.titleCate == '额度转余额'"
+                    >{{ priceEdus }} <span>元</span></div
                 >
                 <div class="bi">
                     <div>
                         <p>竞卖额度</p>
                         <p
                             >¥{{
-                                params?.titleCate == list[0].cate
-                                    ? infos.details1.Quota
-                                    : infos.details2.Quota
+                                formState.AdjustQuota ||
+                                infos.details1.Quota ||
+                                infos.details2.Quota
                             }}</p
                         >
                         <p
@@ -160,10 +218,16 @@ const handleFinishss = async () => {
                                 </a-form-item>
                                 <p
                                     >{{ infos.details1.Quota }} ~
-                                    {{ infos.details1.AvailableQuotas }}</p
-                                >
+                                    {{
+                                        Math.floor(
+                                            Number(infos.details1.BiLi) *
+                                                Number(infos.details1.Balance) +
+                                                Number(infos.details1.Quota)
+                                        )
+                                    }}
+                                </p>
                                 <p class="bottoms"
-                                    >竞买额度用于竞买藏品 , 余额 : 额度=1:{{
+                                    >竞买额度用于竞买藏品 , 余额 : 额度 = 1:{{
                                         infos.details1.BiLi
                                     }}</p
                                 >
@@ -193,7 +257,7 @@ const handleFinishss = async () => {
                                 </a-form-item>
                                 <p
                                     >可用调整额度为 {{ infos.details2.TransBalanceQuota }} , 额度 :
-                                    余额={{ infos.details2.BiLi }}:1</p
+                                    余额 = {{ infos.details2.BiLi }}:1</p
                                 >
                                 <p class="bottoms" style="opacity: 0">345678</p>
                                 <a-form-item :wrapper-col="{ offset: 5, span: 14 }">

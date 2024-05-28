@@ -273,7 +273,7 @@ const JingMaiColumns = [
         ellipsis: true,
         dataIndex: 'Cbn',
         key: 'Cbn',
-        width: 200,
+        width: 140,
         align: 'center'
     },
     {
@@ -282,7 +282,7 @@ const JingMaiColumns = [
         dataIndex: 'EntrustTime',
         key: 'EntrustTime',
         align: 'center',
-        width: 200
+        width: 180
     },
     {
         title: '起始价',
@@ -290,7 +290,7 @@ const JingMaiColumns = [
         dataIndex: 'BasePrice',
         key: 'BasePrice',
         align: 'center',
-        width: 200
+        width: 130
     },
     {
         title: '结标价',
@@ -298,7 +298,7 @@ const JingMaiColumns = [
         dataIndex: 'MakePrice',
         key: 'MakePrice',
         align: 'center',
-        width: 200
+        width: 100
     },
     {
         ellipsis: true,
@@ -306,7 +306,7 @@ const JingMaiColumns = [
         dataIndex: 'Starttime',
         key: 'Starttime',
         align: 'center',
-        width: 200
+        width: 180
     },
     {
         ellipsis: true,
@@ -314,7 +314,7 @@ const JingMaiColumns = [
         dataIndex: 'ClosingTime',
         key: 'ClosingTime',
         align: 'center',
-        width: 200
+        width: 180
     },
     {
         ellipsis: true,
@@ -322,7 +322,7 @@ const JingMaiColumns = [
         dataIndex: 'SettleStatus',
         key: 'SettleStatus',
         align: 'center',
-        width: 200
+        width: 130
     },
     {
         ellipsis: true,
@@ -330,7 +330,7 @@ const JingMaiColumns = [
         dataIndex: 'EntrustTime',
         key: 'EntrustTime',
         align: 'center',
-        width: 200
+        width: 160
     }
 ];
 const JingMaiDataSource = [

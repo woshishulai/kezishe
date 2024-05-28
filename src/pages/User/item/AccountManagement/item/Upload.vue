@@ -20,15 +20,17 @@ const props = defineProps({
         default: '文档'
     },
     userImageUrl: {
-        type: String || Array,
-        default: '' || []
+        type: String,
+        default: ''
     }
 });
 let imageUrl = ref([]);
 let urls = ref([]);
 watchEffect(() => {
-    imageUrl.value = props?.userImageUrl.split(',');
-    urls.value = props?.userImageUrl.split(',');
+    if (props?.userImageUrl) {
+        imageUrl.value = props?.userImageUrl.split(',');
+        urls.value = props?.userImageUrl.split(',');
+    }
 });
 
 onMounted(() => {});
