@@ -89,7 +89,7 @@ const removes = (index) => {
             :key="index"
             :class="imageUrl.length ? 'active' : ''"
         >
-            <img class="show-img" :src="item" alt="" />
+            <a-image class="show-img" style="max-width: 200px" :src="item" />
             <img
                 class="remove"
                 :src="getImageUrl('user/info/error.jpg')"
@@ -147,12 +147,6 @@ const removes = (index) => {
     .preview {
         position: relative;
         display: none;
-        width: 150px;
-        height: 118px;
-        .show-img {
-            max-width: 100%;
-            max-height: 100%;
-        }
         .remove {
             cursor: pointer;
             position: absolute;

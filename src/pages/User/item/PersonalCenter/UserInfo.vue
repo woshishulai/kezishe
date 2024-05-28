@@ -2,23 +2,146 @@
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { getImageUrl } from '@/utils';
-import { infoList, infoDataSource, infoColumns } from '../../data';
 import { useUserInfo } from '@/store/store';
 import { getUserDetailsApi } from '@/request/api';
+import { yuEZhuanEDu, youHuiQuan, getHeTongApi } from '@/request/user/api';
+const HeTongColumns = [
+    {
+        title: '合同编号',
+        key: 'Number',
+        dataIndex: 'Number',
+        align: 'center'
+    },
+    {
+        title: '登录日期',
+        key: 'CreateTime',
+        dataIndex: 'CreateTime',
+        align: 'center'
+    },
+    {
+        title: '藏品数量',
+        key: 'GoodsCount',
+        dataIndex: 'GoodsCount',
+        align: 'center'
+    },
+    {
+        title: '当前状态',
+        key: 'Status',
+        dataIndex: 'Status',
+        align: 'center'
+    },
+    {
+        title: '',
+        key: 'Details',
+        dataIndex: 'Details',
+        align: 'center'
+    }
+];
+const infoList = ref([
+    {
+        img: 'user/info/list1.png',
+        title: '账户余额(¥)',
+        num: '143.40',
+        danwei: '元',
+        btn1: '去充值',
+        btn2: '提现',
+        router: '/user/financial-information/',
+        router2: '/user/financial-information/edu'
+    },
+    {
+        img: 'user/info/list2.png',
+        title: '竞买额度',
+        icon: '?',
+        num: '453,423',
+        btn1: '调整竞买额度',
+        router: '/user/financial-information/edu'
+    },
+    {
+        img: 'user/info/list3.png',
+        title: '我的优惠券',
+        num: '7',
+        danwei: '张',
+        btn1: '立即使用',
+        router: '/user/financial-information/youhuiquan'
+    }
+]);
+const getYouHuiQuanApi = async () => {
+    try {
+        let res = await youHuiQuan();
+        infoList.value[2].num = res.Data.CouponUserData.length;
+    } catch (error) {}
+};
+
+const detailsInfo1 = async () => {
+    try {
+        let res = await yuEZhuanEDu();
+        infoList.value[0].num = res.Data.Balance;
+        infoList.value[1].num = res.Data.AvailableQuotas;
+    } catch (error) {}
+};
 const user = useUserInfo();
 const router = useRouter();
-onMounted(async () => {
+const getInfos = async () => {
     try {
         let res = await getUserDetailsApi();
         let verifyPhone = res.Data.userProfileInfos[1].IsFillIn;
         user.changeUserTranslate(res.Data);
         user.changeUserTranslate({ verifyPhone: verifyPhone });
+    } catch (error) {}
+};
+let query = reactive({
+    total: 1,
+    Status: '-1',
+    TimeRange: '0',
+    Number: ''
+});
+const tableList = ref([]);
+const getTableList = async (page = 1, pageSize = 10) => {
+    query.PageIndex = page;
+    query.PageSize = pageSize;
+    try {
+        let res = await getHeTongApi(query);
+        tableList.value = res.Data;
+        query.total = res.Total;
     } catch (error) {
-        console.error('Error fetching user info:', error);
+        info('error');
     }
+};
+onMounted(() => {
+    Promise.all([getYouHuiQuanApi(), getInfos(), detailsInfo1(), getTableList()]);
 });
 const showGrand = () => {
     router.push('/user/userinfo/show-grand');
+};
+const showPage = (url, params) => {
+    if (params) {
+        localStorage.setItem('showModal', '额度转余额');
+    } else {
+        localStorage.removeItem('showModal');
+    }
+    router.push(url);
+};
+const showDetails = (Number) => {
+    router.push({
+        path: '/user/my-entrustment/my-contract',
+        query: {
+            Number
+        }
+    });
+};
+const statusInfo = (index) => {
+    let statuses = {
+        '-1': '全部',
+        1: '待受理',
+        2: '已受理',
+        3: '整理中',
+        4: '制图中',
+        5: '审核中',
+        6: '核查中',
+        7: '执行中',
+        8: '已执行'
+    };
+    return statuses[index] || '未知状态';
 };
 </script>
 
@@ -64,12 +187,13 @@ const showGrand = () => {
                         <span>{{ item.danwei }}</span>
                     </p>
                     <div class="btns">
-                        <button class="btn1" @click="router.push(item.router)">{{
-                            item.btn1
-                        }}</button>
-                        <button class="btn2" @click="router.push(item.router2)" v-if="item.btn2">{{
-                            item.btn2
-                        }}</button>
+                        <button class="btn1" @click="showPage(item.router)">{{ item.btn1 }}</button>
+                        <button
+                            class="btn2"
+                            @click="showPage(item.router2, 'true')"
+                            v-if="item.btn2"
+                            >{{ item.btn2 }}</button
+                        >
                     </div>
                 </div>
             </div>
@@ -77,7 +201,7 @@ const showGrand = () => {
         <div class="card-box">
             <div class="title"
                 ><span>我的订单</span>
-                <span class="move" @click="router.push('/user/quick-sell')">查看更多</span>
+                <span class="move" @click="router.push('/user/my-bidding')">查看更多</span>
             </div>
             <div class="get-goods">
                 <span
@@ -106,30 +230,38 @@ const showGrand = () => {
         <div class="card-box">
             <div class="title"
                 ><span>我的委托</span>
-                <span class="move" @click="router.push('/user/my-entrustment/')">查看更多</span>
+                <span class="move" @click="router.push('/user/my-entrustment/my-contract')"
+                    >查看更多</span
+                >
             </div>
-            <a-table :pagination="false" :dataSource="infoDataSource" :columns="infoColumns">
-                <template #status="{ record }">
-                    <span>
-                        <span
-                            :class="record.status == 0 || record.status == '已成交' ? '' : 'active'"
-                        >
-                            {{ record.status }}</span
-                        >
-                    </span>
-                </template>
-                <template #operate="{ record }">
-                    <span class="btn-details">
-                        {{ record.operate }}
-                    </span>
+            <a-table :pagination="false" :dataSource="tableList" :columns="HeTongColumns">
+                <template #bodyCell="{ column, record }">
+                    <template v-if="column.key === `Status`">
+                        <p :class="record.Status == 2 ? 'active' : ''">
+                            {{ statusInfo(record.Status) }}
+                        </p>
+                    </template>
+                    <template v-if="column.key === `Details`">
+                        <p class="details" @click="showDetails(record.Number)"> 查看详情 </p>
+                    </template>
                 </template>
             </a-table>
+            <cate-page :paginations="query" @fetchList="getTableList"></cate-page>
         </div>
     </div>
 </template>
 
 <style scoped lang="less">
 .user-info {
+    .active {
+        color: #a11111;
+    }
+    .details {
+        cursor: pointer;
+        &:hover {
+            color: #a11111;
+        }
+    }
     .header-account {
         background-color: #fff;
         padding: 40px 30px 26px;

@@ -46,7 +46,7 @@ const priceEdus = computed(() => {
         const reduceQuota = Number(formState.ReduceQuota);
         return (formState.ReduceQuota < 50 ? balance : balance + reduceQuota / 50).toFixed(2);
     } else {
-        return infos.value.details2?.Balance;
+        return Number(infos.value.details2?.Balance).toFixed(2);
     }
 });
 
