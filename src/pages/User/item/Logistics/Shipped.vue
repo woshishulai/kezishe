@@ -261,7 +261,6 @@ const showGoodsDetails = (i) => {
                             placeholder="名称和藏品"
                         />
                         <a-button
-                            type="primary"
                             :loading="loading"
                             @click="getTableList()"
                             :icon="h(SearchOutlined)"

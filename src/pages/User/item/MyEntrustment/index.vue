@@ -7,7 +7,14 @@ import {
     timeEndOptions,
     sellingPriceList,
     statusLists,
+    JingMaiColumns1,
+    JingMaiColumns2,
+    JingMaiColumns3,
+    JingMaiColumns4,
+    JingMaiColumns5,
+    JingMaiColumns6,
     JingMaiColumns,
+    JingMaiColumns7,
     ShippingColumns
 } from './data';
 import { getGoodsCateApi, getSelectCateApi, getGoodsListApi } from '@/request/user/api.js';
@@ -28,7 +35,8 @@ const query = reactive({
     Status: '', //active2
     PageSize: '10',
     PageIndex: '1',
-    total: 1
+    total: 1,
+    Cbn: '0'
 });
 const list = [
     {
@@ -41,7 +49,7 @@ const list = [
 //获取所有的分类
 const getNavCateList = async () => {
     try {
-        let res = await getGoodsCateApi();
+        let res = await getGoodsCateApi(0);
         navList.value = res.Data;
         query.Status = navList.value[0].Key;
         console.log(navList.value, '我是顶部的类型');
@@ -108,20 +116,50 @@ watch(
 );
 
 watchEffect(() => {
+    console.log(query.Status, '这里');
     columnsList.value =
-        params.value.titleCate == list[0].cate || params.value.titleCate == undefined
-            ? JingMaiColumns
-            : ShippingColumns;
+        //结算成交
+        query.Status == 3 || query.Status == 6
+            ? JingMaiColumns1
+            : //预展
+              query.Status == 1 || query.Status == 0
+              ? JingMaiColumns2
+              : //"竞买中"
+                query.Status == 2
+                ? JingMaiColumns3
+                : //已退回
+                  query.Status == 9
+                  ? JingMaiColumns4
+                  : //已下架
+                    query.Status == 8
+                    ? JingMaiColumns5
+                    : //未成交
+                      query.Status == 7
+                      ? JingMaiColumns6
+                      : //待结算结算中
+                        query.Status == 4 || query.Status == 5
+                        ? JingMaiColumns7
+                        : JingMaiColumns;
 });
-const handleChange = () => {
-    console.log(query);
-};
 const statusText = (value) => {
     const statusMap = {
         0: '无状态',
         4: '待结算',
         5: '结算中',
         6: '已结算'
+    };
+
+    return statusMap[value] || undefined;
+};
+const statusTexts = (value) => {
+    const statusMap = {
+        0: '待预展',
+        1: '预展中',
+        2: '竞买中',
+        3: '已成交',
+        7: '未成交',
+        8: '已下架',
+        9: '已退回'
     };
 
     return statusMap[value] || undefined;
@@ -169,10 +207,7 @@ const statusText = (value) => {
                             class="item-input"
                             placeholder="名称和藏品"
                         />
-                        <a-button
-                            type="primary"
-                            @click="getTableList(1, 10)"
-                            :icon="h(SearchOutlined)"
+                        <a-button @click="getTableList(1, 10)" :icon="h(SearchOutlined)"
                             >搜索</a-button
                         >
                     </div>
@@ -182,7 +217,6 @@ const statusText = (value) => {
                             v-model:value="query.status"
                             style="width: 220px"
                             :options="statusLists"
-                            @change="handleChange"
                         ></a-select>
                         <a-input
                             v-model:value="query.kw"
@@ -210,12 +244,32 @@ const statusText = (value) => {
                                         </span>
                                     </div>
                                 </template>
+                                <template v-if="column.key === 'Cbn'">
+                                    <div
+                                        class="goods-infos"
+                                        @click="
+                                            router.push({
+                                                path: '/user/my-entrustment/my-contract',
+                                                query: {
+                                                    Number: record.Cbn
+                                                }
+                                            })
+                                        "
+                                    >
+                                        <span> {{ record.Cbn }}</span>
+                                    </div>
+                                </template>
                                 <template v-if="column.key === 'SettleStatus'">
                                     <div
                                         class="status"
                                         :class="record.SettleStatus == '5' ? 'active' : ''"
                                     >
                                         <span>{{ statusText(record.SettleStatus) }}</span>
+                                    </div>
+                                </template>
+                                <template v-if="column.key === 'Status'">
+                                    <div class="status">
+                                        <span>{{ statusTexts(record.Status) }}</span>
                                     </div>
                                 </template>
                             </template>
@@ -236,7 +290,8 @@ const statusText = (value) => {
     :deep(.ant-select-selector) {
         padding: 0 20px;
     }
-    .goods-info {
+    .goods-info,
+    .goods-infos {
         display: flex;
         align-items: center;
         justify-content: space-between;
@@ -254,7 +309,9 @@ const statusText = (value) => {
             flex: 1;
         }
     }
-
+    .goods-infos {
+        border-bottom: 1px solid #8a0000;
+    }
     .jiesuanzhuangtai {
         .flex-col;
     }

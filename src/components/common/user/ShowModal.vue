@@ -170,6 +170,7 @@ defineExpose({
     }
     :deep(.table-wrap) {
         width: 1070px;
+        margin: 0 auto;
     }
 }
 </style>

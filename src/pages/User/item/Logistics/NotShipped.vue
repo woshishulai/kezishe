@@ -214,7 +214,6 @@ const value1 = ref('0');
                             placeholder="名称和藏品"
                         />
                         <a-button
-                            type="primary"
                             :loading="loading"
                             @click="getTableList()"
                             :icon="h(SearchOutlined)"

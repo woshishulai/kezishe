@@ -7,7 +7,7 @@ const list = [
         cate: '购物'
     }
 ];
-const tableList = [
+const tableListsss = [
     {
         cate: '结算单号'
     },
@@ -28,20 +28,38 @@ const tableList = [
         cate: '状态'
     }
 ];
-const options1 = ref([
+const options1 = [
     {
-        value: 'cate1',
-        label: '所有分类'
+        value: '0',
+        label: '按合同查看'
     },
     {
-        value: 'lucy',
-        label: 'Lucy'
-    },
-    {
-        value: 'yiminghe',
-        label: 'Yiminghe'
+        value: '1',
+        label: '按合同结算单查看'
     }
-]);
+];
+const timeStartOptionss = [
+    {
+        value: '0',
+        label: '全部'
+    },
+    {
+        value: '1',
+        label: '一日内'
+    },
+    {
+        value: '2',
+        label: '七日内'
+    },
+    {
+        value: '30',
+        label: '一月内'
+    },
+    {
+        value: '40',
+        label: '一月外'
+    }
+];
 const setColumns = [
     {
         title: '合同编号 : 626231',
@@ -176,4 +194,13 @@ const gouWuDataSource = [
         jieSuanShiJian: '2023-10-9 23:33:11'
     }
 ];
-export { options1, list, tableList, setColumns, dataSource, gouWuTitleColumns, gouWuDataSource };
+export {
+    options1,
+    timeStartOptionss,
+    list,
+    tableListsss,
+    setColumns,
+    dataSource,
+    gouWuTitleColumns,
+    gouWuDataSource
+};

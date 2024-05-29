@@ -178,11 +178,7 @@ const showDetails = () => {
                             style="width: 316px"
                             placeholder="名称和藏品"
                         />
-                        <a-button
-                            type="primary"
-                            :loading="loading"
-                            @click="getGoodsList"
-                            :icon="h(SearchOutlined)"
+                        <a-button :loading="loading" @click="getGoodsList" :icon="h(SearchOutlined)"
                             >搜索</a-button
                         >
                     </div>

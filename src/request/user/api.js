@@ -35,7 +35,7 @@ export const QuotaToBalanceFrom = async (params) =>
 export const youHuiQuan = async (data) => instance.get(`/Member/Coupon/GetList`, data);
 
 //我的藏品类别 比如已成交 待遇展等等
-export const getGoodsCateApi = async (data) => instance.get(`Member/Auction/TypeList`);
+export const getGoodsCateApi = async (data) => instance.get(`Member/Auction/TypeList?Cbn=` + data);
 
 //我的藏品类别 比如已成交 待遇展等等
 export const getSelectCateApi = async (data) => instance.get(`Member/Auction/BidderTypeList`);
@@ -43,7 +43,7 @@ export const getSelectCateApi = async (data) => instance.get(`Member/Auction/Bid
 //根据类别获取藏品信息
 export const getGoodsListApi = async (params) =>
     instance.get(
-        `Member/Auction/GoodsList?Cid=${params.Cid}&StartDateRange=${params.StartDateRange}&EndDateRange=${params.EndDateRange}&Brand=${params.Brand}&Kw=${params.Kw}&Status=${params.Status}&PageSize=${params.PageSize}&PageIndex=${params.PageIndex}`
+        `Member/Auction/GoodsList?Cbn=${params.Cbn}&Cid=${params.Cid}&StartDateRange=${params.StartDateRange}&EndDateRange=${params.EndDateRange}&Brand=${params.Brand}&Kw=${params.Kw}&Status=${params.Status}&PageSize=${params.PageSize}&PageIndex=${params.PageIndex}`
     );
 
 //我的委托合同
@@ -87,3 +87,12 @@ export const ZhiFuApi = async (data) => instance.post(`Member/Pay/BalancePay`, d
 
 //收货
 export const shouhuoapi = async (data) => instance.post(`/Member/UserDeliver/ConfirmReceipt`, data);
+
+//按照合同查看明细
+export const getJieSuanDetailsApi = async (params) =>
+    instance.post(`Member/SettleMent/CbnList?TimeRange=${params.TimeRange}&Kw=${params.Kw}&PageSize=${params.PageSize}&PageIndex=${params.PageIndex}
+`);
+//按照确认单查看明细
+export const getQueRenDetailsApi = async (params) =>
+    instance.post(`Member/SettleMent/SbnList?DateRange=${params.TimeRange}&Kw=${params.Kw}&PageSize=${params.PageSize}&PageIndex=${params.PageIndex}
+`);

@@ -265,7 +265,9 @@ const zhiFu = () => {
                             class="item-input"
                             placeholder="名称和藏品"
                         />
-                        <a-button type="primary" @click="getFetchData(1, 10)">搜索</a-button>
+                        <a-button :icon="h(SearchOutlined)" @click="getFetchData(1, 10)"
+                            >搜索</a-button
+                        >
                     </div>
                 </template>
                 <!-- 快递取件码 -->
@@ -349,6 +351,20 @@ const zhiFu = () => {
 
 <style scoped lang="less">
 .my-bidding {
+    :deep(.ant-table-wrapper) {
+        .ant-table-thead > tr > th {
+            background-color: #eef3f8;
+        }
+        .active {
+            color: #a11111;
+        }
+        .details {
+            cursor: pointer;
+            &:hover {
+                color: #a11111;
+            }
+        }
+    }
     .card-box {
         .table-item-gooods-info {
             .flex-row;

@@ -117,7 +117,6 @@ const dataSource = [
                                 placeholder="名称和藏品"
                             />
                             <a-button
-                                type="primary"
                                 :loading="loading"
                                 @click="getGoodsList"
                                 :icon="h(SearchOutlined)"

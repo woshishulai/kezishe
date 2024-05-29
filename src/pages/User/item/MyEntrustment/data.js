@@ -293,6 +293,99 @@ const JingMaiColumns = [
         width: 130
     },
     {
+        title: '当前出价',
+        ellipsis: true,
+        dataIndex: 'MPrice',
+        key: 'MPrice',
+        align: 'center',
+        width: 100
+    },
+    {
+        ellipsis: true,
+        title: '开始竞价时间',
+        dataIndex: 'Starttime',
+        key: 'Starttime',
+        align: 'center',
+        width: 180
+    },
+    {
+        ellipsis: true,
+        title: '结标时间',
+        dataIndex: 'OnTime',
+        key: 'OnTime',
+        align: 'center',
+        width: 180
+    },
+    {
+        ellipsis: true,
+        title: '结算状态',
+        dataIndex: 'SettleStatus',
+        key: 'SettleStatus',
+        align: 'center',
+        width: 130
+    },
+    {
+        ellipsis: true,
+        title: '结算时间',
+        dataIndex: 'SettleTime',
+        key: 'SettleTime',
+        align: 'center',
+        width: 160
+    },
+
+    {
+        ellipsis: true,
+        title: '藏品状态',
+        dataIndex: 'Status',
+        key: 'Status',
+        align: 'center',
+        width: 160
+    }
+];
+//已结算 已成交
+const JingMaiColumns1 = [
+    {
+        title: '商品编号',
+        ellipsis: true,
+        dataIndex: 'Bn',
+        key: 'Bn',
+        width: 140,
+        align: 'center'
+    },
+    {
+        title: '商品名称',
+        ellipsis: true,
+        dataIndex: 'Title',
+        key: 'Title',
+        width: 200,
+        align: 'center',
+        ellipsis: true
+    },
+    {
+        title: '合同编号',
+        ellipsis: true,
+        dataIndex: 'Cbn',
+        key: 'Cbn',
+        width: 140,
+        align: 'center'
+    },
+    {
+        title: '委托时间',
+        ellipsis: true,
+        dataIndex: 'EntrustTime',
+        key: 'EntrustTime',
+        align: 'center',
+        width: 180
+    },
+    {
+        title: '起始价',
+        ellipsis: true,
+        dataIndex: 'BasePrice',
+        key: 'BasePrice',
+        align: 'center',
+        width: 130
+    },
+    {
         title: '结标价',
         ellipsis: true,
         dataIndex: 'MakePrice',
@@ -311,8 +404,8 @@ const JingMaiColumns = [
     {
         ellipsis: true,
         title: '结标时间',
-        dataIndex: 'ClosingTime',
-        key: 'ClosingTime',
+        dataIndex: 'OnTime',
+        key: 'OnTime',
         align: 'center',
         width: 180
     },
@@ -327,8 +420,424 @@ const JingMaiColumns = [
     {
         ellipsis: true,
         title: '结算时间',
+        dataIndex: 'SettleTime',
+        key: 'SettleTime',
+        align: 'center',
+        width: 160
+    },
+    {
+        ellipsis: true,
+        title: '结算编号',
+        dataIndex: 'Settlebn',
+        key: 'Settlebn',
+        align: 'center',
+        width: 160
+    },
+    {
+        ellipsis: true,
+        title: '藏品状态',
+        dataIndex: 'Status',
+        key: 'Status',
+        align: 'center',
+        width: 160
+    }
+];
+//预展
+const JingMaiColumns2 = [
+    {
+        title: '商品编号',
+        ellipsis: true,
+        dataIndex: 'Bn',
+        key: 'Bn',
+        width: 140,
+        align: 'center'
+    },
+    {
+        title: '商品名称',
+        ellipsis: true,
+        dataIndex: 'Title',
+        key: 'Title',
+        width: 200,
+        align: 'center',
+        ellipsis: true
+    },
+    {
+        title: '合同编号',
+        ellipsis: true,
+        dataIndex: 'Cbn',
+        key: 'Cbn',
+        width: 140,
+        align: 'center'
+    },
+    {
+        title: '起始价',
+        ellipsis: true,
+        dataIndex: 'BasePrice',
+        key: 'BasePrice',
+        width: 140,
+        align: 'center'
+    },
+    {
+        title: '委托时间',
+        ellipsis: true,
         dataIndex: 'EntrustTime',
         key: 'EntrustTime',
+        align: 'center',
+        width: 180
+    },
+    {
+        ellipsis: true,
+        title: '藏品状态',
+        dataIndex: 'Status',
+        key: 'Status',
+        align: 'center',
+        width: 160
+    }
+];
+//竞买中
+const JingMaiColumns3 = [
+    {
+        title: '商品编号',
+        ellipsis: true,
+        dataIndex: 'Bn',
+        key: 'Bn',
+        width: 140,
+        align: 'center'
+    },
+    {
+        title: '商品名称',
+        ellipsis: true,
+        dataIndex: 'Title',
+        key: 'Title',
+        width: 200,
+        align: 'center',
+        ellipsis: true
+    },
+    {
+        title: '合同编号',
+        ellipsis: true,
+        dataIndex: 'Cbn',
+        key: 'Cbn',
+        width: 140,
+        align: 'center'
+    },
+    {
+        title: '专场名称',
+        ellipsis: true,
+        dataIndex: 'SpecialName',
+        key: 'SpecialName',
+        width: 140,
+        align: 'center'
+    },
+    {
+        title: '委托时间',
+        ellipsis: true,
+        dataIndex: 'EntrustTime',
+        key: 'EntrustTime',
+        align: 'center',
+        width: 180
+    },
+    {
+        title: '起始价',
+        ellipsis: true,
+        dataIndex: 'BasePrice',
+        key: 'BasePrice',
+        align: 'center',
+        width: 180
+    },
+    {
+        ellipsis: true,
+        title: '藏品状态',
+        dataIndex: 'Status',
+        key: 'Status',
+        align: 'center',
+        width: 160
+    }
+];
+//已退回
+const JingMaiColumns4 = [
+    {
+        title: '商品编号',
+        ellipsis: true,
+        dataIndex: 'Bn',
+        key: 'Bn',
+        width: 140,
+        align: 'center'
+    },
+    {
+        title: '商品名称',
+        ellipsis: true,
+        dataIndex: 'Title',
+        key: 'Title',
+        width: 200,
+        align: 'center',
+        ellipsis: true
+    },
+    {
+        title: '合同编号',
+        ellipsis: true,
+        dataIndex: 'Cbn',
+        key: 'Cbn',
+        width: 140,
+        align: 'center'
+    },
+    {
+        title: '委托时间',
+        ellipsis: true,
+        dataIndex: 'EntrustTime',
+        key: 'EntrustTime',
+        align: 'center',
+        width: 180
+    },
+    {
+        title: '退回时间',
+        ellipsis: true,
+        dataIndex: 'FailBackTime',
+        key: 'FailBackTime',
+        align: 'center',
+        width: 180
+    },
+    {
+        ellipsis: true,
+        title: '藏品状态',
+        dataIndex: 'Status',
+        key: 'Status',
+        align: 'center',
+        width: 160
+    }
+];
+//已下架
+const JingMaiColumns5 = [
+    {
+        title: '商品编号',
+        ellipsis: true,
+        dataIndex: 'Bn',
+        key: 'Bn',
+        width: 140,
+        align: 'center'
+    },
+    {
+        title: '商品名称',
+        ellipsis: true,
+        dataIndex: 'Title',
+        key: 'Title',
+        width: 200,
+        align: 'center',
+        ellipsis: true
+    },
+    {
+        title: '合同编号',
+        ellipsis: true,
+        dataIndex: 'Cbn',
+        key: 'Cbn',
+        width: 140,
+        align: 'center'
+    },
+    {
+        title: '委托时间',
+        ellipsis: true,
+        dataIndex: 'EntrustTime',
+        key: 'EntrustTime',
+        align: 'center',
+        width: 180
+    },
+    {
+        title: '起始价',
+        ellipsis: true,
+        dataIndex: 'BasePrice',
+        key: 'BasePrice',
+        align: 'center',
+        width: 180
+    },
+    {
+        title: '结标价',
+        ellipsis: true,
+        dataIndex: 'MakePrice',
+        key: 'MakePrice',
+        align: 'center',
+        width: 180
+    },
+    {
+        title: '开始竞价时间',
+        ellipsis: true,
+        dataIndex: 'Starttime',
+        key: 'Starttime',
+        align: 'center',
+        width: 180
+    },
+    {
+        title: '下架时间',
+        ellipsis: true,
+        dataIndex: 'ClosingTime',
+        key: 'ClosingTime',
+        align: 'center',
+        width: 180
+    },
+    {
+        ellipsis: true,
+        title: '藏品状态',
+        dataIndex: 'Status',
+        key: 'Status',
+        align: 'center',
+        width: 160
+    }
+];
+//未成交
+const JingMaiColumns6 = [
+    {
+        title: '商品编号',
+        ellipsis: true,
+        dataIndex: 'Bn',
+        key: 'Bn',
+        width: 140,
+        align: 'center'
+    },
+    {
+        title: '商品名称',
+        ellipsis: true,
+        dataIndex: 'Title',
+        key: 'Title',
+        width: 200,
+        align: 'center',
+        ellipsis: true
+    },
+    {
+        title: '合同编号',
+        ellipsis: true,
+        dataIndex: 'Cbn',
+        key: 'Cbn',
+        width: 140,
+        align: 'center'
+    },
+    {
+        title: '委托时间',
+        ellipsis: true,
+        dataIndex: 'EntrustTime',
+        key: 'EntrustTime',
+        align: 'center',
+        width: 180
+    },
+    {
+        title: '起始价',
+        ellipsis: true,
+        dataIndex: 'BasePrice',
+        key: 'BasePrice',
+        align: 'center',
+        width: 180
+    },
+    {
+        title: '结标价',
+        ellipsis: true,
+        dataIndex: 'MakePrice',
+        key: 'MakePrice',
+        align: 'center',
+        width: 180
+    },
+    {
+        title: '开始竞价时间',
+        ellipsis: true,
+        dataIndex: 'Starttime',
+        key: 'Starttime',
+        align: 'center',
+        width: 180
+    },
+    {
+        title: '结标时间',
+        ellipsis: true,
+        dataIndex: 'OnTime',
+        key: 'OnTime',
+        align: 'center',
+        width: 180
+    },
+    {
+        ellipsis: true,
+        title: '藏品状态',
+        dataIndex: 'Status',
+        key: 'Status',
+        align: 'center',
+        width: 160
+    }
+];
+//待结算 结算中
+const JingMaiColumns7 = [
+    {
+        title: '商品编号',
+        ellipsis: true,
+        dataIndex: 'Bn',
+        key: 'Bn',
+        width: 140,
+        align: 'center'
+    },
+    {
+        title: '商品名称',
+        ellipsis: true,
+        dataIndex: 'Title',
+        key: 'Title',
+        width: 200,
+        align: 'center',
+        ellipsis: true
+    },
+    {
+        title: '合同编号',
+        ellipsis: true,
+        dataIndex: 'Cbn',
+        key: 'Cbn',
+        width: 140,
+        align: 'center'
+    },
+    {
+        title: '委托时间',
+        ellipsis: true,
+        dataIndex: 'EntrustTime',
+        key: 'EntrustTime',
+        align: 'center',
+        width: 180
+    },
+    {
+        title: '起始价',
+        ellipsis: true,
+        dataIndex: 'BasePrice',
+        key: 'BasePrice',
+        align: 'center',
+        width: 180
+    },
+    {
+        title: '结标价',
+        ellipsis: true,
+        dataIndex: 'MakePrice',
+        key: 'MakePrice',
+        align: 'center',
+        width: 180
+    },
+    {
+        title: '开始竞价时间',
+        ellipsis: true,
+        dataIndex: 'Starttime',
+        key: 'Starttime',
+        align: 'center',
+        width: 180
+    },
+    {
+        title: '结标时间',
+        ellipsis: true,
+        dataIndex: 'OnTime',
+        key: 'OnTime',
+        align: 'center',
+        width: 180
+    },
+    {
+        title: '结算状态',
+        ellipsis: true,
+        dataIndex: 'SettleStatus',
+        key: 'SettleStatus',
+        align: 'center',
+        width: 180
+    },
+    {
+        ellipsis: true,
+        title: '藏品状态',
+        dataIndex: 'Status',
+        key: 'Status',
         align: 'center',
         width: 160
     }
@@ -620,6 +1129,13 @@ export {
     sellingPriceList,
     statusLists,
     JingMaiStatusList,
+    JingMaiColumns1,
+    JingMaiColumns2,
+    JingMaiColumns3,
+    JingMaiColumns4,
+    JingMaiColumns5,
+    JingMaiColumns6,
+    JingMaiColumns7,
     JingMaiColumns,
     JingMaiDataSource,
     ShippingStatusList,
