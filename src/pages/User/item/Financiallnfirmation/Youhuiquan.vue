@@ -43,7 +43,7 @@ const columns = [
         ellipsis: true
     },
     {
-        title: '无门槛',
+        title: '使用门槛',
         dataIndex: 'UseCondition',
         key: 'UseCondition',
         align: 'center'
@@ -73,6 +73,11 @@ const columns = [
 <template>
     <div class="card-box">
         <a-table :pagination="false" :columns="columns" :data-source="tableList.CouponUserData">
+            <template #bodyCell="{ column, record }">
+                <template v-if="column.key === 'Title'">
+                    {{ record.UseCondition == 0 ? '无门槛' : '' }}
+                </template>
+            </template>
         </a-table>
     </div>
 </template>
@@ -80,5 +85,8 @@ const columns = [
 <style scoped lang="less">
 .card-box {
     padding-top: 30px;
+    :deep(.ant-table-wrapper .ant-table-thead > tr > th) {
+        background-color: #eef3f8;
+    }
 }
 </style>

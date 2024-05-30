@@ -1,113 +1,90 @@
 <script setup>
-import { ref, computed, reactive, onMounted, watchEffect, h } from 'vue';
+import { ref, computed, reactive, onMounted, watch, h } from 'vue';
 import { SearchOutlined } from '@ant-design/icons-vue';
 import { useRouter, useRoute } from 'vue-router';
-import { getImageUrl } from '@/utils';
+import { getYuERiJiParams, yuerijizhang, eDuInfoParams, edumingxi } from '@/request/user/api';
+const timeOptions = [
+    {
+        value: '0',
+        label: '全部'
+    },
+    {
+        value: '1',
+        label: '一月内'
+    },
+    {
+        value: '2',
+        label: '三月内'
+    },
+    {
+        value: '3',
+        label: '六月内'
+    },
+    {
+        value: '4',
+        label: '六月外'
+    }
+];
+const query = reactive({
+    total: 1,
+    TimeRange: '0',
+    Kid: '0',
+    PageSize: 1,
+    PageSize: 10
+});
+const paramsList = ref([]);
+const getEDuParasList = async () => {
+    let res = await getYuERiJiParams();
+    paramsList.value = res.Data;
+    console.log(paramsList.value);
+};
+const getEDuParasLists = async () => {
+    let res = await eDuInfoParams();
+    paramsList.value = res.Data;
+    console.log(paramsList.value);
+};
+const tableList = ref([]);
+const getTableList = async (page = 1, pageSize = 10) => {
+    query.PageIndex = page;
+    query.PageSize = pageSize;
+    console.log(query);
+    let res;
+    if (params.value.titleCate == list[0].cate) {
+        res = await yuerijizhang(query);
+    } else if (params.value.titleCate == list[1].cate) {
+        res = await edumingxi(query);
+    }
+    query.total = res.Total;
+    tableList.value = res.Data;
+    console.log(tableList.value);
+};
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
-const loading = ref(false);
 const showModals = ref(null);
 const params = ref({});
 const columnsList = ref([]);
-const dataSourceList = ref([]);
 const columns1 = [
     {
         title: '产生时间',
-        dataIndex: 'increaseTime',
-        key: 'increaseTime',
-        width: '250px',
+        dataIndex: 'CreateTime',
+        key: 'CreateTime',
         align: 'center'
     },
     {
         title: '类别',
-        dataIndex: 'cate',
-        key: 'cate',
+        dataIndex: 'KDes',
+        key: 'KDes',
         align: 'center'
     },
     {
-        title: '增加',
-        dataIndex: 'increase',
-        key: 'increase',
-        align: 'center'
-    },
-    {
-        title: '减少',
-        dataIndex: 'reduce',
-        key: 'reduce',
-        align: 'center'
-    },
-    {
-        title: '仓储费',
-        dataIndex: 'storage',
-        key: 'storage',
+        title: '金额',
+        dataIndex: 'Amount',
+        key: 'Amount',
         align: 'center'
     }
 ];
-const columns2 = [];
-const dataList1 = [
-    {
-        increaseTime: '2024-29-44 01:52:44',
-        cate: '交易单支付',
-        increase: '+3452',
-        reduce: '-3452',
-        storage: ''
-    },
-    {
-        increaseTime: '2024-29-44 01:52:44',
-        cate: '交易单支付',
-        increase: '+3452',
-        reduce: '-3452',
-        storage: ''
-    },
 
-    {
-        increaseTime: '2024-29-44 01:52:44',
-        cate: '交易单支付',
-        increase: '+3452',
-        reduce: '-3452',
-        storage: ''
-    },
-    {
-        increaseTime: '2024-29-44 01:52:44',
-        cate: '交易单支付',
-        increase: '+3452',
-        reduce: '-3452',
-        storage: ''
-    },
-    {
-        increaseTime: '2024-29-44 01:52:44',
-        cate: '交易单支付',
-        increase: '+3452',
-        reduce: '-3452',
-        storage: ''
-    },
-    {
-        increaseTime: '2024-29-44 01:52:44',
-        cate: '交易单支付',
-        increase: '+3452',
-        reduce: '-3452',
-        storage: ''
-    },
-    {
-        increaseTime: '2024-29-44 01:52:44',
-        cate: '交易单支付',
-        increase: '+3452',
-        reduce: '-3452',
-        storage: ''
-    }
-];
-const dataList2 = [];
-const query = reactive({
-    cid: '-1',
-    start: '-1',
-    end: '-1',
-    brand: '-1',
-    kw: '',
-    status: undefined,
-    pageSize: '10',
-    pageIndex: '1'
-});
 onMounted(() => {
     params.value = showModals.value?.params;
 });
@@ -119,32 +96,28 @@ const list = [
         cate: '额度明细'
     }
 ];
-watchEffect(() => {
-    console.log(params.value.titleCate);
-    columnsList.value =
-        params.value.titleCate == list[0].cate || params.value.titleCate == undefined
-            ? columns1
-            : columns2;
-    dataSourceList.value =
-        params.value.titleCate == list[0].cate || params.value.titleCate == undefined
-            ? dataList1
-            : dataList2;
-    if (params.value.titleCate == list[1].cate && params.value.statusCate == '额度明细') {
-        (columnsList.value = columns2), (dataSourceList.value = dataList2JieSuan);
+
+watch(
+    () => showModals.value?.params?.titleCate,
+    () => {
+        if (showModals.value?.params?.titleCate == list[0].cate) {
+            query.TimeRange = '0';
+            query.Kid = '0';
+            getEDuParasList();
+            getTableList();
+            columnsList.value = columns1;
+            return;
+        }
+        if (showModals.value?.params?.titleCate == list[1].cate) {
+            query.TimeRange = '0';
+            query.Kid = '0';
+            getEDuParasLists();
+            getTableList();
+            columnsList.value = columns1;
+            return;
+        }
     }
-});
-const handleChange = (value) => {
-    console.log(`selected ${value}`);
-};
-const getGoodsList = async () => {
-    console.log(query);
-    loading.value = true;
-    try {
-        let res = await getUserCollectionListApi(query);
-        loading.value = false;
-        console.log(res);
-    } catch (error) {}
-};
+);
 </script>
 
 <template>
@@ -152,30 +125,29 @@ const getGoodsList = async () => {
         <div class="title"> 财务明细 </div>
         <ShowModal ref="showModals" :titleList="list">
             <template v-slot:active3>
-                <div class="search-cate" v-if="params.titleCate == list[0].cate">
+                <div class="search-cate">
                     <a-select
                         placeholder="所有分类"
-                        v-model:value="query.status"
+                        v-model:value="query.Kid"
                         style="width: 220px"
-                        @change="handleChange"
+                        :options="paramsList"
+                        :field-names="{ label: 'Value', value: 'Key', options: 'Children' }"
                     ></a-select>
                     <a-select
                         placeholder="所有时间"
-                        v-model:value="query.status"
+                        v-model:value="query.TimeRange"
                         style="width: 220px"
-                        @change="handleChange"
+                        :options="timeOptions"
                     ></a-select>
-                    <a-button :loading="loading" @click="getGoodsList" :icon="h(SearchOutlined)"
-                        >搜索</a-button
-                    >
+                    <a-button @click="getTableList()" :icon="h(SearchOutlined)">搜索</a-button>
                 </div>
             </template>
             <template v-slot:active4>
-                <a-table :pagination="false" :columns="columnsList" :dataSource="dataSourceList">
+                <a-table :pagination="false" :columns="columnsList" :dataSource="tableList">
                 </a-table>
             </template>
         </ShowModal>
-        <CatePage></CatePage>
+        <CatePage :paginations="query" @fetchList="getTableList"></CatePage>
     </div>
 </template>
 

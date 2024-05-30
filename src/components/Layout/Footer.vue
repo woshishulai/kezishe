@@ -1,13 +1,25 @@
 <script setup>
 import { useRouter } from 'vue-router';
 import { cateList, footerNavList, footerInfoList } from '../data';
+import { onMounted, ref } from 'vue';
+import { getFooterApi } from '@/request/footer';
 const router = useRouter();
-const showPage = () => {
+let tableList = ref([]);
+onMounted(async () => {
+    let res = await getFooterApi();
+    tableList.value = res.Data;
+});
+const showPage = (item) => {
+    console.log(item);
+    if (item.Href) {
+        window.open(item.Href, '_blank');
+        return;
+    }
     router.push({
-        path: '/help',
+        path: '/' + item.Path || '/help',
         query: {
             //关于我们
-            faId: '698887626106605568'
+            faId: item.Id
             //收购的
             // faId: '698859719640485888'
             //不能用
@@ -30,7 +42,7 @@ const showPage = () => {
                 </div>
             </div>
         </div>
-        <div class="details-info" @click="showPage">
+        <div class="details-info">
             <div class="con-main-wrap">
                 <div class="left-call-info">
                     <div class="item">
@@ -43,10 +55,15 @@ const showPage = () => {
                     </div>
                 </div>
                 <div class="nav-list">
-                    <div class="nav-item" v-for="item in footerNavList" :key="item.title">
-                        <h5>{{ item.title }}</h5>
-                        <span class="nav-item-details" v-for="i in item.list" :key="i">
-                            {{ i.text }}
+                    <div class="nav-item" v-for="item in tableList" :key="item.Id">
+                        <h5>{{ item.Name }}</h5>
+                        <span
+                            class="nav-item-details"
+                            @click="showPage(i)"
+                            v-for="i in item.Children"
+                            :key="i"
+                        >
+                            {{ i.Name }}
                         </span>
                     </div>
                 </div>
@@ -155,6 +172,9 @@ const showPage = () => {
                         color: #828282;
                         font-size: 14px;
                         font-weight: 600;
+                        &:hover {
+                            color: #9a0000;
+                        }
                     }
                 }
             }

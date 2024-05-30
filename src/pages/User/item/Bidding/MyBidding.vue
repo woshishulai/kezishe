@@ -104,7 +104,7 @@ const apiList = {
     不支付: getBuZhiFuApi
 };
 const fetchData = ref(null);
-const getFetchData = async (page, pageSize) => {
+const getFetchData = async (page = 1, pageSize = 10) => {
     params.value.PageIndex = page;
     params.value.PageSize = pageSize;
     try {

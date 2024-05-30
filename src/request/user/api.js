@@ -31,6 +31,25 @@ export const eDuZhuanYUE = async (params) =>
 export const QuotaToBalanceFrom = async (params) =>
     instance.post(`/Member/RecordBidquota/QuotaToBalanceFrom?ReduceQuota=${params}`);
 
+//余额日记帐参数
+export const getYuERiJiParams = async (params) =>
+    instance.get(`/Member/RecordBidquota/BalanceLogConfig`);
+
+//转余额
+export const yuerijizhang = async (params) =>
+    instance.post(
+        `/Member/RecordBidquota/BalanceLogList?TimeRange=${params.TimeRange}&Kid=${params.Kid}&PageSize=${params.PageSize}&PageIndex=${params.PageIndex}`
+    );
+//余额日记帐参数
+export const eDuInfoParams = async (params) =>
+    instance.get(`/Member/RecordBidquota/BidquotaLogConfig`);
+
+//转余额
+export const edumingxi = async (params) =>
+    instance.post(
+        `/Member/RecordBidquota/BidquotaLogList?TimeRange=${params.TimeRange}&Kid=${params.Kid}&PageSize=${params.PageSize}&PageIndex=${params.PageIndex}`
+    );
+
 //优惠券
 export const youHuiQuan = async (data) => instance.get(`/Member/Coupon/GetList`, data);
 
