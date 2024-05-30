@@ -499,23 +499,14 @@ const addRoutes = [
                 meta: {
                     name: '收购'
                 },
-                component: () => import('@/pages/Shougou/index.vue'),
-                children: [
-                    {
-                        path: '',
-                        // meta: {
-                        //     // name: '收购资讯'
-                        // },
-                        component: () => import('@/pages/Shougou/ShouGou.vue')
-                    },
-                    {
-                        path: 'details',
-                        meta: {
-                            name: '收购详情'
-                        },
-                        component: () => import('@/pages/Shougou/Details.vue')
-                    }
-                ]
+                component: () => import('@/pages/Shougou/index.vue')
+            },
+            {
+                path: '/help',
+                meta: {
+                    name: '帮助中心'
+                },
+                component: () => import('@/pages/Help/index.vue')
             },
             {
                 path: '/pingji',

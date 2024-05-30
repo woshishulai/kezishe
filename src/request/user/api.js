@@ -103,6 +103,11 @@ export const getQueRenDetailsApi = async (params) =>
 `);
 
 //按照确认单查看明细
+export const getOrderAllInfo = async (params) =>
+    instance.post(`Member/SettleMent/SettleCensus
+`);
+
+//按照确认单查看明细
 export const getJieSuanXiangQing = async (params) =>
     instance.post(`Member/SettleMent/SbnInfo?Sbn=${params}
 `);

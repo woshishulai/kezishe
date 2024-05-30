@@ -8,3 +8,7 @@ export const getLeftMenuList = async (params) =>
     instance.get(
         `/Web/NewsHelp/ColumnList?Id=${params.Id}&PageSize=${params.PageSize}&PageIndex=${params.PageIndex}`
     );
+
+//收购文章详情
+export const getInfoDetails = async (params) =>
+    instance.get(`/Web/NewsHelp/ArticleData?Aid=${params}`);

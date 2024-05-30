@@ -112,9 +112,9 @@ const columns = [
         <div class="card-box">
             <div class="title"> 积分 </div>
             <div class="con-wrap">
-                <div class="jifen-wrap">
+                <!-- <div class="jifen-wrap">
                     <h5>{{}}</h5>
-                </div>
+                </div> -->
                 <show-modal :titleList="list">
                     <template v-slot:active2>
                         <div class="search-cate">
@@ -165,18 +165,18 @@ const columns = [
     .con-wrap {
         padding: 20px 12px;
 
-        .jifen-wrap {
-            padding: 55px 0 100px 120px;
-            margin-bottom: 20px;
-            background: url('@/assets/img/user/jifen/jifen-bg.png');
-            background-size: 100% 100%;
+        // .jifen-wrap {
+        //     padding: 55px 0 100px 120px;
+        //     margin-bottom: 20px;
+        //     background: url('@/assets/img/user/jifen/jifen-bg.png');
+        //     background-size: 100% 100%;
 
-            h5 {
-                color: #fff;
-                font-size: 40px;
-                height: 40px;
-            }
-        }
+        //     h5 {
+        //         color: #fff;
+        //         font-size: 40px;
+        //         height: 40px;
+        //     }
+        // }
     }
 }
 </style>

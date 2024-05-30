@@ -1,5 +1,20 @@
 <script setup>
+import { useRouter } from 'vue-router';
 import { cateList, footerNavList, footerInfoList } from '../data';
+const router = useRouter();
+const showPage = () => {
+    router.push({
+        path: '/help',
+        query: {
+            //关于我们
+            faId: '698887626106605568'
+            //收购的
+            // faId: '698859719640485888'
+            //不能用
+            // faId: '698859902541500416'
+        }
+    });
+};
 </script>
 
 <template>
@@ -15,7 +30,7 @@ import { cateList, footerNavList, footerInfoList } from '../data';
                 </div>
             </div>
         </div>
-        <div class="details-info">
+        <div class="details-info" @click="showPage">
             <div class="con-main-wrap">
                 <div class="left-call-info">
                     <div class="item">

@@ -19,6 +19,7 @@ import Item3 from './Item3.vue';
 import Item4 from './Item4.vue';
 import { info } from '@/hooks/antd/message';
 import { watch } from 'vue';
+const route = useRoute();
 const jingMaiList = ref([
     {
         cate: '竞买中'
@@ -137,6 +138,12 @@ watch(
             router.push('/user/logistics/yifahuo');
             return;
         } else if (showModals.value?.params?.titleCate) {
+            router.push({
+                path: '/user/my-bidding',
+                query: {
+                    titleCate: showModals.value?.params?.titleCate
+                }
+            });
             Object.keys(params.value).forEach((item) => {
                 params.value[item] = '';
             });
@@ -222,7 +229,14 @@ const zhiFu = () => {
     localStorage.setItem('showPaegs', 2);
     const goodsList = JSON.stringify(checkList.value.DelList);
     localStorage.setItem('goodsList', goodsList);
-    showComponent.value = 2;
+    router.push({
+        path: '/user/my-bidding',
+        query: {
+            titleCate: showModals.value?.params?.titleCate,
+            show: 2,
+            goodsList: checkList.value?.DelList
+        }
+    });
 };
 </script>
 
@@ -230,7 +244,7 @@ const zhiFu = () => {
     <Item
         :fetchData="checkList?.DelList"
         @changeShowPage="changeShowPage"
-        v-show="showComponent == 2"
+        v-show="route.query.show == 2"
     ></Item>
     <div class="my-bidding" v-show="showComponent == 1">
         <div class="card-box">

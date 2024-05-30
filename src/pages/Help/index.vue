@@ -10,7 +10,7 @@ const props = defineProps({});
 const menuData = ref(null);
 const rightList = ref(null);
 const query = reactive({
-    Pid: '698859719640485888',
+    Pid: route.query.faId,
     Id: '',
     PageSize: 10,
     total: 1,

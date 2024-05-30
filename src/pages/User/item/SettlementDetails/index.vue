@@ -5,7 +5,7 @@ import { getImageUrl } from '@/utils';
 import CatePage from '@/components/common/CatePage.vue';
 import SettleMentDetails from './SettlementDetails.vue';
 import { SearchOutlined } from '@ant-design/icons-vue';
-import { getJieSuanDetailsApi, getQueRenDetailsApi } from '@/request/user/api';
+import { getJieSuanDetailsApi, getQueRenDetailsApi, getOrderAllInfo } from '@/request/user/api';
 import {
     options1,
     timeStartOptionss,
@@ -14,7 +14,11 @@ import {
     gouWuTitleColumns,
     gouWuDataSource
 } from './data';
-
+const allOrderInfo = ref({});
+const getOrderAllInfos = async () => {
+    let res = await getOrderAllInfo();
+    allOrderInfo.value = res.Data;
+};
 const setColumns = ref([
     {
         title: '结算单号',
@@ -101,6 +105,7 @@ onMounted(() => {
     if (showModals.value) {
         params.value = showModals.value?.params;
     }
+    getOrderAllInfos();
 });
 
 watch(
@@ -214,6 +219,23 @@ const changeShowDetails = (number) => {
                     </div>
                 </template>
             </show-modal>
+            <div class="all-order-info">
+                <div
+                    >总结算单数: <span>{{ allOrderInfo.SbnNums }}</span> 张</div
+                >
+                <div
+                    >涉及总合同数: <span>{{ allOrderInfo.TotalMPrice }}</span> 个</div
+                >
+                <div
+                    >总结标额: <span>{{ allOrderInfo.Prices }}</span> 元</div
+                >
+                <div
+                    >总结算单数: <span>{{ allOrderInfo.CbnNums }}</span> 元</div
+                >
+                <div
+                    >未结算总数: <span>{{ allOrderInfo.UnSettNums }}</span> 项</div
+                >
+            </div>
             <CatePage :paginations="query" @fetchList="getGoodsList"></CatePage>
         </div>
     </div>
@@ -231,6 +253,15 @@ const changeShowDetails = (number) => {
     }
     :deep(.ant-table-thead) {
         display: none;
+    }
+    .all-order-info {
+        .flex-row;
+        justify-content: flex-start;
+        gap: 35px;
+        padding: 20px 16px;
+        span {
+            color: #9a0000;
+        }
     }
     .active {
         :deep(.ant-table-tbody) {

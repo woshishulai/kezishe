@@ -46,24 +46,22 @@ const props = defineProps({
 });
 const goodsLists = ref([]);
 watchEffect(() => {
-    if (props?.fetchData.length >= 1) {
-        goodsLists.value = props?.fetchData;
+    if (props?.fetchData.length >= 1 || route.query.goodsList) {
+        goodsLists.value = props?.fetchData || route.query.goodsList;
+        getYouHuiQuanList();
     } else {
         goodsLists.value = JSON.parse(localStorage.getItem('goodsList'));
     }
 });
-
-onMounted(async () => {
-    try {
+watchEffect(async () => {
+    if (route.query.show == 2 && route.query.goodsList) {
         await initCountList();
-        await getZhiFuInfoList();
         await getAddressList();
-        await getYouHuiQuanList();
+        await getZhiFuInfoList();
         await getKuaiDiLists();
-    } catch (error) {
-        console.error(error);
     }
 });
+
 //快递价格
 const kuaidiPriceList = ref([]);
 const getKuaiDiLists = async () => {
