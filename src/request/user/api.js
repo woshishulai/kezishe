@@ -55,6 +55,11 @@ export const getHeTongApi = async (params) =>
 //我的委托合同详情
 export const getHeTongDetailsApi = async (params) =>
     instance.get(`Member/Contract/Detail?Number=${params}`);
+
+//查看结算概况
+export const getJieSuanGaiKuo = async (params) =>
+    instance.post(`Member/SettleMent/CbnSettList?Cbn=${params}`);
+
 //获取配送支付方式
 export const getZhiFu = async (params) =>
     instance.get(`Member/Pay/GetPayBaseData?OrderType=${params}`);
@@ -95,4 +100,19 @@ export const getJieSuanDetailsApi = async (params) =>
 //按照确认单查看明细
 export const getQueRenDetailsApi = async (params) =>
     instance.post(`Member/SettleMent/SbnList?DateRange=${params.TimeRange}&Kw=${params.Kw}&PageSize=${params.PageSize}&PageIndex=${params.PageIndex}
+`);
+
+//按照确认单查看明细
+export const getJieSuanXiangQing = async (params) =>
+    instance.post(`Member/SettleMent/SbnInfo?Sbn=${params}
+`);
+
+// 积分参数
+export const jifenParams = async (params) =>
+    instance.post(`Member/Point/PointConfig
+`);
+
+// 获取积分参数
+export const getjiFenInfo = async (params) =>
+    instance.post(`Member/Point/PointList?TimeRange=${params.TimeRange}&PointFunType=${params.PointFunType}&PointMold=${params.PointMold}&PageSize=${params.PageSize}&PageIndex=${params.PageIndex}
 `);

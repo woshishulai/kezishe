@@ -71,13 +71,16 @@ const deletes = () => {
         <!-- <a-table :pagination="false" :columns="jingMaiColumns" :dataSource="props?.fetchData">
             <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'Title'">
-                    <div class="goods-info" @click="showGoodsDetails(record)">
-                        <img :src="record.CoverImg" alt="" />
-                        <span>
-                            {{ record.Title }}
-                        </span>
-                    </div>
-                </template>
+                                <div class="goods-info" @click="showGoodsDetails(record)">
+                                    <img :src="record.CoverImg" alt="" />
+                                    <a-tooltip>
+                                        <template #title> {{ record.Title }} </template>
+                                        <span>
+                                            {{ record.Title }}
+                                        </span>
+                                    </a-tooltip>
+                                </div>
+                            </template>
                 <template v-if="column.key === 'Status'">
                     <a-checkbox
                         @change.stop="showCheck(record)"

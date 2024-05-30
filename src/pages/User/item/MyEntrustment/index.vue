@@ -239,9 +239,12 @@ const statusTexts = (value) => {
                                 <template v-if="column.key === 'Title'">
                                     <div class="goods-info" @click="showGoodsDetails(record)">
                                         <img :src="record.CoverImg" alt="" />
-                                        <span>
-                                            {{ record.Title }}
-                                        </span>
+                                        <a-tooltip>
+                                            <template #title> {{ record.Title }} </template>
+                                            <span>
+                                                {{ record.Title }}
+                                            </span>
+                                        </a-tooltip>
                                     </div>
                                 </template>
                                 <template v-if="column.key === 'Cbn'">
@@ -294,23 +297,26 @@ const statusTexts = (value) => {
     .goods-infos {
         display: flex;
         align-items: center;
-        justify-content: space-between;
         text-align: center;
-        gap: 3px;
+        gap: 10px;
         width: 100%;
-        &:hover {
-            color: #9a0000;
-            cursor: pointer;
-        }
+        cursor: pointer;
+
         img {
-            height: 40px;
+            max-height: 40px;
+            max-width: 40px;
         }
         span {
             flex: 1;
+            width: 117px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     }
     .goods-infos {
-        border-bottom: 1px solid #8a0000;
+        color: #3a84e6;
+        text-decoration: underline;
     }
     .jiesuanzhuangtai {
         .flex-col;

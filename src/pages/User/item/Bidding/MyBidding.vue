@@ -298,9 +298,12 @@ const zhiFu = () => {
                             <template v-if="column.key === 'Title'">
                                 <div class="goods-info" @click="showGoodsDetails(record)">
                                     <img :src="record.CoverImg" alt="" />
-                                    <span>
-                                        {{ record.Title }}
-                                    </span>
+                                    <a-tooltip>
+                                        <template #title> {{ record.Title }} </template>
+                                        <span>
+                                            {{ record.Title }}
+                                        </span>
+                                    </a-tooltip>
                                 </div>
                             </template>
                             <template v-if="column.key === 'Status'">

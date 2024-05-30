@@ -41,7 +41,7 @@ const infoList = ref([
     {
         img: 'user/info/list1.png',
         title: '账户余额(¥)',
-        num: '143.40',
+        num: '',
         danwei: '元',
         btn1: '去充值',
         btn2: '提现',
@@ -52,14 +52,14 @@ const infoList = ref([
         img: 'user/info/list2.png',
         title: '竞买额度',
         icon: '?',
-        num: '453,423',
+        num: '',
         btn1: '调整竞买额度',
         router: '/user/financial-information/edu'
     },
     {
         img: 'user/info/list3.png',
         title: '我的优惠券',
-        num: '7',
+        num: '',
         danwei: '张',
         btn1: '立即使用',
         router: '/user/financial-information/youhuiquan'
@@ -183,7 +183,7 @@ const statusInfo = (index) => {
                         <span v-if="item.icon">{{ item.icon }}</span>
                     </p>
                     <p class="number">
-                        {{ item.num }}
+                        {{ item.num || 0 }}
                         <span>{{ item.danwei }}</span>
                     </p>
                     <div class="btns">

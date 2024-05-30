@@ -1,7 +1,7 @@
 <script setup>
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { getMenuList } from '@/request/shougou/api';
+import { getMenuList, getLeftMenuList } from '@/request/shougou/api';
 import ShouGou from './ShouGou.vue';
 import { info } from '@/hooks/antd/message';
 const router = useRouter();
@@ -9,13 +9,26 @@ const route = useRoute();
 const props = defineProps({});
 const active = ref(0);
 const fetchData = ref({});
-onMounted(async () => {
+const query = reactive({
+    Pid: '698887626106605568',
+    Id: '698859902541500416',
+    PageSize: 10,
+    total: 1,
+    PageIndex: 1
+});
+const fetchDataApi = async (page = 1, pageSize = 10) => {
+    query.PageIndex = page;
+    query.PageSize = pageSize;
     try {
-        let res = await getMenuList(698887626106605568);
-        console.log(res);
+        let res = await getMenuList(query);
+        let ress = await getLeftMenuList(query);
+        console.log(res, ress);
     } catch (error) {
         info('error', error);
     }
+};
+onMounted(() => {
+    fetchDataApi();
 });
 const showDetails = (item) => {
     router.push('/shougou/details');

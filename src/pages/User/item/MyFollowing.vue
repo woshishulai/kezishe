@@ -225,7 +225,7 @@ const getAll = () => {
                                     <img :src="record.CoverImg" alt="" />
                                     <a-tooltip>
                                         <template #title> {{ record.Title }} </template>
-                                        <span style="width: 100px">
+                                        <span>
                                             {{ record.Title }}
                                         </span>
                                     </a-tooltip>
@@ -298,10 +298,15 @@ const getAll = () => {
             cursor: pointer;
         }
         img {
-            height: 40px;
+            max-height: 40px;
+            max-width: 40px;
         }
         span {
             flex: 1;
+            width: 117px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     }
     .card-box {

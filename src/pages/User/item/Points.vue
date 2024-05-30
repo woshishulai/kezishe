@@ -2,12 +2,69 @@
 import { ref, computed, reactive, onMounted, h } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { SearchOutlined } from '@ant-design/icons-vue';
-import { getImageUrl } from '@/utils';
+import { jifenParams, getjiFenInfo } from '@/request/user/api';
 import CatePage from '@/components/common/CatePage.vue';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
-onMounted(() => {});
+const params = ref([]);
+const tableList = ref([]);
+const timeStartOptionss = [
+    {
+        value: '0',
+        label: '全部'
+    },
+    {
+        value: '1',
+        label: '近一年'
+    },
+    {
+        value: '2',
+        label: '近三年'
+    },
+    {
+        value: '3',
+        label: '近三月'
+    },
+    {
+        value: '4',
+        label: '近一月'
+    },
+    {
+        value: '5',
+        label: '近一周'
+    }
+];
+const query = reactive({
+    TimeRange: '0',
+    PointFunType: '0',
+    PointMold: '0',
+    total: 1
+});
+const getParams = async () => {
+    let res = await jifenParams();
+    console.log(res);
+    params.value = res.Data;
+    params.value.PointFunType.forEach((item) => {
+        item.value = item.Key;
+        item.label = item.Value;
+    });
+    params.value.PointMold.forEach((item) => {
+        item.value = item.Key;
+        item.label = item.Value;
+    });
+};
+const fetchTableList = async (page = 1, pageSize = 10) => {
+    query.PageIndex = page;
+    query.PageSize = pageSize;
+    let res = await getjiFenInfo(query);
+    console.log(res);
+    tableList.value = res.Data;
+    query.total = res.Total;
+};
+onMounted(() => {
+    Promise.all([getParams(), fetchTableList()]);
+});
 const list = [
     {
         cate: '积分明细'
@@ -18,60 +75,34 @@ const list = [
 ];
 const columns = [
     {
-        title: '全部类型',
-        dataIndex: 'goodscode',
-        key: 'goodscode',
+        title: '类型',
+        dataIndex: 'MoldDes',
+        key: 'MoldDes',
         align: 'center'
     },
     {
         title: '全部事件',
-        dataIndex: 'goodscate',
-        key: 'goodscate',
+        dataIndex: 'FunTypeDes',
+        key: 'FunTypeDes',
         align: 'center'
     },
     {
         title: '积分',
-        dataIndex: 'goodsname',
-        key: 'goodsname',
+        dataIndex: 'Point',
+        key: 'Point',
         align: 'center'
     },
     {
         title: '时间',
-        dataIndex: 'order',
-        key: 'order',
+        dataIndex: 'Time',
+        key: 'Time',
         align: 'center'
     },
     {
         title: '说明',
-        dataIndex: 'price',
-        key: 'price',
+        dataIndex: 'Remark',
+        key: 'Remark',
         align: 'center'
-    }
-];
-const dataSource = [
-    {
-        goodscode: '获取',
-        goodscate: '委托结算',
-        goodsname: '55',
-        order: '2023-10.10'
-    },
-    {
-        goodscode: '获取',
-        goodscate: '委托结算',
-        goodsname: '55',
-        order: '2023-10.10'
-    },
-    {
-        goodscode: '获取',
-        goodscate: '委托结算',
-        goodsname: '55',
-        order: '2023-10.10'
-    },
-    {
-        goodscode: '获取',
-        goodscate: '委托结算',
-        goodsname: '55',
-        order: '2023-10.10'
     }
 ];
 </script>
@@ -82,7 +113,7 @@ const dataSource = [
             <div class="title"> 积分 </div>
             <div class="con-wrap">
                 <div class="jifen-wrap">
-                    <h5>{{ '3, 614' }}</h5>
+                    <h5>{{}}</h5>
                 </div>
                 <show-modal :titleList="list">
                     <template v-slot:active2>
@@ -90,47 +121,38 @@ const dataSource = [
                             <a-select
                                 ref="select"
                                 placeholder="全部类型"
-                                v-model:value="value1"
+                                v-model:value="query.PointMold"
                                 style="width: 220px"
-                                :options="options1"
-                                @change="handleChange"
+                                :options="params.PointMold"
                             ></a-select>
                             <a-select
                                 ref="select"
                                 placeholder="全部事件"
-                                v-model:value="value1"
+                                v-model:value="query.PointFunType"
                                 style="width: 220px"
-                                :options="options1"
-                                @change="handleChange"
+                                :options="params.PointFunType"
                             ></a-select>
                             <a-select
                                 ref="select"
                                 placeholder="近一年"
-                                v-model:value="value1"
+                                v-model:value="query.TimeRange"
                                 style="width: 220px"
-                                :options="options1"
-                                @change="handleChange"
+                                :options="timeStartOptionss"
                             ></a-select>
-                            <a-input
-                                v-model:value="value"
-                                style="width: 316px"
-                                placeholder="名称和藏品"
-                            />
-                            <a-button
-                                :loading="loading"
-                                @click="getGoodsList"
-                                :icon="h(SearchOutlined)"
+                            <a-button @click="fetchTableList()" :icon="h(SearchOutlined)"
                                 >搜索</a-button
                             >
                         </div>
                     </template>
                     <template v-slot:active3>
-                        <a-table :columns="columns" :dataSource="dataSource"></a-table>
-                    </template>
-                    <template v-slot:active4>
-                        <CatePage></CatePage>
+                        <a-table
+                            :pagination="false"
+                            :columns="columns"
+                            :dataSource="tableList"
+                        ></a-table>
                     </template>
                 </show-modal>
+                <CatePage :paginations="query" @fetchList="fetchTableList"></CatePage>
             </div>
         </div>
     </div>
@@ -152,6 +174,7 @@ const dataSource = [
             h5 {
                 color: #fff;
                 font-size: 40px;
+                height: 40px;
             }
         }
     }

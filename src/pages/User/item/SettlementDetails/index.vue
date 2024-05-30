@@ -14,23 +14,18 @@ import {
     gouWuTitleColumns,
     gouWuDataSource
 } from './data';
+
 const setColumns = ref([
     {
-        title: '编号',
+        title: '结算单号',
         key: 'Sbn',
         dataIndex: 'Sbn',
         align: 'center'
     },
     {
-        title: '结算单数',
+        title: '结算项数',
         key: 'SettNums',
         dataIndex: 'SettNums',
-        align: 'center'
-    },
-    {
-        title: '结算总结标额',
-        key: 'Prices',
-        dataIndex: 'Prices',
         align: 'center'
     },
     {
@@ -39,26 +34,33 @@ const setColumns = ref([
         dataIndex: 'TotalMPrice',
         align: 'center'
     },
-
     {
-        title: '',
-        key: 'UnSteeNum',
-        dataIndex: 'UnSteeNum',
+        title: '实得总额',
+        key: 'Prices',
+        dataIndex: 'Prices',
         align: 'center'
-    }
+    },
+
     // {
     //     title: '',
-    //     key: 'CreateTime',
-    //     dataIndex: 'CreateTime',
-    //     width: 200,
-    //     align: 'center'
-    // }
-    // {
-    //     title: '',
-    //     key: 'Status',
-    //     dataIndex: 'Status',
+    //     key: 'UnSteeNum',
+    //     dataIndex: 'UnSteeNum',
     //     align: 'center'
     // },
+    {
+        title: '',
+        key: 'CreateTime',
+        dataIndex: 'CreateTime',
+        width: 300,
+        align: 'center'
+    },
+    {
+        title: '',
+        key: 'Status',
+        dataIndex: 'Status',
+        width: 100,
+        align: 'center'
+    }
     // {
     //     title: '',
     //     key: 'details',
@@ -88,31 +90,32 @@ const getGoodsList = async (page = 1, pageSize = 10) => {
         }
         tableList.value = res.Data;
         query.total = res.Tag;
-        console.log(res);
     } catch (error) {}
 };
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
-const showModals = ref(null);
-const params = ref({});
-const showDetails = ref(true);
+const showModals = ref({});
+const params = ref(list[0].cate);
 onMounted(() => {
-    params.value = showModals.value?.params;
+    if (showModals.value) {
+        params.value = showModals.value?.params;
+    }
 });
 
 watch(
-    () => showModals.value?.params?.titleCate,
+    () => showModals.value,
     () => {
+        if (showModals.value?.params?.titleCate) {
+        }
         query.total = 1;
         getGoodsList();
     }
 );
 
 const changeShowDetails = (number) => {
-    showDetails.value = false;
     router.push({
-        path: 'user/my-entrustment/settlement-details',
+        path: '/user/my-entrustment/settlement-details',
         query: {
             Number: number
         }
@@ -121,7 +124,8 @@ const changeShowDetails = (number) => {
 </script>
 
 <template>
-    <div class="my-set-details" v-if="showDetails">
+    <SettleMentDetails v-if="route.query.Number"></SettleMentDetails>
+    <div class="my-set-details" v-else>
         <div class="card-box">
             <div class="title"> 结算明细 </div>
             <show-modal ref="showModals" :titleList="list">
@@ -150,7 +154,7 @@ const changeShowDetails = (number) => {
                     </div>
                     <div class="search-cate" v-else>
                         <a-input
-                            v-model:value="value"
+                            v-model:value="query.Kw"
                             style="width: 330px"
                             placeholder="结算单号"
                         />
@@ -183,42 +187,20 @@ const changeShowDetails = (number) => {
                                 :dataSource="item.SettleMentList"
                                 :class="item.SettleMentList.length ? '' : 'active'"
                             >
-                                <!-- <template #headerCell="{ title, column }">
-                                    <template v-if="column.key === `Sbn`">
-                                        <div class="flex">
-                                            <img
-                                                class="table-header"
-                                                :src="getImageUrl('user/weituo/1.png')"
-                                                alt=""
-                                            />
-                                            合同编号： {{ item.Cbn }}
-                                        </div>
-                                    </template>
-                                    <template v-if="column.key === `SettNums`">
-                                        结算单数: {{ item.SNums }}
-                                    </template>
-                                    <template v-if="column.key === `Prices`">
-                                        结算总结标额: {{ item.Prices }}
-                                    </template>
-                                    <template v-if="column.key === `TotalMPrice`">
-                                        结算总额: {{ item.TotalMPrice }}
-                                    </template>
-                                    <template v-if="column.key === `UnSteeNum`">
-                                        未结算藏品数: {{ item.UnSteeNum }}
-                                    </template>
-                                </template> -->
                                 <template #bodyCell="{ column, record }">
-                                    <template v-if="column.key === `UnSteeNum`">
+                                    <template v-if="column.key === `Sbn`">
+                                        <div
+                                            class="details"
+                                            @click="changeShowDetails(record.Sbn)"
+                                            >{{ record.Sbn }}</div
+                                        >
+                                    </template>
+                                    <!-- <template v-if="column.key === `UnSteeNum`">
                                         <div class="flex info">
                                             <span>{{ record.CreateTime }}</span>
                                             <div>{{ record.Status }}</div>
-                                            <div
-                                                class="details"
-                                                @click="changeShowDetails(record.Sbn)"
-                                                >查看详情</div
-                                            >
                                         </div>
-                                    </template>
+                                    </template> -->
                                 </template>
                             </a-table>
                         </div>
@@ -235,7 +217,6 @@ const changeShowDetails = (number) => {
             <CatePage :paginations="query" @fetchList="getGoodsList"></CatePage>
         </div>
     </div>
-    <SettleMentDetails v-else></SettleMentDetails>
 </template>
 
 <style scoped lang="less">
@@ -293,21 +274,9 @@ const changeShowDetails = (number) => {
         }
 
         .details {
-            border-width: 1px;
-            border-color: rgb(183, 194, 206);
-            border-style: solid;
-            border-radius: 4px;
-            background-color: rgb(255, 255, 255);
-            width: 70px;
-            height: 23px;
-            font-size: 12px;
-            line-height: 23px;
-            font-family: 'MicrosoftYaHei';
-            color: rgb(102, 115, 129);
+            color: #3a84e6;
             cursor: pointer;
-            &:hover {
-                color: #9a0000;
-            }
+            text-decoration: underline;
         }
     }
 }

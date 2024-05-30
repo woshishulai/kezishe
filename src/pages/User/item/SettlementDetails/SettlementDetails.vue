@@ -1,211 +1,176 @@
 <script setup>
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { getImageUrl } from '@/utils';
+import { getJieSuanXiangQing } from '@/request/user/api';
+
 const router = useRouter();
 const route = useRoute();
+const tableListInfo = ref({});
 const props = defineProps({});
-onMounted(() => {});
-const titleTopList = [
+const titleTopList = ref([
     {
         cate: '结算单号',
-        num: 1018163
+        num: ''
     },
     {
         cate: '所属合同',
-        num: 43495433
+        num: ''
     },
     {
         cate: '结算时间',
-        num: '2023-03-12'
+        num: ''
     },
     {
         cate: '结算单状态',
-        num: '已完成'
+        num: ''
     }
-];
-const titleTopDatList = [
+]);
+const titleTopDatList = ref([
     {
         cate: '合计结算金额',
-        num: '7, 117.20'
+        num: ''
     },
     {
         cate: '合计人民币(大写)',
-        num: '七千壹佰壹拾柒元貳角整'
+        num: ''
     },
     {
         cate: '本单获取的积分',
-        num: '144'
+        num: ''
     }
-];
-const columns = [
+]);
+const dataSource = ref([
     {
-        title: '分配方式',
-        key: 'cate',
-        dataIndex: 'cate'
-    },
-    {
-        title: '信息',
-        key: 'information',
-        dataIndex: 'information'
-    },
-    {
-        title: '金额',
-        key: 'amount',
-        dataIndex: 'amount'
-    },
-    {
-        title: '状态',
-        key: 'status',
-        dataIndex: 'status'
-    },
-    {
-        title: '备注',
-        key: 'remark',
-        dataIndex: 'remark'
+        PayType: '',
+        PayInfo: '',
+        Prices: '',
+        Status: '',
+        Remarks: ''
     }
-];
-const dataSource = [
-    {
-        cate: '银联',
-        information: '',
-        amount: '7,117.20',
-        status: '已完成',
-        remark: ''
-    }
-];
-const detailsColumns = [
-    {
-        title: '藏品编号',
-        key: 'goodsCode',
-        dataIndex: 'goodsCode'
-    },
-    {
-        title: '关联拍品编号',
-        key: 'infoGoodsCode',
-        dataIndex: 'infoGoodsCode'
-    },
-    {
-        title: '名称',
-        key: 'name',
-        dataIndex: 'name'
-    },
-    {
-        title: '结标价',
-        key: 'jieBiaoJia',
-        dataIndex: 'jieBiaoJia'
-    },
-    {
-        title: '服务费(-)',
-        key: 'fuWuFei',
-        dataIndex: 'fuWuFei'
-    },
-    {
-        title: '制作费(-)',
-        key: 'zhiZuoFei',
-        dataIndex: 'zhiZuoFei'
-    },
-    {
-        title: '涌币抵扣节省(+)',
-        key: 'yongBiJieSheng',
-        dataIndex: 'yongBiJieSheng'
-    },
-    {
-        title: '福利包抵扣节省(+)',
-        key: 'fuLiBaoJieSheng',
-        dataIndex: 'fuLiBaoJieSheng'
-    },
-    {
-        title: '保险费(-)',
-        key: 'baoXianFei',
-        dataIndex: 'baoXianFei'
-    },
-    {
-        title: '保管费(-)',
-        key: 'baoGuanFei',
-        dataIndex: 'baoGuanFei'
-    },
-    {
-        title: '结余',
-        key: 'jieYu',
-        dataIndex: 'jieYu'
-    }
-];
-const detailsDataSource = [
-    {
-        goodsCode: 38453450983,
-        infoGoodsCode: 430953234,
-        name: '纪特票新四套(部分票带边，色标)',
-        jieBiaoJia: 170.0,
-        fuWuFei: 3.49,
-        zhiZuoFei: 12.0,
-        yongBiJieSheng: 0.0,
-        fuLiBaoJieSheng: 0.0,
-        baoXianFei: 1.7,
-        baoGuanFei: 0.0,
-        jieYu: 152.9
-    },
-    {
-        goodsCode: 38453450983,
-        infoGoodsCode: 430953234,
-        name: '纪特票新四套(部分票带边，色标)',
-        jieBiaoJia: 170.0,
-        fuWuFei: 3.49,
-        zhiZuoFei: 12.0,
-        yongBiJieSheng: 0.0,
-        fuLiBaoJieSheng: 0.0,
-        baoXianFei: 1.7,
-        baoGuanFei: 0.0,
-        jieYu: 152.9
-    },
-    {
-        goodsCode: 38453450983,
-        infoGoodsCode: 430953234,
-        name: '纪特票新四套(部分票带边，色标)',
-        jieBiaoJia: 170.0,
-        fuWuFei: 3.49,
-        zhiZuoFei: 12.0,
-        yongBiJieSheng: 0.0,
-        fuLiBaoJieSheng: 0.0,
-        baoXianFei: 1.7,
-        baoGuanFei: 0.0,
-        jieYu: 152.9
-    }
-];
-const detailsList = [
+]);
+const detailsList = ref([
     {
         cate: '结标金额(+)',
-        data: '7,560.00'
+        data: ''
     },
     {
         cate: '服务费(-)',
-        data: '151.20'
+        data: ''
     },
     {
         cate: '保险费(-)',
-        data: '75.6'
+        data: ''
     },
     {
         cate: '保管费(-)',
-        data: '0.00'
+        data: ''
     },
     {
         cate: '制作费(-)',
-        data: '216.00'
+        data: ''
     },
     {
         cate: '其他费用(-)',
-        data: '0.00'
+        data: ''
+    }
+]);
+const getDetails = async () => {
+    let res = await getJieSuanXiangQing(route.query.Number);
+    tableListInfo.value = res.Data;
+    titleTopList.value[0].num = tableListInfo.value.Sbn;
+    titleTopList.value[1].num = tableListInfo.value.Cbn;
+    titleTopList.value[2].num = tableListInfo.value.SettleTime;
+    titleTopList.value[3].num = tableListInfo.value.Status;
+    titleTopDatList.value[0].num = tableListInfo.value.Prices;
+    titleTopDatList.value[1].num = tableListInfo.value.CnPrices;
+    titleTopDatList.value[2].num = tableListInfo.value.Points;
+    dataSource.value[0].PayType = tableListInfo.value.PayType;
+    dataSource.value[0].PayInfo = tableListInfo.value.PayInfo;
+    dataSource.value[0].Prices = tableListInfo.value.Prices;
+    dataSource.value[0].Status = tableListInfo.value.Status;
+    dataSource.value[0].Remarks = tableListInfo.value.Remarks;
+    detailsList.value[0].data = tableListInfo.value.TotalMPrice;
+    detailsList.value[1].data = tableListInfo.value.FwPrices;
+    detailsList.value[2].data = tableListInfo.value.BxPrices;
+    detailsList.value[3].data = tableListInfo.value.BgPrices;
+    detailsList.value[4].data = tableListInfo.value.ZzPrices;
+    detailsList.value[5].data = tableListInfo.value.QtPrices;
+};
+onMounted(() => {
+    getDetails();
+});
+
+const columns = [
+    {
+        title: '分配方式',
+        key: 'PayType',
+        dataIndex: 'PayType'
     },
     {
-        cate: '满币抵扣制作费(+)',
-        data: '0.00',
-        active: true
+        title: '信息',
+        key: 'PayInfo',
+        dataIndex: 'PayInfo'
     },
     {
-        cate: '福利包抵扣制作费(+)',
-        data: '0.00',
-        active: true
+        title: '金额',
+        key: 'Prices',
+        dataIndex: 'Prices'
+    },
+    {
+        title: '状态',
+        key: 'Status',
+        dataIndex: 'Status'
+    },
+    {
+        title: '备注',
+        key: 'Remarks',
+        dataIndex: 'Remarks'
+    }
+];
+
+const detailsColumns = [
+    {
+        title: '藏品编号',
+        key: 'Bn',
+        dataIndex: 'Bn',
+        width: 150
+    },
+    {
+        title: '名称',
+        key: 'Title',
+        dataIndex: 'Title',
+        width: 150,
+        ellipsis: true
+    },
+    {
+        title: '结标价',
+        key: 'MPrice',
+        dataIndex: 'MPrice'
+    },
+    {
+        title: '服务费(-)',
+        key: 'FwPrices',
+        dataIndex: 'FwPrices'
+    },
+    {
+        title: '制作费(-)',
+        key: 'ZzPrices',
+        dataIndex: 'ZzPrices'
+    },
+    {
+        title: '保险费(-)',
+        key: 'BxPrices',
+        dataIndex: 'BxPrices'
+    },
+    {
+        title: '保管费(-)',
+        key: 'BgPrices',
+        dataIndex: 'BgPrices'
+    },
+    {
+        title: '结余',
+        key: 'Prices',
+        dataIndex: 'Prices'
     }
 ];
 </script>
@@ -232,23 +197,38 @@ const detailsList = [
             </div>
         </div>
         <div class="show-item">
-            <div class="title"> 结算款分配 </div>
-            <a-table :pagination="false" :columns="columns" :dataSource="dataSource"></a-table>
+            <div class="title xiao"> 结算款分配 </div>
+            <a-table :pagination="false" :columns="columns" :dataSource="dataSource"> </a-table>
         </div>
         <div class="show-item">
-            <div class="title"> 藏品清单 </div>
+            <div class="title xiao"> 藏品清单 </div>
             <a-table
                 :pagination="false"
                 :columns="detailsColumns"
-                :dataSource="detailsDataSource"
-            ></a-table>
+                :dataSource="tableListInfo.SettlementRecordDatas"
+            >
+                <template #bodyCell="{ column, record }">
+                    <template v-if="column.key === 'Title'">
+                        <div class="goods-info">
+                            <a-tooltip>
+                                <template #title> {{ record.Title }} </template>
+                                <span>
+                                    {{ record.Title }}
+                                </span>
+                            </a-tooltip>
+                        </div>
+                    </template>
+                </template>
+            </a-table>
             <div class="details">
                 <div class="title-wrap">
                     <p
-                        ><span>项数 :</span> <span>{{ 4 }}项</span></p
+                        ><span>项数 : </span>
+                        <span>{{ tableListInfo?.SettlementRecordDatas?.length }}项</span></p
                     >
                     <p
-                        ><span>结余小技 :</span> <span class="active">￥{{ '7, 117.20' }}</span></p
+                        ><span>结余小计 : </span>
+                        <span class="active"> ￥ {{ titleTopDatList[0].num }}</span></p
                     >
                 </div>
                 <div class="data-wrap">
@@ -259,23 +239,42 @@ const detailsList = [
                         :class="item.active ? 'active' : ''"
                     >
                         <span>{{ item.cate }}</span>
-                        <span>{{ item.data }}</span>
+                        <span> ￥ {{ item.data }}</span>
                     </p>
                 </div>
             </div>
-            <div class="zong"> 结余小技 ￥ 7,117.20 </div>
+            <div class="zong"> 结余小计 ￥ {{ titleTopDatList[0].num }} </div>
         </div>
     </div>
 </template>
 
 <style scoped lang="less">
 .jiesuan-details {
+    :deep(.ant-table-wrapper .ant-table-thead > tr > th) {
+        padding: 16px 15px;
+        background-color: #eef3f8;
+    }
+    :deep(.ant-table-wrapper .ant-table-tbody > tr > td, ) {
+        padding: 16px 22px;
+    }
+    .goods-info {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        span {
+            flex: 1;
+            width: 117px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+    }
     .table-top {
         .title-info {
             .flex-row;
             justify-content: flex-start;
             gap: 30px;
-            padding: 15px 20px;
+            padding: 20px;
             background-color: #eef3f8;
 
             .active {
@@ -320,7 +319,7 @@ const detailsList = [
                     .flex-row;
 
                     span {
-                        width: 200px;
+                        width: 213px;
                     }
                 }
             }
@@ -329,7 +328,9 @@ const detailsList = [
                 color: #9a0000;
             }
         }
-
+        .xiao {
+            font-size: 16px;
+        }
         .zong {
             color: #9a0000;
             padding: 20px;

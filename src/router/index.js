@@ -232,6 +232,14 @@ const userRoutes = [
                 ]
             },
             {
+                path: 'youhuiquan',
+                component: () => import('@/pages/User/item/Financiallnfirmation/Youhuiquan.vue'),
+                meta: {
+                    name: '优惠券',
+                    icon: InboxOutlined
+                }
+            },
+            {
                 path: 'points',
                 component: () => import('@/pages/User/item/Points.vue'),
                 meta: {
@@ -253,15 +261,6 @@ const userRoutes = [
                             import('@/pages/User/item/Financiallnfirmation/Chongzhi.vue'),
                         meta: {
                             name: '账户余额',
-                            icon: CaretRightOutlined
-                        }
-                    },
-                    {
-                        path: 'youhuiquan',
-                        component: () =>
-                            import('@/pages/User/item/Financiallnfirmation/Youhuiquan.vue'),
-                        meta: {
-                            name: '优惠券',
                             icon: CaretRightOutlined
                         }
                     },

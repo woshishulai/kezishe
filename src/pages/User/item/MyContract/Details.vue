@@ -2,7 +2,12 @@
 import { ref, computed, reactive, onMounted, watch, watchEffect } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
-import { getHeTongDetailsApi, getGoodsListApi, getGoodsCateApi } from '@/request/user/api.js';
+import {
+    getHeTongDetailsApi,
+    getJieSuanGaiKuo,
+    getGoodsListApi,
+    getGoodsCateApi
+} from '@/request/user/api.js';
 import {
     timeStartOptions,
     timeEndOptions,
@@ -43,19 +48,16 @@ const getNavCateList = async () => {
         let res = await getGoodsCateApi(route.query.Number);
         navList.value = res.Data;
         query.Status = navList.value[0].Key;
-        console.log(navList.value, '我是顶部的类型');
     } catch (error) {}
 };
 const getTableList = async (page = 1, pageSize = 10) => {
     query.PageIndex = page;
     query.PageSize = pageSize;
-    console.log(32);
 
     try {
         let newRes = await getGoodsListApi(query);
         tableList.value = newRes.Data;
         query.total = newRes.Total;
-        console.log(newRes, '我是返回的数据', query.total);
     } catch (error) {}
 };
 onMounted(() => {
@@ -77,7 +79,6 @@ watch(
             return;
         }
         query.Status = showModals.value?.params?.statusCate;
-        console.log(query.Status);
         getTableList(1, 10);
     },
     {
@@ -85,7 +86,6 @@ watch(
     }
 );
 watchEffect(() => {
-    console.log(query.Status, '这里');
     columnsList.value =
         //结算成交
         query.Status == 3 || query.Status == 6
@@ -110,6 +110,52 @@ watchEffect(() => {
                         ? JingMaiColumns7
                         : JingMaiColumns;
 });
+const setColumns = ref([
+    {
+        title: '结算单号',
+        key: 'Sbn',
+        dataIndex: 'Sbn',
+        align: 'center'
+    },
+    {
+        title: '结算项数',
+        key: 'SettNums',
+        dataIndex: 'SettNums',
+        align: 'center'
+    },
+    {
+        title: '结算总额',
+        key: 'TotalMPrice',
+        dataIndex: 'TotalMPrice',
+        align: 'center'
+    },
+    {
+        title: '实得总额',
+        key: 'Prices',
+        dataIndex: 'Prices',
+        align: 'center'
+    },
+
+    {
+        title: '生成时间',
+        key: 'CreateTime',
+        dataIndex: 'CreateTime',
+        width: 200,
+        align: 'center'
+    },
+    {
+        title: '状态',
+        key: 'Status',
+        dataIndex: 'Status',
+        align: 'center'
+    }
+    // {
+    //     title: '',
+    //     key: 'details',
+    //     dataIndex: 'details',
+    //     align: 'center'
+    // }
+]);
 const statusText = (value) => {
     const statusMap = {
         0: '无状态',
@@ -133,6 +179,25 @@ const statusTexts = (value) => {
 
     return statusMap[value] || undefined;
 };
+const gaiKuoList = ref({});
+const isShowModal = ref(false);
+const getGaiKuo = async () => {
+    let res = await getJieSuanGaiKuo(tableLists.value.Number);
+    gaiKuoList.value = res.Data;
+};
+const showModalPage = (open) => {
+    isShowModal.value = open;
+    getGaiKuo();
+};
+const showGoodsDetails = (i) => {
+    console.log(i);
+    router.push({
+        path: '/jingmai/goods-details',
+        query: {
+            id: i.Id
+        }
+    });
+};
 </script>
 
 <template>
@@ -143,7 +208,7 @@ const statusTexts = (value) => {
                     <p>合同编号： {{ tableLists.Number }}</p>
                     <p>登记日期：{{ tableLists.AcceptTime }}</p>
                 </div>
-                <div class="show-jie-suan"> 查看结算概括 </div>
+                <div class="show-jie-suan" @click="showModalPage(true)"> 查看结算概括 </div>
             </div>
             <div class="liucheng-list">
                 <div
@@ -151,7 +216,7 @@ const statusTexts = (value) => {
                     v-for="(item, index) in tableLists.JinDuList"
                     :key="index"
                 >
-                    <div class="card-info">
+                    <div class="card-info" :class="tableLists.IsNow == item.Id ? 'active' : ''">
                         <p>{{ item.Title }}</p>
                         <p>{{ item.Time }}</p>
                     </div>
@@ -174,9 +239,12 @@ const statusTexts = (value) => {
                                 <template v-if="column.key === 'Title'">
                                     <div class="goods-info" @click="showGoodsDetails(record)">
                                         <img :src="record.CoverImg" alt="" />
-                                        <span>
-                                            {{ record.Title }}
-                                        </span>
+                                        <a-tooltip>
+                                            <template #title> {{ record.Title }} </template>
+                                            <span>
+                                                {{ record.Title }}
+                                            </span>
+                                        </a-tooltip>
                                     </div>
                                 </template>
                                 <template v-if="column.key === 'SettleStatus'">
@@ -199,6 +267,28 @@ const statusTexts = (value) => {
             </show-modal>
             <CatePage :paginations="query" @fetchList="getTableList()"></CatePage>
         </div>
+        <a-modal
+            :footer="null"
+            v-model:open="isShowModal"
+            style="width: 1130px; top: 25%"
+            @ok="showModalPage(false)"
+            class="xin"
+        >
+            <div class="title">结算概况</div>
+            <div class="flex">
+                <div> 单据数： {{ gaiKuoList.SNums }} </div>
+                <div> 结算项数: {{ gaiKuoList.SettNums }}项</div>
+                <div> 结算总额: {{ gaiKuoList.TotalMPrice }}元</div>
+                <div> 实得总额: {{ gaiKuoList.Prices }}元</div>
+                <div> 未结算: {{ gaiKuoList.UnSteeNum }}项</div>
+            </div>
+            <a-table
+                :pagination="false"
+                :columns="setColumns"
+                :dataSource="gaiKuoList.SettleMentList"
+            >
+            </a-table>
+        </a-modal>
     </div>
 </template>
 
@@ -240,14 +330,21 @@ const statusTexts = (value) => {
             cursor: pointer;
         }
         img {
-            height: 40px;
+            max-height: 40px;
+            max-width: 40px;
         }
         span {
             flex: 1;
+            width: 117px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     }
+
     .goods-infos {
-        border-bottom: 1px solid #8a0000;
+        color: #3a84e6;
+        text-decoration: underline;
     }
 
     .liucheng-list {
@@ -274,11 +371,33 @@ const statusTexts = (value) => {
                 background-color: #eef3f8;
                 border-radius: 8px;
                 font-size: 14px;
+
                 p {
                     height: 14px;
                 }
             }
+            .active {
+                background-color: #9a0000;
+                color: #fff;
+            }
         }
     }
+}
+.title {
+    font-size: 18px;
+    font-family: 'Adobe Heiti Std';
+    color: rgb(82, 82, 82);
+    margin-left: 16px;
+}
+.flex {
+    .flex-row;
+    gap: 20px;
+    justify-content: flex-start;
+    margin-top: 20px;
+    margin-left: 16px;
+    margin-bottom: 22px;
+    font-size: 16px;
+    font-family: 'Adobe Heiti Std';
+    color: rgb(85, 82, 82);
 }
 </style>

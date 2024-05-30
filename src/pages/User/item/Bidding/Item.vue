@@ -697,9 +697,12 @@ const deletes = () => {
                 <template v-if="column.key === 'Title'">
                     <div class="goods-info" @click="showGoodsDetails(record)">
                         <img :src="record.CoverImg" alt="" />
-                        <span>
-                            {{ record.Title }}
-                        </span>
+                        <a-tooltip>
+                            <template #title> {{ record.Title }} </template>
+                            <span>
+                                {{ record.Title }}
+                            </span>
+                        </a-tooltip>
                     </div>
                 </template>
                 <template v-if="column.key === 'Status'">
@@ -1147,10 +1150,15 @@ const deletes = () => {
             cursor: pointer;
         }
         img {
-            height: 40px;
+            max-height: 40px;
+            max-width: 40px;
         }
         span {
             flex: 1;
+            width: 117px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
     }
     :deep(.ant-table-wrapper .ant-table-thead > tr > th) {
