@@ -1,9 +1,10 @@
 <script setup>
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { getMenuList, getLeftMenuList, getInfoDetails } from '@/request/shougou/api';
+import { getMenuList, getLeftMenuList, getInfoDetails, getDanYe } from '@/request/shougou/api';
 import Details from './Details.vue';
 import { info } from '@/hooks/antd/message';
+import { getImageUrl } from '@/utils';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
@@ -31,26 +32,41 @@ const getRightList = async (page = 1, pageSize = 10) => {
         rightList.value = ress.Data;
         query.total = rightList.value.Total;
         document.title = rightList.value.seoData.seoTitle;
+
         if (!rightList.value || !Array.isArray(rightList.value.articledatas)) {
             return;
         }
+
         rightList.value.articledatas = rightList.value.articledatas.map((article) => {
-            const date = new Date(article.addTime);
+            const date = new Date(article.addtime);
+            const year = date.getFullYear();
             const month = String(date.getMonth() + 1).padStart(2, '0');
             const day = String(date.getDate()).padStart(2, '0');
-            const year = date.getFullYear();
             return {
                 ...article,
-                monthDay: `${month}.${day}`,
-                year: `-${year}-`
+                year: `-${year}-`,
+                month: `${month}.${day}`
             };
         });
-        console.log(rightList.value);
-    } catch (error) {}
+    } catch (error) {
+        console.error('Error fetching menu list:', error);
+    }
 };
+
+const addMethods = (query) => {
+    if (query && query.ColType && query.ColType == 2) {
+        getDanYes(query.Id);
+    } else if (query && query.Number) {
+        getDetails(query.Number);
+    } else {
+        getRightList();
+    }
+};
+
 function* apis() {
     let index = yield fetchDataApi();
-    yield index ? getDetails(index) : getRightList();
+    // 文章详情  和 右边列表
+    yield addMethods(index);
 }
 const iterator = apis();
 const fetchDataApi = async (page = 1, pageSize = 10) => {
@@ -62,8 +78,14 @@ const fetchDataApi = async (page = 1, pageSize = 10) => {
         query.Id = route.query.Id || menuData.value.Children[0].Id;
         title.value = menuData.value.Children[0].Name;
         let number = route.query.Number;
-        if (number || menuData.value.Children[0].ColType == 2) {
-            iterator.next(number || menuData.value.Children[0].Id);
+        let ColType = route.query.ColType;
+        if (number || ColType || menuData.value.Children[0].ColType == 2) {
+            let querys = {
+                Number: number,
+                ColType,
+                Id: query.Id
+            };
+            iterator.next(querys);
         } else {
             iterator.next();
         }
@@ -74,7 +96,12 @@ const fetchDataApi = async (page = 1, pageSize = 10) => {
 onMounted(() => {
     iterator.next();
 });
-
+const getDanYes = async (index) => {
+    let res = await getDanYe(index);
+    details.value = res.Data.articledata;
+    console.log(details.value);
+    document.title = res.Data.seoData.seoTitle;
+};
 const showDetails = (item) => {
     getDetails(item);
     router.push({
@@ -85,17 +112,19 @@ const showDetails = (item) => {
         }
     });
 };
-const changeShowList = (index, name) => {
-    query.Id = index;
+const changeShowList = (item) => {
+    query.Id = item.Id;
     getRightList();
     router.push({
         path: '/shougou',
         query: {
             Number: '',
-            Id: index
+            //左侧的选项
+            Id: item.Id,
+            ColType: item.ColType
         }
     });
-    title.value = name;
+    title.value = item.Name;
 };
 </script>
 
@@ -119,7 +148,7 @@ const changeShowList = (index, name) => {
                                 v-for="item in menuData?.Children"
                                 :key="item.Id"
                                 :class="query.Id == item.Id ? 'active' : ''"
-                                @click="changeShowList(item.Id, item.Name)"
+                                @click="changeShowList(item)"
                             >
                                 {{ item?.Name }}
                             </div>
@@ -131,18 +160,13 @@ const changeShowList = (index, name) => {
                             <h5>推荐资讯</h5>
                         </div>
                         <div class="center">
-                            <div
-                                class="nav-item"
-                                v-for="(item, index) in 8"
-                                :key="index"
-                                @click="showDetails(item)"
-                            >
+                            <div class="nav-item" v-for="(item, index) in 8" :key="index">
                                 中国邮政发行《“一带一路”倡议提出十周年》纪念邮票
                             </div>
                         </div>
                     </div>
                 </div>
-                <div class="shou-gou" v-show="!route.query.Number">
+                <div class="shou-gou" v-show="!route.query.Number && route.query.ColType != 2">
                     <div class="title">{{ title }}</div>
                     <div class="con-wrap">
                         <div
@@ -150,12 +174,12 @@ const changeShowList = (index, name) => {
                             v-for="(item, index) in rightList?.articledatas"
                             :key="index"
                             @click="showDetails(item.id)"
-                            :style="{ backgroundImage: `url(${menuData?.ImgUrl})` }"
+                            :style="{ backgroundImage: `url(${getImageUrl('shougou/bg.png')})` }"
                         >
                             <div class="bg"> </div>
                             <div class="left-time">
-                                <p class="mounth-day">09.03</p>
-                                <p class="year">-2023-</p>
+                                <p class="mounth-day">{{ item?.month }}</p>
+                                <p class="year">{{ item?.year }}</p>
                             </div>
                             <div class="right-text">
                                 {{ item.addtime }}
@@ -167,7 +191,10 @@ const changeShowList = (index, name) => {
                     </div>
                     <CatePage :paginations="query" @fetchList="getRightList"></CatePage>
                 </div>
-                <Details v-show="route.query.Number" :tableList="details"></Details>
+                <Details
+                    v-show="route.query.Number || route.query.ColType == 2"
+                    :tableList="details"
+                ></Details>
             </div>
         </div>
     </div>
@@ -200,6 +227,9 @@ const changeShowList = (index, name) => {
                 padding: 20px;
                 cursor: pointer;
                 background-size: 100% 100%;
+                border-radius: 4px;
+                height: 219px;
+
                 &:hover {
                     .bg {
                         opacity: 0;
@@ -220,12 +250,16 @@ const changeShowList = (index, name) => {
                     text-align: center;
                     .mounth-day {
                         font-size: 36px;
+                        font-family: 'Songti SC';
+                        color: rgb(16, 16, 16);
+                        line-height: 1.139;
                     }
                     .year {
                         margin-top: 10px;
                         font-size: 16px;
                     }
                 }
+
                 .right-text {
                     flex: 1;
                     width: 0;

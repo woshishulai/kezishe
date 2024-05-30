@@ -9,6 +9,10 @@ export const getLeftMenuList = async (params) =>
         `/Web/NewsHelp/ColumnList?Id=${params.Id}&PageSize=${params.PageSize}&PageIndex=${params.PageIndex}`
     );
 
-//收购文章详情
+//收购栏目单页
+export const getDanYe = async (params) =>
+    instance.get(`Web/NewsHelp/ColumnArticleInfo?Id=${params}`);
+
+//收购文章信息
 export const getInfoDetails = async (params) =>
     instance.get(`/Web/NewsHelp/ArticleData?Aid=${params}`);

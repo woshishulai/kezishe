@@ -11,10 +11,10 @@ onMounted(() => {});
 <template>
     <div class="shougou-details">
         <div class="title">
-            <h5>{{ props?.tableList?.Title }}</h5>
-            <p>时间 : {{ props?.tableList?.AddTime }}</p>
+            <h5>{{ props?.tableList?.Title || props?.tableList?.title }}</h5>
+            <p>时间 : {{ props?.tableList?.isArrayddTime }}</p>
         </div>
-        <div class="element" v-html="props?.tableList?.Content"> </div>
+        <div class="element" v-html="props?.tableList?.content"> </div>
     </div>
 </template>
 
