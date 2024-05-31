@@ -15,13 +15,14 @@ const showPage = (item) => {
         window.open(item.Href, '_blank');
         return;
     }
+    let path = item.Path || 'help';
     router.push({
-        path: '/' + item.Path || '/help',
+        path: '/' + path,
         query: {
             //关于我们
-            faId: item.Id
+            // faId: item.Id
             //收购的
-            // faId: '698859719640485888'
+            faId: '698887626106605568'
             //不能用
             // faId: '698859902541500416'
         }

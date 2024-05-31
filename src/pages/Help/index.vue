@@ -59,17 +59,12 @@ const fetchDataApi = async (page = 1, pageSize = 10) => {
     try {
         let res = await getMenuList(query);
         menuData.value = res.Data;
+        if (menuData.value.Children.lenght <= 1) {
+            return;
+        }
         query.Id = route.query.Id || menuData.value.Children[0].Id;
         title.value = menuData.value.Children[0].Name;
-        let number = route.query.Number;
-        if (number || menuData.value.Children[0].ColType == 2) {
-            iterator.next(number || menuData.value.Children[0].Id);
-        } else {
-            iterator.next();
-        }
-    } catch (error) {
-        info('error', error);
-    }
+    } catch (error) {}
 };
 onMounted(() => {
     iterator.next();
@@ -101,7 +96,6 @@ const changeShowList = (index, name) => {
 
 <template>
     <div class="wrap">
-        <div class="bgs" :style="{ backgroundImage: `url(${menuData?.ImgUrl})` }"></div>
         <div class="con-main-wrap">
             <BreadCrumbs></BreadCrumbs>
             <div class="show-element">
@@ -175,8 +169,16 @@ const changeShowList = (index, name) => {
 
 <style scoped lang="less">
 .wrap {
-    position: relative;
     padding-bottom: 40px;
+    background: linear-gradient(
+        to bottom,
+        #fff 0,
+        #fff 76px,
+        #fee3ba 76px,
+        #fdf3e4 286px,
+        #fff 286px
+    );
+
     .shou-gou {
         flex: 1;
         background-color: #fff;
@@ -251,23 +253,11 @@ const changeShowList = (index, name) => {
             }
         }
     }
-    .bgs {
-        content: '';
-        position: absolute;
-        top: 76px;
-        left: 0;
-        right: 0;
-        bottom: auto;
-        height: 310px;
-        z-index: -1;
-        // background-image: url('@/assets/img/shougou/bg.jpg');
-        background-size: cover;
-        background-position: center top;
-    }
+
     .show-element {
         display: flex;
         flex-direction: row;
-        margin-top: 120px;
+        margin-top: 40px;
         .left-wrap {
             width: 280px;
             .cate-nav {

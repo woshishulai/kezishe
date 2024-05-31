@@ -75,6 +75,9 @@ const fetchDataApi = async (page = 1, pageSize = 10) => {
     try {
         let res = await getMenuList(query);
         menuData.value = res.Data;
+        if (menuData.value.Children.lenght <= 1) {
+            return;
+        }
         query.Id = route.query.Id || menuData.value.Children[0].Id;
         title.value = menuData.value.Children[0].Name;
         let number = route.query.Number;
