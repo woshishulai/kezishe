@@ -10,7 +10,6 @@ onMounted(async () => {
     tableList.value = res.Data;
 });
 const showPage = (item) => {
-    console.log(item);
     if (item.Href) {
         window.open(item.Href, '_blank');
         return;

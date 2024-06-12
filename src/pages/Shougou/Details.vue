@@ -12,9 +12,9 @@ onMounted(() => {});
     <div class="shougou-details">
         <div class="title">
             <h5>{{ props?.tableList?.Title || props?.tableList?.title }}</h5>
-            <p>时间 : {{ props?.tableList?.isArrayddTime }}</p>
+            <p>时间 : {{ props?.tableList?.isArrayddTime || props?.tableList?.AddTime }}</p>
         </div>
-        <div class="element" v-html="props?.tableList?.content"> </div>
+        <div class="element" v-html="props?.tableList?.content || props?.tableList?.Content"> </div>
     </div>
 </template>
 
@@ -23,6 +23,7 @@ onMounted(() => {});
     flex: 1;
     background-color: #fafafa;
     padding: 0 12px;
+    min-height: 700px;
     .title {
         text-align: center;
         padding: 50px 0 30px;

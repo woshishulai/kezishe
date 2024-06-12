@@ -11,10 +11,11 @@ onMounted(() => {});
 <template>
     <div class="shougou-details">
         <div class="title">
-            <h5>{{ props?.tableList?.Title }}</h5>
-            <p>时间 : {{ props?.tableList?.AddTime }}</p>
+            <h5>{{ props?.tableList?.Title || props?.tableList?.title }}</h5>
+            <p>时间 : {{ props?.tableList?.AddTime || props?.tableList?.addtime }}</p>
         </div>
-        <div class="element" v-html="props?.tableList?.Content"> </div>
+        <div class="element" v-html="props?.tableList?.Content || props?.tableList?.contents">
+        </div>
     </div>
 </template>
 
@@ -23,6 +24,8 @@ onMounted(() => {});
     flex: 1;
     background-color: #fafafa;
     padding: 0 12px;
+    min-height: 700px;
+
     .title {
         text-align: center;
         padding: 50px 0 30px;
@@ -43,6 +46,9 @@ onMounted(() => {});
             line-height: 30px;
             margin: 20px 0;
             color: #2c2c2c;
+        }
+        :deep(p) {
+            line-height: 30px;
         }
         .img-p {
             text-align: center;

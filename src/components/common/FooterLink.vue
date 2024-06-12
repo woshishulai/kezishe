@@ -21,6 +21,17 @@ const props = defineProps({
 });
 
 onMounted(() => {});
+const showPage = (item) => {
+    let path = item.Path || 'help';
+    if (item == '关于我们') {
+        router.push({
+            path: '/' + path,
+            query: {
+                faId: '698887626106605568'
+            }
+        });
+    }
+};
 </script>
 
 <template>
@@ -29,7 +40,12 @@ onMounted(() => {});
         :style="{ backgroundColor: bg, paddingTop: pdTop, paddingBottom: pdBom }"
     >
         <div class="nav-list">
-            <li class="nav-item" v-for="item in footerInfoList" :key="item.title">
+            <li
+                class="nav-item"
+                @click="showPage(item.title)"
+                v-for="item in footerInfoList"
+                :key="item.title"
+            >
                 <span>{{ item.title }}</span>
                 <span>{{ item.shu }}</span>
             </li>

@@ -62,6 +62,7 @@ const generateMenuItems = (routes, parentRoutePath = '/user/') => {
 const menuItems = ref(generateMenuItems(userRoutes));
 
 const handleClick = (e) => {
+    console.log(e);
     const routePath = `${e.key}`;
     if (routePath === route.path) {
         router.replace({ path: routePath, query: { refresh: Math.random() } }).then(() => {

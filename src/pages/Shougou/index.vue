@@ -81,13 +81,19 @@ const fetchDataApi = async (page = 1, pageSize = 10) => {
         query.Id = route.query.Id || menuData.value.Children[0].Id;
         title.value = menuData.value.Children[0].Name;
         let number = route.query.Number;
-        let ColType = route.query.ColType;
+        let ColType = route.query.ColType || menuData.value.Children[0].ColType;
         if (number || ColType || menuData.value.Children[0].ColType == 2) {
             let querys = {
                 Number: number,
                 ColType,
                 Id: query.Id
             };
+            const currentQuery = { ...route.query };
+            currentQuery.ColType = ColType;
+            router.push({
+                path: route.path,
+                query: currentQuery
+            });
             iterator.next(querys);
         } else {
             iterator.next();
@@ -117,15 +123,15 @@ const showDetails = (item) => {
 };
 const changeShowList = (item) => {
     query.Id = item.Id;
-    getRightList();
+    let querys = {
+        Number: '',
+        Id: item.Id,
+        ColType: item.ColType
+    };
+    addMethods(querys);
     router.push({
         path: '/shougou',
-        query: {
-            Number: '',
-            //左侧的选项
-            Id: item.Id,
-            ColType: item.ColType
-        }
+        query: querys
     });
     title.value = item.Name;
 };
