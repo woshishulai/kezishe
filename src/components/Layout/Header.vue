@@ -184,6 +184,7 @@ watchEffect(async () => {
             padding: 20px 0;
             .logo {
                 cursor: pointer;
+                height: 82px;
             }
             .reserach {
                 flex: 1;

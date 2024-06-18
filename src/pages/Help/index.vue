@@ -11,8 +11,6 @@ const route = useRoute();
 const props = defineProps({});
 const menuData = ref(null);
 const rightList = ref(null);
-const openKeys = ref([]); // 忽略参数部分
-
 const query = reactive({
     Pid: route.query.faId,
     Id: '',
@@ -21,6 +19,10 @@ const query = reactive({
     PageIndex: 1
 });
 const details = ref({});
+const openKeys = ref([]);
+const selectKeys = ref('');
+selectKeys.value = route.query.faId;
+console.log(selectKeys.value);
 const getDetails = async (index) => {
     let res = await getInfoDetails(index);
     details.value = res.Data.ArticleInfo;
@@ -49,7 +51,6 @@ const getRightList = async (page = 1, pageSize = 10) => {
                 year: `-${year}-`
             };
         });
-        console.log(rightList.value);
     } catch (error) {}
 };
 const getDanYes = async (index) => {
@@ -72,18 +73,84 @@ function* apis() {
     yield addMethods(index);
 }
 const iterator = apis();
+const list = [
+    {
+        Id: '698887626106605568',
+        Name: '关于我们',
+        EnName: '',
+        Path: '',
+        ImgUrl: '',
+        Href: '',
+        ColType: 0,
+        Children: [
+            {
+                Id: '698887690329788416',
+                Name: '服务网点',
+                EnName: 'Service Locations',
+                Path: '',
+                ImgUrl: '',
+                Href: '',
+                ColType: 2
+            },
+            {
+                Id: '698887743412899840',
+                Name: '公司介绍',
+                EnName: 'Enterprise introduces',
+                Path: '',
+                ImgUrl: '',
+                Href: '',
+                ColType: 2
+            },
+            {
+                Id: '698887839881891840',
+                Name: '新闻动态',
+                EnName: 'Active news of us',
+                Path: '',
+                ImgUrl: '',
+                Href: '',
+                ColType: 2
+            },
+            {
+                Id: '698887884333125632',
+                Name: '诚聘英才',
+                EnName: 'Jobs',
+                Path: '',
+                ImgUrl: '',
+                Href: '',
+                ColType: 2
+            },
+            {
+                Id: '698887996530757632',
+                Name: '法律声明',
+                EnName: 'Legal Notices',
+                Path: '',
+                ImgUrl: '',
+                Href: '',
+                ColType: 2
+            }
+        ]
+    },
+    {
+        Id: '698887996530757632',
+        Name: '法律声明',
+        EnName: 'Legal Notices',
+        Path: '',
+        ImgUrl: '',
+        Href: '',
+        ColType: 2
+    }
+];
 const fetchDataApi = async (page = 1, pageSize = 10) => {
     query.PageIndex = page;
     query.PageSize = pageSize;
     try {
         let res = await getMenuList(query);
         menuData.value = res.Data;
+        menuData.value.Children = menuData.value.Children.concat(list);
         if (menuData.value.Children.lenght <= 1) {
             return;
         }
         query.Id = route.query.Id || menuData.value.Children[0].Id;
-        openKeys.value.push(query.Id);
-        console.log(openKeys.value);
         title.value = menuData.value.Children[0].Name;
         let number = route.query.Number;
         let ColType = route.query.ColType || menuData.value.Children[0].ColType;
@@ -135,40 +202,7 @@ const changeShowList = (item) => {
     });
     title.value = item.Name;
 };
-const generateMenuItems = (menu) => {
-    console.log(menu);
-    if (menu && Object.prototype.toString.call(menu) === '[object Array]' && menu.length > 0) {
-        return menu
-            .map((item) => {
-                const childMenuItem = {
-                    Id: item.Id,
-                    key: item.Id,
-                    label: item.Name,
-                    Name: item.Name,
-                    ColType: item.ColType,
-                    Href: item.Href,
-                    Path: item.Path,
-                    icon: () =>
-                        h('img', {
-                            src: getImageUrl('help/menu-son.svg'),
-                            alt: 'icon',
-                            class: 'menu-icon'
-                        })
-                };
-                if (
-                    item.Children &&
-                    Object.prototype.toString.call(item.Children) === '[object Array]' &&
-                    item.Children.length > 0
-                ) {
-                    childMenuItem.children = generateMenuItems(item.Children);
-                }
-                return childMenuItem;
-            })
-            .filter(Boolean);
-    } else {
-        return [];
-    }
-};
+
 const handleClick = (items) => {
     let item = items.item;
     query.Id = item.Id;
@@ -208,29 +242,57 @@ watch(
                             </p>
                         </div>
                         <div class="center">
-                            <a-menu
-                                id="dddddd"
-                                v-model:openKeys="openKeys"
-                                v-model:selectedKeys="selectedKeys"
-                                mode="inline"
-                                :items="generateMenuItems(menuData?.Children)"
-                                @click="handleClick"
-                            >
-                                <template v-slot:expandIcon="{ isOpen }">
-                                    <img
-                                        v-if="isOpen"
-                                        class="menu-icons"
-                                        :src="getImageUrl('help/selectRight.svg')"
-                                        alt="展开图标"
-                                    />
-                                    <img
-                                        v-else
-                                        class="menu-icon"
-                                        :src="getImageUrl('help/right.svg')"
-                                        alt="收起图标"
-                                    />
-                                </template>
-                            </a-menu>
+                            <div class="list">
+                                <div class="item" v-for="item in menuData?.Children" :key="item.Id">
+                                    <div
+                                        class="menu-title"
+                                        v-show="item?.Children && item?.Children.length"
+                                    >
+                                        <p>
+                                            {{ item.Name }}
+                                        </p>
+                                        <img
+                                            class="menu-icons"
+                                            :src="getImageUrl('help/selectRight.svg')"
+                                            alt="展开图标"
+                                        />
+                                        <img
+                                            class="menu-icon"
+                                            :src="getImageUrl('help/right.svg')"
+                                            alt="收起图标"
+                                        />
+                                    </div>
+                                    <div
+                                        class="menu-title"
+                                        v-show="!item?.Children || item.Children.length < 1"
+                                    >
+                                        <p>
+                                            {{ item.Name }}
+                                        </p>
+                                        <img
+                                            class="menu-icons"
+                                            :src="getImageUrl('help/selectRight.svg')"
+                                            alt="展开图标"
+                                        />
+                                        <img
+                                            class="menu-icon"
+                                            :src="getImageUrl('help/right.svg')"
+                                            alt="收起图标"
+                                        />
+                                    </div>
+                                    <div class="son-list">
+                                        <div
+                                            class="son-item"
+                                            v-for="i in item?.Children"
+                                            :key="i.Id"
+                                            :class="selectKeys == i.Id ? 'active' : ''"
+                                        >
+                                            <img src="" alt="" />
+                                            <p>{{ i.Name }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -267,7 +329,6 @@ watch(
         </div>
     </div>
 </template>
-
 <style scoped lang="less">
 .wrap {
     padding-bottom: 40px;
@@ -280,6 +341,7 @@ watch(
         #fff 286px
     );
 
+    //  正常的
     :deep(.ant-menu-light) {
         background-color: #fffaeb;
         padding: 10px 0;
@@ -304,43 +366,71 @@ watch(
                 height: 6px;
             }
         }
-        .ant-menu-item {
-            img {
-                opacity: 0;
-                width: 10px;
-                height: 12px;
-                margin-top: 3px;
-            }
-        }
-        .ant-menu-item-only-child {
-            background-color: #fce7a5 !important;
-            border-radius: 20px;
-            color: rgb(183, 119, 7);
-            height: 45px;
-            &.ant-menu-item-selected {
-                font-family: 'MicrosoftYaHei';
-                color: rgb(154, 0, 0);
-            }
+        // .ant-menu-item {
+        //     img {
+        //         opacity: 0;
+        //         width: 10px;
+        //         height: 12px;
+        //     }
+        // }
 
-            .ant-menu-title-content {
-                font-size: 16px;
-                font-family: 'MicrosoftYaHei';
-            }
-        }
+        // .ant-menu-item-only-child {
+        //     background-color: #fce7a5;
+        //     border-radius: 20px;
+        //     color: rgb(183, 119, 7);
+        //     height: 45px;
+        //     &.ant-menu-item-selected {
+        //         font-family: 'MicrosoftYaHei';
+        //         color: rgb(154, 0, 0);
+        //     }
+
+        //     .ant-menu-title-content {
+        //         font-size: 16px;
+        //         font-family: 'MicrosoftYaHei';
+        //     }
+        // }
+        // .ant-menu-item {
+        //     &.ant-menu-item-selected {
+        //         background-color: #fce7a5;
+        //         border-radius: 20px;
+        //         color: rgb(183, 119, 7);
+        //         height: 45px;
+        //         &.ant-menu-item-selected {
+        //             font-family: 'MicrosoftYaHei';
+        //             color: rgb(154, 0, 0);
+        //         }
+
+        //         .ant-menu-title-content {
+        //             font-size: 16px;
+        //             font-family: 'MicrosoftYaHei';
+        //         }
+        //     }
+        // }
         //选中的
-        .ant-menu-submenu-open {
-            .ant-menu-submenu-title {
-                font-size: 16px;
-                font-family: 'MicrosoftYaHei';
-                color: rgb(154, 0, 0);
-                font-weight: 500;
-            }
-            .ant-menu-item-selected {
-                img {
-                    opacity: 1;
-                }
-                // color: rgb(154, 0, 0);
-            }
+        // .ant-menu-submenu-open {
+        //     .ant-menu-submenu-title {
+        //         font-size: 16px;
+        //         font-family: 'MicrosoftYaHei';
+        //         color: rgb(154, 0, 0);
+        //         font-weight: 500;
+        //         .ant-menu-item-icon {
+        //             opacity: 0;
+        //         }
+        //     }
+        //     //选中的紫菜蛋的箭头
+        //     .ant-menu-item-selected {
+        //         img {
+        //             opacity: 1;
+        //         }
+        //         // color: rgb(154, 0, 0);
+        //     }
+        // }
+    }
+    // 子级
+    :deep(.ant-menu-submenu) {
+        .ant-menu-item.ant-menu-item-selected {
+            background-color: rgb(255 246 217);
+            border-radius: 0;
         }
     }
     .shou-gou {
@@ -442,6 +532,45 @@ watch(
                 }
                 .center {
                     min-height: 300px;
+                    .list {
+                        padding: 10px 5px 20px;
+                        background-color: rgb(254 250 236);
+                        .item {
+                            .menu-title,
+                            .title {
+                                .flex-row;
+                                justify-content: space-between;
+                                padding: 0 30px 0 35px;
+                                height: 45px;
+                                background-color: rgb(252 231 166);
+                                border-radius: 20px;
+                                margin-bottom: 10px;
+                                color: rgb(183, 119, 7);
+
+                                &.active,
+                                &:hover {
+                                    cursor: pointer;
+                                    color: rgb(154, 0, 0);
+                                }
+                            }
+                            .son-list {
+                                .son-item {
+                                    .flex-row;
+                                    justify-content: flex-start;
+                                    gap: 30px;
+                                    padding: 0 30px 0 35px;
+                                    height: 45px;
+                                    margin-bottom: 10px;
+
+                                    &.active,
+                                    &:hover {
+                                        cursor: pointer;
+                                        color: rgb(154, 0, 0);
+                                    }
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
