@@ -847,7 +847,7 @@ const JingMaiDataSource = [
         goodscode: '630527010',
         goodscate: '竞买',
         goodsname: '好东西很不错',
-        order: '壳子社',
+        order: '中邮网',
         time: '2023.10.12',
         price: '3,600.00元',
         sub: '待结算'
@@ -856,7 +856,7 @@ const JingMaiDataSource = [
         goodscode: '630527010',
         goodscate: '竞买',
         goodsname: '好东西很不错',
-        order: '壳子社',
+        order: '中邮网',
         time: '2023.10.12',
         price: '3,600.00元',
         sub: '结算中'
@@ -866,37 +866,7 @@ const JingMaiDataSource = [
         goodscate: '竞买',
 
         goodsname: '好东西很不错',
-        order: '壳子社',
-        time: '2023.10.12',
-        price: '3,600.00元',
-        sub: '待结算'
-    },
-
-    {
-        goodscode: '630527010',
-        goodscate: '竞买',
-
-        goodsname: '好东西很不错',
-        order: '壳子社',
-        time: '2023.10.12',
-        price: '3,600.00元',
-        sub: '结算中'
-    },
-    {
-        goodscode: '630527010',
-        goodscate: '竞买',
-        goodsname: '好东西很不错',
-        order: '壳子社',
-        time: '2023.10.12',
-        price: '3,600.00元',
-        sub: '结算中'
-    },
-    {
-        goodscode: '630527010',
-        goodscate: '竞买',
-
-        goodsname: '好东西很不错',
-        order: '壳子社',
+        order: '中邮网',
         time: '2023.10.12',
         price: '3,600.00元',
         sub: '待结算'
@@ -907,7 +877,37 @@ const JingMaiDataSource = [
         goodscate: '竞买',
 
         goodsname: '好东西很不错',
-        order: '壳子社',
+        order: '中邮网',
+        time: '2023.10.12',
+        price: '3,600.00元',
+        sub: '结算中'
+    },
+    {
+        goodscode: '630527010',
+        goodscate: '竞买',
+        goodsname: '好东西很不错',
+        order: '中邮网',
+        time: '2023.10.12',
+        price: '3,600.00元',
+        sub: '结算中'
+    },
+    {
+        goodscode: '630527010',
+        goodscate: '竞买',
+
+        goodsname: '好东西很不错',
+        order: '中邮网',
+        time: '2023.10.12',
+        price: '3,600.00元',
+        sub: '待结算'
+    },
+
+    {
+        goodscode: '630527010',
+        goodscate: '竞买',
+
+        goodsname: '好东西很不错',
+        order: '中邮网',
         time: '2023.10.12',
         price: '3,600.00元',
         sub: '待结算'

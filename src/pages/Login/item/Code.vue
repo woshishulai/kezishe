@@ -126,7 +126,12 @@ const handleFinish = async (values) => {
                         <LockOutlined style="color: rgba(0, 0, 0, 1.25)" />
                     </template>
                     <template #addonAfter>
-                        <a-button type="primary" @click="getCode" :disabled="countdown > 0">
+                        <a-button
+                            class="bg-btn"
+                            type="primary"
+                            @click="getCode"
+                            :disabled="countdown > 0"
+                        >
                             <span v-if="countdown === 0">获取验证码</span>
                             <span v-else>{{ countdown }}</span></a-button
                         >
@@ -146,7 +151,7 @@ const handleFinish = async (values) => {
                     </template>
                 </a-input>
             </a-form-item>
-            <a-form-item>
+            <a-form-item class="checkeds">
                 <a-checkbox v-model:checked="formState.remember">记住我</a-checkbox>
             </a-form-item>
             <a-form-item>
@@ -162,16 +167,20 @@ const handleFinish = async (values) => {
 .code {
     .code-img {
         width: 94.5px;
-        height: 52px;
+        height: 49px;
         cursor: pointer;
         background-color: #f3f3f3;
+        padding: 2px 2px 2px 0;
         .flex-row;
 
         img {
+            height: 100%;
             width: 100%;
-            height: 52px;
         }
     }
+}
+:deep(.bg-btn) {
+    height: 50px;
 }
 :deep(.ant-btn-primary:disabled) {
     color: #fff;

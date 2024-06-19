@@ -468,7 +468,7 @@ watch(
                             :options="addressList"
                         />
                     </a-dropdown>
-                    ¥{{ userPriceInfo.addressPrice }} (本商品由壳子社北京仓库为您发货)</div
+                    ¥{{ userPriceInfo.addressPrice }} (本商品由中邮网北京仓库为您发货)</div
                 >
             </div>
             <div

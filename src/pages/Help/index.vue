@@ -19,10 +19,20 @@ const query = reactive({
     PageIndex: 1
 });
 const details = ref({});
+//展开的数组
 const openKeys = ref([]);
+const addShowMenuItem = (id) => {
+    const index = openKeys.value.findIndex((item) => item == id);
+    if (index >= 0) {
+        openKeys.value.splice(index, 1);
+    } else {
+        openKeys.value.push(id);
+    }
+};
+
+//选中的
 const selectKeys = ref('');
-selectKeys.value = route.query.faId;
-console.log(selectKeys.value);
+selectKeys.value = route.query.Id;
 const getDetails = async (index) => {
     let res = await getInfoDetails(index);
     details.value = res.Data.ArticleInfo;
@@ -73,84 +83,30 @@ function* apis() {
     yield addMethods(index);
 }
 const iterator = apis();
-const list = [
-    {
-        Id: '698887626106605568',
-        Name: '关于我们',
-        EnName: '',
-        Path: '',
-        ImgUrl: '',
-        Href: '',
-        ColType: 0,
-        Children: [
-            {
-                Id: '698887690329788416',
-                Name: '服务网点',
-                EnName: 'Service Locations',
-                Path: '',
-                ImgUrl: '',
-                Href: '',
-                ColType: 2
-            },
-            {
-                Id: '698887743412899840',
-                Name: '公司介绍',
-                EnName: 'Enterprise introduces',
-                Path: '',
-                ImgUrl: '',
-                Href: '',
-                ColType: 2
-            },
-            {
-                Id: '698887839881891840',
-                Name: '新闻动态',
-                EnName: 'Active news of us',
-                Path: '',
-                ImgUrl: '',
-                Href: '',
-                ColType: 2
-            },
-            {
-                Id: '698887884333125632',
-                Name: '诚聘英才',
-                EnName: 'Jobs',
-                Path: '',
-                ImgUrl: '',
-                Href: '',
-                ColType: 2
-            },
-            {
-                Id: '698887996530757632',
-                Name: '法律声明',
-                EnName: 'Legal Notices',
-                Path: '',
-                ImgUrl: '',
-                Href: '',
-                ColType: 2
-            }
-        ]
-    },
-    {
-        Id: '698887996530757632',
-        Name: '法律声明',
-        EnName: 'Legal Notices',
-        Path: '',
-        ImgUrl: '',
-        Href: '',
-        ColType: 2
-    }
-];
 const fetchDataApi = async (page = 1, pageSize = 10) => {
     query.PageIndex = page;
     query.PageSize = pageSize;
+    console.log(query);
     try {
         let res = await getMenuList(query);
+        console.log(res);
         menuData.value = res.Data;
-        menuData.value.Children = menuData.value.Children.concat(list);
         if (menuData.value.Children.lenght <= 1) {
             return;
         }
+        if (selectKeys.value) {
+            menuData.value.Children.forEach((item) => {
+                if (item.Children && item.Children.length) {
+                    item.Children.forEach((i) => {
+                        if (i.Id == selectKeys.value) {
+                            openKeys.value.push(item.Id);
+                        }
+                    });
+                }
+            });
+        }
         query.Id = route.query.Id || menuData.value.Children[0].Id;
+        selectKeys.value = query.Id;
         title.value = menuData.value.Children[0].Name;
         let number = route.query.Number;
         let ColType = route.query.ColType || menuData.value.Children[0].ColType;
@@ -189,6 +145,7 @@ const showDetails = (item) => {
 };
 const changeShowList = (item) => {
     query.Id = item.Id;
+    selectKeys.value = item.Id;
     let querys = {
         Number: '',
         Id: item.Id,
@@ -222,8 +179,22 @@ const handleClick = (items) => {
 watch(
     () => route.query.faId,
     () => {
-        query.Pid = route.query.faId;
-        fetchDataApi();
+        if (route.query.faId) {
+            query.Pid = route.query.faId;
+            fetchDataApi();
+        }
+    }
+);
+watch(
+    () => route.query.Id,
+    () => {
+        if (route.query.Id) {
+            let query = {
+                Id: route.query.Id,
+                ColType: route.query.ColType
+            };
+            changeShowList(query);
+        }
     }
 );
 </script>
@@ -245,49 +216,58 @@ watch(
                             <div class="list">
                                 <div class="item" v-for="item in menuData?.Children" :key="item.Id">
                                     <div
+                                        @click.stop="addShowMenuItem(item.Id)"
                                         class="menu-title"
+                                        :class="openKeys.includes(item.Id) ? 'active' : ''"
                                         v-show="item?.Children && item?.Children.length"
                                     >
                                         <p>
                                             {{ item.Name }}
                                         </p>
                                         <img
+                                            v-show="openKeys.includes(item.Id)"
                                             class="menu-icons"
                                             :src="getImageUrl('help/selectRight.svg')"
                                             alt="展开图标"
                                         />
                                         <img
+                                            v-show="!openKeys.includes(item.Id)"
                                             class="menu-icon"
                                             :src="getImageUrl('help/right.svg')"
                                             alt="收起图标"
                                         />
                                     </div>
                                     <div
+                                        @click="changeShowList(item)"
                                         class="menu-title"
+                                        :class="selectKeys == item.Id ? 'active' : ''"
                                         v-show="!item?.Children || item.Children.length < 1"
                                     >
                                         <p>
                                             {{ item.Name }}
                                         </p>
                                         <img
-                                            class="menu-icons"
-                                            :src="getImageUrl('help/selectRight.svg')"
+                                            v-show="selectKeys == item.Id"
+                                            style="width: 10px"
+                                            :src="getImageUrl('help/select1.svg')"
                                             alt="展开图标"
                                         />
                                         <img
-                                            class="menu-icon"
-                                            :src="getImageUrl('help/right.svg')"
+                                            v-show="selectKeys != item.Id"
+                                            style="width: 10px"
+                                            :src="getImageUrl('help/select2.svg')"
                                             alt="收起图标"
                                         />
                                     </div>
-                                    <div class="son-list">
+                                    <div class="son-list" v-show="openKeys.includes(item.Id)">
                                         <div
                                             class="son-item"
                                             v-for="i in item?.Children"
                                             :key="i.Id"
+                                            @click="changeShowList(i)"
                                             :class="selectKeys == i.Id ? 'active' : ''"
                                         >
-                                            <img src="" alt="" />
+                                            <img :src="getImageUrl('help/menu-son.svg')" alt="" />
                                             <p>{{ i.Name }}</p>
                                         </div>
                                     </div>
@@ -357,14 +337,6 @@ watch(
             color: rgb(183, 119, 7);
             background-color: #fce7a5;
             border-radius: 20px;
-            .menu-icon {
-                width: 8px;
-                height: 10px;
-            }
-            .menu-icons {
-                width: 11px;
-                height: 6px;
-            }
         }
         // .ant-menu-item {
         //     img {
@@ -552,6 +524,14 @@ watch(
                                     cursor: pointer;
                                     color: rgb(154, 0, 0);
                                 }
+                                .menu-icon {
+                                    width: 10px;
+                                    height: 10px;
+                                }
+                                .menu-icons {
+                                    width: 11px;
+                                    height: 6px;
+                                }
                             }
                             .son-list {
                                 .son-item {
@@ -561,11 +541,17 @@ watch(
                                     padding: 0 30px 0 35px;
                                     height: 45px;
                                     margin-bottom: 10px;
-
+                                    img {
+                                        opacity: 0;
+                                    }
                                     &.active,
                                     &:hover {
                                         cursor: pointer;
                                         color: rgb(154, 0, 0);
+                                        background-color: rgb(255 246 217);
+                                        img {
+                                            opacity: 1;
+                                        }
                                     }
                                 }
                             }

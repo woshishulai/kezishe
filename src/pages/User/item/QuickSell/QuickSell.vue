@@ -84,7 +84,7 @@ for (let i = 0; i < 10; i++) {
         num: '1',
         name: '清朝瓷器',
         chengjiao: '112.00元',
-        laoban: '壳子社',
+        laoban: '中邮网',
         time: '2023.10.02',
         zhaopian: 'register/logo.png',
         qixian: '',

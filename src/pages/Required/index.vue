@@ -106,7 +106,7 @@ const changeStatus = async () => {
 <template>
     <div class="wrap">
         <Logo></Logo>
-        <div class="titles"> 壳子社在线委托出售明细 </div>
+        <div class="titles"> 中邮网在线委托出售明细 </div>
         <div class="label"
             ><span>委托方ID：{{ details?.UserId || '' }}</span>
             <p>

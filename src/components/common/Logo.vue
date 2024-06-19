@@ -10,9 +10,9 @@ onMounted(() => {});
 
 <template>
     <div class="header-logo" @click="router.push('/')">
-        <img class="logo" src="@/assets/img/common/logo.png" alt="" />
+        <img class="logo" src="@/assets/img/global/logo.png" alt="" />
         <div class="text-wrap">
-            <h5>您好，欢迎来到壳子社</h5>
+            <h5>您好，欢迎来到中邮网</h5>
             <h5>免费咨询热线：4000-888-0888</h5>
         </div>
     </div>

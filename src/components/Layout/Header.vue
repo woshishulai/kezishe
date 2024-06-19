@@ -64,7 +64,7 @@ watchEffect(async () => {
         <div class="header-user-wrap">
             <div class="con-main-wrap">
                 <div class="welcome-login">
-                    <h5>您好，欢迎来到壳子社</h5>
+                    <h5>您好，欢迎来到中邮网</h5>
                     <a-divider type="vertical" style="background-color: #a2887d" />
                     <div class="login" v-if="!user.userInfo.ApiToken">
                         <span class="active" @click="router.push('/login')">登录</span>

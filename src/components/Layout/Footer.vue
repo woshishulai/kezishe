@@ -9,19 +9,22 @@ onMounted(async () => {
     let res = await getFooterApi();
     tableList.value = res.Data;
 });
-const showPage = (item) => {
-    if (item.Href) {
-        window.open(item.Href, '_blank');
+const showPage = (item, i) => {
+    if (i.Href) {
+        window.open(i.Href, '_blank');
         return;
     }
-    let path = item.Path || 'help';
+    let path = i.Path || 'help';
     router.push({
         path: '/' + path,
         query: {
             //关于我们
-            // faId: item.Id
+            faId: item.Id,
+            Id: i.Id,
+            ColType: i.ColType,
+            Number: ''
             //收购的
-            faId: '698887626106605568'
+            // faId: '698887626106605568'
             //不能用
             // faId: '698859902541500416'
         }
@@ -59,7 +62,7 @@ const showPage = (item) => {
                         <h5>{{ item.Name }}</h5>
                         <span
                             class="nav-item-details"
-                            @click="showPage(i)"
+                            @click="showPage(item, i)"
                             v-for="i in item.Children"
                             :key="i"
                         >

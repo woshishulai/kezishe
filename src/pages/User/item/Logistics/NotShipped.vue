@@ -162,7 +162,7 @@ for (let i = 0; i < 10; i++) {
         cate: '竞买',
         chengjiao: '3,960.00元',
         cangchuqi: '剩余114天(免费)',
-        laoban: '壳子社',
+        laoban: '中邮网',
         time: '2023.10.02',
         price: '1.00',
         zhaopian: 'register/logo.png',

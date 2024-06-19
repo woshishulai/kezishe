@@ -89,7 +89,7 @@ const handleFinish = async () => {
                 </template>
                 <a-input
                     v-model:value.trim="formState.username"
-                    placeholder="请输入手机号码"
+                    placeholder="用户名"
                     id="login-account"
                 >
                     <template #prefix>
@@ -110,7 +110,7 @@ const handleFinish = async () => {
                 </template>
                 <template #addonAfter>
                     <!-- <a-button type="primary" @click="router.push('/reset-password')">忘记密码?</a-button> -->
-                    <a-button type="primary" @click="router.push('/reset-password')"
+                    <a-button class="bg-btn" @click="router.push('/reset-password')"
                         >忘记密码?</a-button
                     >
                 </template>
@@ -128,7 +128,7 @@ const handleFinish = async () => {
                 </template>
             </a-input>
         </a-form-item>
-        <a-form-item>
+        <a-form-item class="checkeds">
             <a-checkbox id="login-check" v-model:checked="formState.remember">记住我</a-checkbox>
         </a-form-item>
         <a-form-item>
@@ -167,16 +167,22 @@ const handleFinish = async () => {
     }
 }
 
+:deep(.bg-btn) {
+    border: none;
+    background-color: #f4f4f4;
+    height: auto;
+}
 .code-img {
     width: 94.5px;
-    height: 52px;
+    height: 49px;
     cursor: pointer;
     background-color: #f3f3f3;
+    padding: 2px 2px 2px 0;
     .flex-row;
 
     img {
+        height: 100%;
         width: 100%;
-        height: 52px;
     }
 }
 </style>

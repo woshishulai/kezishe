@@ -119,7 +119,7 @@ const onChange = (current) => {
             <div class="show-banner">
                 <div class="dynamic-wrap">
                     <div class="new-wrap">
-                        <h2 v-if="!user.userInfo.ApiToken">欢迎登录壳子社</h2>
+                        <h2 v-if="!user.userInfo.ApiToken">欢迎登录中邮网</h2>
                         <div class="login-wrap" v-if="!user.userInfo.ApiToken">
                             <a-button>
                                 <img :src="getImageUrl('home/icon1.jpg')" alt="注册" />
@@ -131,7 +131,7 @@ const onChange = (current) => {
                             </a-button>
                         </div>
                         <div class="user-name" v-if="user.userInfo.ApiToken">
-                            <span> {{ user.userInfo.RealName }} </span>, 欢迎登录壳子社
+                            <span> {{ user.userInfo.RealName }} </span>, 欢迎登录中邮网
                         </div>
                         <div class="nav-l" v-if="user.userInfo.ApiToken">
                             <div class="nav-item" v-for="(item, index) in list" :key="index">

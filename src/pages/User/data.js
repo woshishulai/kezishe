@@ -154,7 +154,7 @@ export const pingTai = [
     },
     {
         value: '0',
-        label: '壳子社'
+        label: '中邮网'
     }
 ];
 export const jingMaiColumns = [

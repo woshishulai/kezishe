@@ -93,7 +93,7 @@ const setActive = (index) => {
                 <p>累计销售0件</p>
             </div>
             <div class="prices">
-                <p class="label">配送：上海 ¥12.00 (本商品由壳子社北京仓库为您发货)</p>
+                <p class="label">配送：上海 ¥12.00 (本商品由中邮网北京仓库为您发货)</p>
                 <div class="add-price">
                     <div class="change-price">
                         <span>数量：</span>
