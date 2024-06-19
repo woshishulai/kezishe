@@ -3,13 +3,14 @@ import Logo from '@/components/common/Logo.vue';
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 //引入状态
-import { usePassword } from '@/store/store';
 import { getCodeLogin, registerLogin } from '@/request/api';
 import { handleFinishFailed } from '@/utils/form/rules';
+import { useUserInfo, usePassword } from '@/store/store';
 import { encryptionPassword } from '@/hooks/user';
 //获取状态接口
 import { getCodeParams } from '@/request/api';
 import { info } from '@/hooks/antd/message';
+const user = useUserInfo();
 const newCodeParams = usePassword();
 const router = useRouter();
 const route = useRoute();
@@ -209,8 +210,8 @@ const onFinish = async (values) => {
         query.Password = querys.Password;
         let res = await registerLogin(query);
         if (res.Tag == 1) {
-            info('success', res.Message);
-            router.push('/login');
+            user.changeUserInfo(res.Data);
+            router.push('/');
         }
     } catch (error) {
         info('error', error);
@@ -228,9 +229,10 @@ const onFinish = async (values) => {
                     :rules="rules"
                     :model="formState"
                     name="basic"
-                    :label-col="{ span: 8 }"
-                    :wrapper-col="{ span: 10 }"
+                    :label-col="{ span: 6 }"
+                    :wrapper-col="{ span: 11 }"
                     autocomplete="off"
+                    hideRequiredMark="true"
                     @finish="onFinish"
                     @finishFailed="handleFinishFailed"
                 >
@@ -270,17 +272,23 @@ const onFinish = async (values) => {
                             </template>
                         </a-input>
                     </a-form-item>
-                    <a-form-item name="remember" :wrapper-col="{ offset: 8, span: 16 }">
+                    <a-form-item
+                        class="checkeds"
+                        name="remember"
+                        :wrapper-col="{ offset: 6, span: 11 }"
+                    >
                         <a-checkbox v-model:checked="formState.remember"
                             >我已阅读并同意 《用户注册协议》</a-checkbox
                         >
                     </a-form-item>
-                    <a-form-item :wrapper-col="{ offset: 8, span: 10 }">
-                        <a-button type="primary" html-type="submit">注册</a-button>
+                    <a-form-item :wrapper-col="{ offset: 6, span: 11 }">
+                        <a-button type="primary" html-type="submit">立即注册</a-button>
                     </a-form-item>
                 </a-form>
             </div>
-            <p>我已经注册，现在就 <span @click="router.push('/login')">登录</span> </p>
+            <p class="label"
+                >我已经注册 ，现在就 <span @click="router.push('/login')">登录</span>
+            </p>
         </div>
     </div>
 </template>
@@ -293,7 +301,6 @@ const onFinish = async (values) => {
     height: 100vh;
     gap: 10px;
     padding: 30px 0;
-
     .header-logo {
         width: 820px;
     }
@@ -302,14 +309,16 @@ const onFinish = async (values) => {
         width: 820px;
         background-color: #fff;
         padding: 40px 0;
+        border-radius: 8px;
+        background-color: rgb(255, 255, 255);
 
         h3 {
             text-align: center;
             font-weight: 700;
-            font-size: 28px;
             margin-bottom: 30px;
+            font-size: 22px;
+            color: rgb(0, 0, 0);
         }
-
         .btn {
             button {
                 background-color: #afb9c6;
@@ -317,32 +326,81 @@ const onFinish = async (values) => {
             }
         }
 
-        p {
-            text-align: center;
-            font-size: 700;
+        .label {
+            margin-left: 290px;
 
             span {
                 color: #2677e5;
                 cursor: pointer;
+                &:hover {
+                    color: #9a0000;
+                }
             }
         }
     }
-    :deep(.ant-input) {
-        background-color: #f4f4f4;
+    :deep(.ant-form) {
+        .ant-form-item .ant-form-item-label > label {
+        }
+        .ant-form-item .ant-form-item-label > label::after {
+            margin-right: 15px;
+        }
+        .ant-checkbox + span {
+        }
+        .ant-btn {
+            border: none;
+            height: 48px;
+        }
+        .ant-input {
+            border: none;
+            background-color: #f4f4f4;
+        }
+        .ant-input-affix-wrapper {
+            background-color: #f4f4f4;
+            border: none;
+        }
+        .anticon svg {
+            color: #6b6b6b;
+            margin-right: 10px;
+            width: 15px;
+        }
+
+        .checkeds {
+            &:hover {
+                .ant-checkbox-inner {
+                    background-color: rgb(239, 239, 239);
+                }
+            }
+            .ant-checkbox-inner {
+                width: 18px;
+                height: 17px;
+                border-width: 1px;
+                border-color: rgb(107, 107, 107);
+                border-style: solid;
+                border-radius: 2px;
+                background-color: rgb(239, 239, 239);
+                &::after {
+                    top: 47%;
+                    margin-left: 3%;
+                    width: 5px;
+                    height: 10px;
+                    border-color: rgb(107, 107, 107);
+                }
+            }
+        }
     }
-    :deep(.ant-input-affix-wrapper) {
-        background-color: #f4f4f4;
-    }
+
     .code-img {
-        width: 94.5px;
-        height: 52px;
+        width: 120px;
+        height: 48px;
         cursor: pointer;
         background-color: #f3f3f3;
+        margin-left: 5px;
+        border: 1px solid #f4f4f4;
         .flex-row;
 
         img {
             width: 100%;
-            height: 52px;
+            height: 46px;
         }
     }
 }

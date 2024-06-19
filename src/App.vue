@@ -54,7 +54,7 @@ onMounted(() => {
                     //输入框提示文本
                     colorTextPlaceholder: '#000',
                     //组件高度 比如输入框 按钮等
-                    controlHeight: 52,
+                    controlHeight: 50,
                     //输入框提示文本
                     colorTextPlaceholder: '#000',
                     //被选中的

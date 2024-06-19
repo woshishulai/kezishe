@@ -28,8 +28,8 @@ const resetRules = {
 };
 
 const formState = reactive({
-    password: '215215',
-    repassword: '215215'
+    password: '',
+    repassword: ''
 });
 const info = (status, msg) => message[status](msg);
 const handleUsernameInput = () => {

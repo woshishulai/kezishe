@@ -371,7 +371,6 @@ const onChange = (current) => {
                     p {
                         line-height: 20px;
                         font-size: 14px;
-                        letter-spacing: 0;
                         height: 20px;
                     }
                 }

@@ -85,7 +85,7 @@ const handleFinishFailed = (errors) => {
 <style scoped lang="less">
 .btn-code {
     width: 120px;
-    height: 52px;
+    height: 48px;
     background-color: #fee5be;
     .flex-row;
 

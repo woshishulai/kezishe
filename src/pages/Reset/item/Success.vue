@@ -37,4 +37,8 @@ const getCurrentTime = () => {
         </a-result>
     </div>
 </template>
-<style scoped lang="less"></style>
+<style scoped lang="less">
+.ant-btn {
+    width: 300px;
+}
+</style>

@@ -29,6 +29,7 @@ onMounted(() => {});
 
     .logo {
         width: 246px;
+        cursor: pointer;
     }
 
     .text-wrap {
