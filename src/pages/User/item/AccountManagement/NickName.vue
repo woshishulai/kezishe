@@ -208,30 +208,32 @@ const changeDefault = async (query) => {
                     labelAlign="left"
                     :model="formState"
                     name="basicsss"
-                    :label-col="{ span: 3 }"
+                    :label-col="{ span: 2 }"
                     :wrapper-col="{ span: 10 }"
                     autocomplete="off"
                     @finish="handleFinish"
                     @finishFailed="handleFinishFailed"
+                    :hide-required-mark="true"
                 >
                     <a-form-item
                         :rules="[{ required: true, message: '昵称不能为空' }]"
                         label="昵称"
                         name="username"
                     >
-                        <a-input v-model:value.trim="formState.username" />
+                        <a-input style="width: 240px" v-model:value.trim="formState.username" />
                     </a-form-item>
                     <a-form-item
                         :rules="[{ required: true, message: '备注不能为空' }]"
                         label="备注"
-                        name="username"
+                        name="text"
                     >
                         <a-textarea
+                            style="width: 300px"
                             v-model:value="formState.text"
                             :auto-size="{ minRows: 2, maxRows: 5 }"
                         />
                     </a-form-item>
-                    <a-form-item :wrapper-col="{ offset: 3, span: 3 }">
+                    <a-form-item :wrapper-col="{ offset: 2, span: 3 }">
                         <a-button type="primary" html-type="submit">保存</a-button>
                     </a-form-item>
                 </a-form>
@@ -272,7 +274,15 @@ const changeDefault = async (query) => {
         }
     }
     .form-wrap {
-        padding: 40px 30px 20px 40px;
+        padding: 25px 30px 20px 32px;
+        .ant-input {
+            border-width: 1px;
+            border-style: solid;
+            border-radius: 4px;
+            border-color: rgb(218, 225, 232);
+            height: 43px;
+            background-color: rgb(255, 255, 255);
+        }
     }
 }
 </style>

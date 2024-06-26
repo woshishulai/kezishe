@@ -265,11 +265,13 @@ const handleFinishs = async () => {
                     labelAlign="left"
                     :model="formState"
                     name="basicsss"
+                    style="width: 771px"
                     :label-col="{ span: 3 }"
                     :wrapper-col="{ span: 10 }"
                     autocomplete="off"
                     @finish="handleFinish"
                     @finishFailed="handleFinishFailed"
+                    :hide-required-mark="true"
                 >
                     <a-form-item
                         :rules="[{ required: true, message: '姓名不能为空' }]"
@@ -347,8 +349,10 @@ const handleFinishs = async () => {
                     >
                         <a-input v-model:value="formState.phone" />
                     </a-form-item>
-                    <a-form-item :wrapper-col="{ offset: 3, span: 3 }">
-                        <a-button type="primary" html-type="submit">保存</a-button>
+                    <a-form-item :wrapper-col="{ offset: 3, span: 4 }">
+                        <a-button style="height: 43px; padding: 0" type="primary" html-type="submit"
+                            >保存</a-button
+                        >
                     </a-form-item>
                 </a-form>
             </div>
@@ -479,7 +483,15 @@ const handleFinishs = async () => {
         }
     }
     .form-wrap {
-        padding: 40px 30px 20px 40px;
+        padding: 25px 30px 20px 32px;
+        .ant-input {
+            border-width: 1px;
+            border-style: solid;
+            border-radius: 4px;
+            border-color: rgb(218, 225, 232);
+            height: 43px;
+            background-color: rgb(255, 255, 255);
+        }
     }
 }
 </style>

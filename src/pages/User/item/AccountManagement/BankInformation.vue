@@ -295,11 +295,13 @@ const handleFinishs = async () => {
                     labelAlign="left"
                     :model="formState"
                     name="basicsss"
+                    style="width: 771px"
                     :label-col="{ span: 3 }"
                     :wrapper-col="{ span: 10 }"
                     autocomplete="off"
                     @finish="handleFinish"
                     @finishFailed="handleFinishFailed"
+                    :hide-required-mark="true"
                 >
                     <a-form-item
                         :rules="[{ required: true, message: '姓名不能为空' }]"
@@ -393,7 +395,7 @@ const handleFinishs = async () => {
                     label="姓名"
                     name="username"
                 >
-                    <a-input v-model:value.trim="changeParams.username" />
+                    <a-input style="width: 240px" v-model:value.trim="changeParams.username" />
                 </a-form-item>
                 <a-form-item
                     :rules="[{ required: true, message: '国家不能为空' }]"
@@ -404,6 +406,7 @@ const handleFinishs = async () => {
                             label: 'AreaName',
                             value: 'AreaName'
                         }"
+                        style="width: 416px"
                         v-model:value="changeParams.region"
                         show-search
                         :options="countList"
@@ -421,6 +424,7 @@ const handleFinishs = async () => {
                             value: 'AreaName',
                             children: 'ChildList'
                         }"
+                        style="width: 416px"
                         expand-trigger="hover"
                         v-model:value="changeParams.date1"
                         :options="changeParams.statusList"
@@ -432,7 +436,7 @@ const handleFinishs = async () => {
                     label="银行名称"
                     name="bankNmae"
                 >
-                    <a-input v-model:value="changeParams.bankNmae" />
+                    <a-input style="width: 416px" v-model:value="changeParams.bankNmae" />
                 </a-form-item>
                 <a-form-item
                     :rules="[{ required: true, message: '分行支行' }]"
@@ -449,17 +453,23 @@ const handleFinishs = async () => {
                     label="银行卡号"
                     name="phone"
                 >
-                    <a-input v-model:value="changeParams.phone" />
+                    <a-input style="width: 416px" v-model:value="changeParams.phone" />
                 </a-form-item>
 
                 <a-form-item label="备注信息">
                     <a-textarea
+                        style="width: 416px"
                         v-model:value="changeParams.text"
                         :auto-size="{ minRows: 2, maxRows: 5 }"
                     />
                 </a-form-item>
                 <a-form-item :wrapper-col="{ offset: 5, span: 19 }">
-                    <a-button type="primary" html-type="submit">保存</a-button>
+                    <a-button
+                        style="width: 205px; height: 45px; padding: 0"
+                        type="primary"
+                        html-type="submit"
+                        >保存</a-button
+                    >
                 </a-form-item>
             </a-form>
         </a-modal>
@@ -498,7 +508,15 @@ const handleFinishs = async () => {
     }
 
     .form-wrap {
-        padding: 40px 30px 20px 40px;
+        padding: 25px 30px 20px 32px;
+        .ant-input {
+            border-width: 1px;
+            border-style: solid;
+            border-radius: 4px;
+            border-color: rgb(218, 225, 232);
+            height: 43px;
+            background-color: rgb(255, 255, 255);
+        }
     }
 }
 </style>

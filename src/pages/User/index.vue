@@ -34,6 +34,47 @@ onMounted(() => {});
 /* 在这里添加你的 Less 样式 */
 .wrap {
     background: #eef3f8;
+    :deep(.ant-select-selector) {
+        border-width: 1px;
+        border-color: rgb(218, 225, 232);
+        border-style: solid;
+        border-radius: 4px;
+        height: 43px;
+        background-color: rgb(255, 255, 255);
+    }
+    :deep(.ant-radio-wrapper) {
+        .ant-radio-inner::after {
+            background-color: #6d6d6d;
+        }
+        .ant-radio-checked .ant-radio-inner {
+            background-color: #f4f4f4;
+            border-color: #d9d9d9;
+            border-width: 2px;
+        }
+    }
+    :deep(.ant-form) {
+        .ant-input-affix-wrapper,
+        .ant-picker,
+        .ant-select-selector {
+            border-width: 1px;
+            border-color: rgb(218, 225, 232);
+            border-style: solid;
+            border-radius: 4px;
+            height: 43px;
+            background-color: rgb(255, 255, 255);
+        }
+        .ant-select-selection-item {
+            line-height: 43px;
+        }
+
+        // .ant-input {
+        //     border-width: 1px;
+        //     border-style: solid;
+        //     border-radius: 4px;
+        //     height: 43px;
+        //     background-color: rgb(255, 255, 255);
+        // }
+    }
 
     .con-main-wrap {
         .cen-wrap {

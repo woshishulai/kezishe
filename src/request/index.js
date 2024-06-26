@@ -20,7 +20,6 @@ instance.interceptors.request.use(
             config.headers = config.headers || {};
             config.headers.ApiToken = token;
         }
-        // console.log('请求带数据', config, new Date().toLocaleTimeString());
         return config;
     },
     (err) => {
@@ -31,12 +30,12 @@ instance.interceptors.request.use(
 instance.interceptors.response.use(
     (res) => {
         Loading.changeSpinning(false);
-        //个人信息返回缺少tag
-        res.data.Tag == 1
-            ? ''
-            : res.data.Tag == 2
-              ? removeUserInfo()
-              : info('error', res.data.Message);
+        // res.data.Tag == 1
+        //     ? ''
+        //     : res.data.Tag == 2
+        //       ? removeUserInfo()
+        //       : info('error', res.data.Message);
+        res.data.Tag == 1 ? '' : res.data.Tag == 2 ? removeUserInfo() : '';
         return res.data;
     },
     (resError) => {
@@ -74,7 +73,7 @@ instance.interceptors.response.use(
                     resError.message = `连接出错(${resError.response.status})!`;
             }
         }
-        info('errpr', resError.message);
+        info('error', resError.message);
         return Promise.reject(resError);
     }
 );

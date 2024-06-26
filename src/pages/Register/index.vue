@@ -339,12 +339,8 @@ const onFinish = async (values) => {
         }
     }
     :deep(.ant-form) {
-        .ant-form-item .ant-form-item-label > label {
-        }
         .ant-form-item .ant-form-item-label > label::after {
             margin-right: 15px;
-        }
-        .ant-checkbox + span {
         }
         .ant-btn {
             border: none;

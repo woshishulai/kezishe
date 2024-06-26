@@ -90,7 +90,6 @@ const showLoginApi = () => {
             width: 1300px;
             .left-text {
                 width: 600px;
-                letter-spacing: 1px;
                 color: rgb(250, 231, 175);
                 h2 {
                     font-size: 30px;

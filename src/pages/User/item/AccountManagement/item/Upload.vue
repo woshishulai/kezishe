@@ -28,8 +28,8 @@ let imageUrl = ref([]);
 let urls = ref([]);
 watchEffect(() => {
     if (props?.userImageUrl) {
-        imageUrl.value = props?.userImageUrl.split(',');
-        urls.value = props?.userImageUrl.split(',');
+        imageUrl.value = props?.userImageUrl.split(';');
+        urls.value = props?.userImageUrl.split(';');
     }
 });
 
@@ -68,7 +68,7 @@ const chooseImageUrl = async (e) => {
         });
 
         urls.value.push(res.Data.fullpath);
-        let url = urls.value.join(',');
+        let url = urls.value.join(';');
         emits('getFiles', url);
     } catch (error) {
         console.error('Error uploading file:', error);
@@ -77,6 +77,8 @@ const chooseImageUrl = async (e) => {
 const removes = (index) => {
     imageUrl.value.splice(index, 1);
     urls.value.splice(index, 1);
+    let url = urls.value.join(';');
+    emits('getFiles', url);
 };
 </script>
 
@@ -97,12 +99,9 @@ const removes = (index) => {
                 @click="removes(index)"
             />
         </div>
+
         <div class="upload">
             <input class="ipt" @change="chooseImageUrl" type="file" />
-            <div class="upload-btn">
-                <span>+</span>
-                <h5>上传{{ props?.title }}</h5>
-            </div>
         </div>
     </div>
     <p class="message" v-if="props.fileModule == 3" :class="imageUrl ? 'active' : ''"
@@ -119,29 +118,16 @@ const removes = (index) => {
     gap: 16px;
     .upload {
         position: relative;
-
+        background: url('@/assets/img/user/info/addimg.png');
+        background-size: 100% 100%;
+        width: 176px;
+        height: 115px;
         .ipt {
             position: absolute;
             width: 100%;
             height: 100%;
             opacity: 0;
             cursor: pointer;
-        }
-        .upload-btn {
-            .flex-col;
-            // padding: 20px 80px;
-            width: 310px;
-            height: 216px;
-            background-color: #f1f5f8;
-            color: #6d6d6d;
-
-            span {
-                font-size: 30px;
-            }
-
-            h5 {
-                font-size: 20px;
-            }
         }
     }
     .preview {

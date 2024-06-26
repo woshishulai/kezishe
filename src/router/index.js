@@ -120,7 +120,7 @@ const userRoutes = [
                 component: () => import('@/pages/User/item/Mail/index.vue'),
                 meta: {
                     name: '信箱',
-                    icon: AppstoreOutlined
+                    icon: MailOutlined
                 }
             },
             {
