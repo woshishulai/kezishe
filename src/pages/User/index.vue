@@ -87,6 +87,24 @@ onMounted(() => {});
                 flex: 1;
                 width: 0;
             }
+            :deep(.ant-form) {
+                .ant-form-item-label > label {
+                    font-size: 14px;
+                }
+                .ant-input {
+                    font-size: 14px;
+                }
+                .ant-radio-wrapper span.ant-radio + * {
+                    font-size: 14px;
+                }
+                .ant-picker .ant-picker-input > input {
+                    font-size: 14px;
+                }
+                .ant-select-selection-item,
+                .ant-btn {
+                    font-size: 14px;
+                }
+            }
             :deep(.ant-btn-default) {
                 background-color: #85909b;
             }

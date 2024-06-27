@@ -79,7 +79,10 @@ const showStampGoods = (i) => {
                 :class="
                     route.path == item.router ||
                     route.path == item.children1 ||
-                    route.path == item.children2
+                    route.path == item.children2 ||
+                    route.path == item.children3 ||
+                    route.path == item.children4 ||
+                    route.path == item.children5
                         ? 'active'
                         : ''
                 "

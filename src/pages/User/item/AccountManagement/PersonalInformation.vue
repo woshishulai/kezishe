@@ -455,6 +455,7 @@ const onFinish = async () => {
             .flex-row;
             justify-content: flex-start;
             gap: 90px;
+            font-size: 14px;
         }
 
         .form-wrap {

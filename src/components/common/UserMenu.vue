@@ -41,26 +41,22 @@ const list = ref([
                 selectIcon: 'right.png'
             }
         ],
-        icon: 'zhgl.png',
-        selectIcon: 'zhgl-hong.png'
+        icon: 'zhanghaozhongxinzhanghaoguanli'
     },
     {
         router: 'mail',
         name: '信箱',
-        icon: 'email.png',
-        selectIcon: 'email-hong.png'
+        icon: '001-mailinboxapp'
     },
     {
         router: 'my-following',
         name: '我的关注',
-        icon: 'wdgz.png',
-        selectIcon: 'wdgz-hong.png'
+        icon: 'aixin'
     },
     {
         router: 'my-bidding',
         name: '我的竞买',
-        icon: 'wdjm.png',
-        selectIcon: 'wdjm-hong.png'
+        icon: 'chuizi'
     },
     {
         router: 'my-entrustment',
@@ -82,8 +78,7 @@ const list = ref([
                 selectIcon: 'right.png'
             }
         ],
-        icon: 'wdwt.png',
-        selectIcon: 'wdwt-hong.png'
+        icon: 'weituo'
     },
     {
         router: 'quick-sell',
@@ -105,8 +100,7 @@ const list = ref([
                 selectIcon: 'right.png'
             }
         ],
-        icon: 'yjzm.png',
-        selectIcon: 'yjzm-hong.png'
+        icon: 'touch'
     },
     {
         router: 'logistics',
@@ -123,20 +117,17 @@ const list = ref([
                 selectIcon: 'right.png'
             }
         ],
-        icon: 'wl.png',
-        selectIcon: 'wl-hong.png'
+        icon: 'wuliuxinxi'
     },
     {
         router: 'youhuiquan',
         name: '优惠券',
-        icon: 'yhq.png',
-        selectIcon: 'yhq-hong.png'
+        icon: 'youhuijuan'
     },
     {
         router: 'points',
         name: '积分',
-        icon: 'jf.png',
-        selectIcon: 'jf-hong.png'
+        icon: '5wodejifen'
     },
     {
         router: 'financial-information',
@@ -163,8 +154,7 @@ const list = ref([
                 selectIcon: 'right.png'
             }
         ],
-        icon: 'cwxx.png',
-        selectIcon: 'cwxx-hong.png'
+        icon: 'jurassic_currency'
     }
 ]);
 const url = route.fullPath.replace('/user/', '');
@@ -289,30 +279,29 @@ const showUserInfo = () => {
     sonActive.value = '';
 };
 </script>
-
 <template>
     <div class="user-nav-list">
-        <div class="nav-title" @click="showUserInfo"> 个人中心 </div>
+        <div class="nav-title" @click="showUserInfo">个人中心</div>
         <div class="list">
             <div class="item" v-for="(item, index) in list" :key="index">
                 <div
                     class="title"
                     @click="handleClick(item.router, index)"
-                    :class="active === index ? 'active' : ''"
+                    :class="{ active: active === index }"
                 >
-                    <img class="default" :src="getImageUrl(`user/menu/${item.icon}`)" alt="" />
-                    <img class="select" :src="getImageUrl(`user/menu/${item.selectIcon}`)" alt="" />
+                    <div class="icon">
+                        <i :class="['iconfont', 'icon-' + item.icon]"></i>
+                    </div>
                     {{ item.name }}
-                    <span v-show="item.num"></span>
+                    <span v-if="item.num"></span>
                 </div>
                 <div class="i" v-show="item.children && item.children.length && active === index">
                     <div
                         class="i-item"
-                        v-show="item.children"
                         v-for="(i, iIndex) in item.children"
                         :key="iIndex"
                         @click="handleClick(i.router, index, iIndex)"
-                        :class="sonActive === iIndex ? 'active' : ''"
+                        :class="{ active: sonActive === iIndex }"
                     >
                         <img :src="getImageUrl('user/menu/right.png')" alt="" /> {{ i.name }}
                     </div>
@@ -325,98 +314,86 @@ const showUserInfo = () => {
 <style scoped lang="less">
 .user-nav-list {
     width: 256px;
-    .nav-title {
-        background: url('@/assets/img/user/menu-title-bg.png');
-        background-size: 100% 100%;
-        height: 56px;
-        color: #fff;
-        line-height: 57px;
-        cursor: pointer;
-        padding-left: 35px;
-        border-radius: 10px 10px 0 0;
-        font-size: 18px;
-    }
-    .list {
-        .flex-col;
-        align-items: flex-start;
-        padding: 4px 12px;
-        background-color: #fff;
-        border-radius: 0 0 10px 10px;
-        padding-bottom: 40px;
-
-        .item {
-            width: 100%;
-            .title {
-                position: relative;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-                color: rgb(74, 74, 74);
-                padding: 20px 8px 17px;
-                font-size: 18px;
-                cursor: pointer;
-
-                .select {
-                    display: none;
-                }
-                &:hover {
-                    color: #9a0000;
-                }
-                img {
-                    height: 22px;
-                }
-                &.active {
-                    color: #9a0000;
-                    .select {
-                        display: block;
-                    }
-                    .default {
-                        display: none;
-                    }
-                }
-                span {
-                    position: absolute;
-                    top: 50%;
-                    right: 10%;
-                    transform: translateX(-50%);
-                    display: block;
-                    width: 6px;
-                    height: 6px;
-                    border-radius: 50%;
-                    background-color: #9a0000;
-                }
-            }
-            .i {
-                padding-bottom: 10px;
-                .i-item {
-                    display: flex;
-                    align-items: center;
-                    gap: 16px;
-                    padding: 8px 16px;
-                    cursor: pointer;
-                    border-width: 2px;
-                    border-color: transparent;
-                    border-style: solid;
-                    border-radius: 6px;
-                    &:hover {
-                        color: #9a0000;
-                        img {
-                            opacity: 1;
-                        }
-                    }
-                    &.active {
-                        color: #9a0000;
-                        border-color: rgb(154, 0, 0);
-                        img {
-                            opacity: 1;
-                        }
-                    }
-                    img {
-                        opacity: 0;
-                    }
-                }
-            }
-        }
-    }
+}
+.nav-title {
+    background: url('@/assets/img/user/menu-title-bg.png');
+    background-size: 100% 100%;
+    height: 56px;
+    color: #fff;
+    line-height: 57px;
+    cursor: pointer;
+    padding-left: 35px;
+    border-radius: 10px 10px 0 0;
+    font-size: 16px;
+}
+.list {
+    padding: 4px 12px;
+    background-color: #fff;
+    border-radius: 0 0 10px 10px;
+    padding-bottom: 40px;
+}
+.item {
+    width: 100%;
+}
+.title {
+    position: relative;
+    display: flex;
+    align-items: center;
+    color: rgb(74, 74, 74);
+    padding: 20px 8px 17px;
+    font-size: 16px;
+    cursor: pointer;
+}
+.title:hover {
+    color: #9a0000;
+}
+.title.active {
+    color: #9a0000;
+}
+.title .icon {
+    width: 30px;
+}
+.title span {
+    position: absolute;
+    top: 50%;
+    right: 10%;
+    transform: translateX(-50%);
+    display: block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: #9a0000;
+}
+.i {
+    padding-bottom: 10px;
+    transition: 0.2s;
+    color: #4a4a4a;
+    font-size: 21px;
+}
+.i-item {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 8px 16px;
+    cursor: pointer;
+    border-width: 2px;
+    border-color: transparent;
+    border-style: solid;
+    border-radius: 6px;
+    font-size: 14px;
+}
+.i-item:hover {
+    color: #9a0000;
+}
+.i-item.active {
+    color: #9a0000;
+    border-color: rgb(154, 0, 0);
+}
+.i-item img {
+    opacity: 0;
+}
+.i-item.active img,
+.i-item:hover img {
+    opacity: 1;
 }
 </style>

@@ -7,7 +7,10 @@ let navList = [
         title: '竞买',
         router: '/jingmai',
         children1: '/jingmai/',
-        children2: '/jingmai/stamp'
+        children2: '/jingmai/stamp',
+        children3: '/jingmai/show-stamp-goods',
+        children4: '/jingmai/goods-details',
+        children5: '/jingmai/show-goods'
     },
     {
         title: '委托',
@@ -19,7 +22,9 @@ let navList = [
     },
     {
         title: '成交',
-        router: '/chengjiao'
+        router: '/chengjiao',
+        children1: '/chengjiao/transaction-session',
+        children2: '/chengjiao/details'
     },
     {
         title: '收购',

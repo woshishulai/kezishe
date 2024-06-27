@@ -70,6 +70,7 @@ const user = useUserInfo();
             display: flex;
             align-items: center;
             gap: 20px;
+            font-size: 14px;
             p {
                 display: flex;
                 align-items: center;

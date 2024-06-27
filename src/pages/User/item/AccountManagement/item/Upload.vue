@@ -148,7 +148,7 @@ const removes = (index) => {
 .message {
     display: none;
     color: #9a0000;
-    font-size: 16px;
+    font-size: 14px;
     margin: 20px 0;
     &.active {
         display: block;
