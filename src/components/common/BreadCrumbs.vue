@@ -43,7 +43,7 @@ const handleBreadcrumbClick = (index) => {
     .flex-row;
     justify-content: flex-start;
     gap: 20px;
-    padding: 30px 0 30px 0;
+    padding: 16px 0 16px 0;
     width: 1400px;
     font-size: 16px;
     margin: 0 auto;
@@ -52,7 +52,7 @@ const handleBreadcrumbClick = (index) => {
         .flex-row;
         gap: 10px;
         cursor: pointer;
-        color: #94979a;
+        color: rgb(16, 16, 16);
 
         &:last-child {
             .nav {

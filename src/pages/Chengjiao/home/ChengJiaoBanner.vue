@@ -40,8 +40,9 @@ const list = [
             </div>
             <div class="center">
                 <p class="label">实时成交总数量</p>
-                <p>
-                    <span>{{ 6986501 }}</span> 件
+                <p class="liang">
+                    {{ 6986501 }}
+                    <span>件</span>
                 </p>
             </div>
             <div class="card-list">
@@ -53,7 +54,8 @@ const list = [
             </div>
         </div>
         <div class="swiper-wrap">
-            <a-carousel autoplay>
+            <!-- autoplay -->
+            <a-carousel>
                 <img
                     class="swiper-img"
                     v-for="item in swiperList"
@@ -72,36 +74,47 @@ const list = [
     flex-direction: row;
     gap: 10px;
     .left-wrap {
-        width: 415px;
-        padding: 20px 16px;
         background-color: #fef4d3;
+        width: 413px;
+        height: 315px;
+        padding: 23px 20px;
         .title {
             .flex-row;
             justify-content: flex-start;
             font-size: 16px;
             gap: 5px;
+            padding-left: 10px;
             .name {
                 color: #9a0000;
             }
         }
         .center {
-            background-color: #fff;
+            .flex-col;
+            gap: 15px;
             margin: 20px 0;
-            padding: 40px;
-            font-size: 18px;
-            border-radius: 10px;
+            border-width: 1px;
+            border-color: rgb(247, 234, 198);
+            border-style: solid;
+            border-radius: 6px;
+            background-color: rgb(252, 249, 241);
+            height: 109px;
+            text-align: center;
             .label {
-                font-weight: 600;
-                margin-bottom: 10px;
+                font-size: 18px;
+                color: rgb(16, 16, 16);
             }
-            p {
+            .liang {
                 .flex-row;
+                gap: 4px;
+                font-size: 22px;
+                color: rgb(229, 64, 55);
                 span {
-                    color: #e54037;
-                    font-size: 22px;
+                    font-size: 16px;
+                    color: rgb(16, 16, 16);
                 }
             }
         }
+
         .card-list {
             .flex-row;
             justify-content: space-around;
@@ -116,10 +129,12 @@ const list = [
     }
     .swiper-wrap {
         flex: 1;
-        min-width: 950px;
-
+        width: 0;
+        :deep(.slick-list) {
+            height: 315px;
+        }
         .swiper-img {
-            height: 320px;
+            height: 315px;
         }
     }
 }

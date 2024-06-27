@@ -3,13 +3,96 @@ import { useRouter, useRoute } from 'vue-router';
 import { reactive, ref, onMounted } from 'vue';
 import { isAddActive } from '@/hooks/user';
 import { getUserInfoApi } from '@/request/api';
-import { getPhone } from '@/utils/form/getCode';
 import { useUserInfo } from '@/store/store';
 import { info } from '@/hooks/antd/message';
 import { changeUserInfo, changeUserCallInfo } from '@/request/api';
-import { userInfoRules, changeUserInfoCallRules } from './rules';
+import { changeUserInfoCallRules } from './rules';
 import { handleFinishFailed } from '@/utils/form/rules.js';
 import Upload from './item/Upload.vue';
+const userInfoRules = {
+    RealName: [
+        {
+            required: true,
+            message: '请输入您的姓名',
+            trigger: 'change'
+        },
+        {
+            min: 1,
+            max: 20,
+            message: '用户名长度1-20位',
+            trigger: 'change'
+        }
+    ],
+    Gender: [
+        {
+            required: true,
+            message: '请选择您的性别',
+            trigger: 'change'
+        },
+        {
+            validator: (_, value) => {
+                if (value == 0) {
+                    return Promise.reject(new Error('请选择您的性别'));
+                }
+                return Promise.resolve();
+            },
+            trigger: 'change'
+        }
+    ],
+    Birthday: [
+        {
+            required: true,
+            message: '请完善您的出生日期',
+            trigger: 'change'
+        }
+    ],
+    IdType: [
+        {
+            required: true,
+            message: '请选择您的身份类型',
+            trigger: 'change'
+        }
+    ],
+    IdImage: [
+        {
+            required: true,
+            message: '请上传您的证件',
+            trigger: 'change'
+        }
+    ],
+    IdNumbers: [
+        {
+            validator: (_, value) => {
+                if (formState.value.IdType == 1) {
+                    // 身份证格式校验
+                    const idCardPattern =
+                        /^[1-9]\d{5}(18|19|20)?\d{2}(0[1-9]|1[0-2])(0[1-9]|[12]\d|3[01])\d{3}(\d|X)$/;
+                    if (!idCardPattern.test(value)) {
+                        return Promise.reject('身份证格式不正确');
+                    }
+                } else if (formState.value.IdType == 2) {
+                    // 护照可以不输入
+                    if (value) {
+                        const passportPattern = /^[a-zA-Z0-9]{5,17}$/;
+                        if (!passportPattern.test(value)) {
+                            return Promise.reject('护照格式不正确');
+                        }
+                    }
+                } else if (formState.value.IdType == 3) {
+                    // 台胞证格式校验
+                    const taiwanCardPattern = /^[a-zA-Z][0-9]{9}$/;
+                    if (!taiwanCardPattern.test(value)) {
+                        return Promise.reject('台胞证格式不正确');
+                    }
+                } else if (formState.value.IdType == 4) {
+                    // 不校验
+                }
+                return Promise.resolve();
+            },
+            trigger: 'change'
+        }
+    ]
+};
 const user = useUserInfo();
 const countdown = ref(0);
 const emailCountDown = ref(0);
@@ -46,6 +129,15 @@ const fetchuserInfo = async () => {
 onMounted(() => {
     fetchuserInfo();
 });
+const getPhone = () => {
+    const phoneRegex = /^1[3456789]\d{9}$/;
+    const phoneNumber = formState1.value.TelPhone;
+    const isPhoneValid = phoneRegex.test(phoneNumber);
+    if (!isPhoneValid) {
+        info('error', '请输入正确的手机号');
+    }
+    return isPhoneValid;
+};
 const getCode = () => {
     const isPhoneValid = getPhone();
     if (isPhoneValid) {

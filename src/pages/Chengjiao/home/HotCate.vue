@@ -28,7 +28,10 @@ onMounted(() => {});
                         <img :src="getImageUrl('chengjiao/icon4.png')" alt="" />
                         现代金银币( 446756 )
                     </p>
-                    <span class="more">更多></span>
+                    <span class="more"
+                        >更多
+                        <span style="position: relative; bottom: 1px"> > </span>
+                    </span>
                 </div>
                 <div class="center">
                     <div class="label-item" v-for="(i, iIndex) in 5" :key="iIndex">
@@ -45,10 +48,10 @@ onMounted(() => {});
 
 <style scoped lang="less">
 .hot-cate {
-    margin: 20px 0 50px 0;
+    margin: 12px 0 30px 0;
     background: url('@/assets/img/chengjiao/bg.png');
     background-size: 100% 100%;
-    padding: 0 30px 30px;
+    padding: 0 30px 23px;
     .top-title {
         .flex-row;
         gap: 20px;
@@ -85,7 +88,7 @@ onMounted(() => {});
         flex-wrap: wrap;
         gap: 15px;
         .card-item {
-            width: 32%;
+            width: 32.5%;
             .title {
                 display: flex;
                 align-items: center;
@@ -102,6 +105,9 @@ onMounted(() => {});
                 }
                 .more {
                     cursor: pointer;
+                    &:hover {
+                        color: #9a0000;
+                    }
                 }
             }
             .center {
@@ -115,7 +121,7 @@ onMounted(() => {});
                     border-bottom: 1px solid #efefef;
                     &:hover {
                         background-color: #ebebeb;
-                        color: #9a0000;
+                        color: #d5b560;
                     }
                     p {
                         width: 270px;

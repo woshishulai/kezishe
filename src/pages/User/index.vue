@@ -13,7 +13,7 @@ onMounted(() => {});
     <Header></Header>
     <div class="wrap">
         <div class="con-main-wrap">
-            <BreadCrumbs></BreadCrumbs>
+            <div style="padding-left: 14px"><BreadCrumbs></BreadCrumbs></div>
             <div class="cen-wrap">
                 <UserMenu paths="/user"></UserMenu>
                 <div class="user-item">
@@ -80,11 +80,12 @@ onMounted(() => {});
         .cen-wrap {
             display: flex;
             flex-direction: row;
-            gap: 30px;
+            gap: 20px;
             padding-bottom: 40px;
 
             .user-item {
                 flex: 1;
+                width: 0;
             }
             :deep(.ant-btn-default) {
                 background-color: #85909b;

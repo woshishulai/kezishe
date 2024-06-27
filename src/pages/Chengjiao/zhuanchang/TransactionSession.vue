@@ -1,8 +1,22 @@
 <script setup>
 import { ref, computed, reactive, onMounted, watchEffect } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
+import { fetchDataApi } from '@/request/chengjiao/api';
 import { getImageUrl } from '@/utils';
-
+//参数
+const state = reactive({
+    KeyWd: '', //名称搜索
+    Lid: null, //传递当前请求专场或竞买类别ID 下称集合ID
+    AuctionStatuses: '1,2', //藏品状态，1预展中、2竞买中，多个用逗号拼接
+    AuctionBrands: '1,2', //藏品类型，1竞买、2一口价，多个用逗号拼接
+    CategoryIds: '', //藏品集合ID，下级分类,多个用逗号拼接
+    Grades: '1', //选中的 品级集合，多个用逗号拼接
+    Sort: '1', //排序，1结标时间、2价格高的、3价格低的、4热门的
+    DateStart: '', //开始时间
+    DateEnd: '', //结束时间
+    TimeRange: '0', //结标时间，0全部、1一小时、6六小时、24当天
+    PriceRange: '0' //价格区间 0,N 0,122
+});
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
@@ -121,12 +135,6 @@ const cateList2 = [
         label: '周周转'
     }
 ];
-const state = reactive({
-    value1: ['2023', '2021'],
-    value2: '0',
-    value3: ['邮品'],
-    value4: ['竞买', '一口价', '周周转']
-});
 watchEffect(() => {
     console.log(state.value1);
     console.log(state.value2);
@@ -138,7 +146,14 @@ watchEffect(() => {
 <template>
     <div class="transaction-session">
         <div class="left-wrap">
-            <a-collapse v-model:activeKey="activeKey">
+            <a-collapse
+                expandIconPosition="end"
+                :expand-icon="expandIcon"
+                v-model:activeKey="activeKey"
+            >
+                <template #expandIcon>
+                    <img :src="getImageUrl('chengjiao/down.png')" alt="" />
+                </template>
                 <a-collapse-panel key="1" header="年份">
                     <a-checkbox-group
                         v-model:value="state.value1"
@@ -160,13 +175,6 @@ watchEffect(() => {
                         :options="cateList1"
                     />
                 </a-collapse-panel>
-                <a-collapse-panel key="4" header="类别">
-                    <a-checkbox-group
-                        v-model:value="state.value4"
-                        name="checkboxgrousssp"
-                        :options="cateList2"
-                    />
-                </a-collapse-panel>
             </a-collapse>
         </div>
         <div class="right-wrap">
@@ -184,15 +192,68 @@ watchEffect(() => {
 <style scoped lang="less">
 .transaction-session {
     display: flex;
-    gap: 15px;
+    gap: 11px;
     .left-wrap {
         width: 260px;
+
+        :deep(.ant-collapse) {
+            .ant-collapse-content {
+                color: #f8f8f8;
+                border-radius: 0 0 5px 5px;
+            }
+            .ant-collapse-item {
+                margin-bottom: 13px;
+                .ant-collapse-header {
+                    border-radius: 5px 5px 0 0;
+                    padding-left: 20px;
+                }
+                .ant-checkbox-wrapper {
+                    .ant-checkbox-inner {
+                        border-width: 1px;
+                        border-color: rgb(217, 217, 217);
+                        border-style: solid;
+                        width: 16px;
+                        height: 16px;
+                        border-radius: 2px;
+                        &::after {
+                            width: 5px;
+                            height: 8px;
+                        }
+                    }
+                    .ant-checkbox + span {
+                        line-height: auto;
+                        margin-left: 10px;
+                    }
+                }
+                .ant-checkbox-group {
+                    gap: 20px;
+                }
+                .ant-collapse-content-box {
+                    background-color: #f8f8f8;
+                    border-radius: 0 0 5px 5px;
+                    padding: 20px;
+                }
+            }
+            .ant-select-selector {
+                border-width: 1px;
+                border-color: rgb(212, 212, 212);
+                border-style: solid;
+                border-radius: 5px;
+                height: 46px;
+                .ant-select-selection-item {
+                    line-height: 45px;
+                }
+            }
+            .ant-select .ant-select-arrow svg {
+                color: #b0b0b0;
+            }
+        }
     }
     .right-wrap {
         flex: 1;
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 13px;
         .cate-item {
             position: relative;
             height: 280px;

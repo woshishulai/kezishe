@@ -51,14 +51,19 @@ const details = (item) => {
                     <a-form
                         :model="formState"
                         name="basic"
-                        :label-col="{ span: 6 }"
-                        :wrapper-col="{ span: 16 }"
+                        :label-col="{ span: 7 }"
                         autocomplete="off"
                         @finish="onFinish"
                         @finishFailed="handleFinishFailed"
+                        :hide-required-mark="false"
+                        label-align="left"
                     >
                         <a-form-item label="评级公司" has-feedback name="IdType">
-                            <a-select v-model:value.trim="formState.IdType" placeholder="">
+                            <a-select
+                                style="width: 229px"
+                                v-model:value.trim="formState.IdType"
+                                placeholder=""
+                            >
                                 <a-select-option value="1">PMG</a-select-option>
                                 <a-select-option value="2">护照</a-select-option>
                                 <a-select-option value="3">台胞证</a-select-option>
@@ -73,7 +78,7 @@ const details = (item) => {
                             <a-input v-model:value="formState.code" />
                         </a-form-item>
 
-                        <a-form-item :wrapper-col="{ offset: 6, span: 16 }">
+                        <a-form-item :wrapper-col="{ offset: 7, span: 16 }">
                             <a-button html-type="submit">确定</a-button>
                         </a-form-item>
                     </a-form>
@@ -132,36 +137,64 @@ const details = (item) => {
     display: flex;
     flex-direction: row;
     gap: 10px;
-    margin-top: 20px;
+    margin-top: 12px;
     .left-cate {
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
-        gap: 10px;
-        width: 415px;
+        gap: 12px;
+        width: 413px;
 
         .search-wrap {
             .title {
                 background-color: #d5b560;
-                color: #fff;
-                padding: 10px 20px;
+                color: rgb(255, 255, 255);
+                padding: 0 30px;
                 font-size: 18px;
+                height: 50px;
+                line-height: 52px;
             }
             .center {
-                padding: 20px 20px 1px;
+                padding: 23px 30px 10px;
                 background: linear-gradient(to bottom, #fef3d3, #fffaea);
+                :deep(.ant-form-item) {
+                    margin-bottom: 15px;
+                    .ant-form-item-control-input {
+                        min-height: auto;
+                    }
+                    .ant-form-item-label > label {
+                        height: 39px;
+                    }
+                }
                 :deep(.ant-select-selector) {
-                    background-color: #fff;
+                    border-width: 1px;
+                    border-color: rgb(228, 203, 135);
+                    border-style: solid;
+                    border-radius: 4px;
+                    background-color: rgb(255, 255, 255);
+                    height: 39px;
+                    .ant-select-selection-item {
+                        line-height: 39px;
+                    }
+                }
+                .ant-select .ant-select-arrow svg {
+                    color: rgb(228, 203, 135);
                 }
                 :deep(.ant-input) {
-                    height: 50px;
-                    background-color: #fff;
+                    border-width: 1px;
+                    border-color: rgb(228, 203, 135);
+                    border-style: solid;
+                    border-radius: 4px;
+                    background-color: rgb(255, 255, 255);
+                    width: 229px;
+                    height: 39px;
                 }
                 :deep(.ant-btn-default) {
-                    background-color: #d5b560;
-                    padding: 10px 40px;
                     border-radius: 4px;
+                    background-color: rgb(201, 170, 86);
+                    width: 107px;
+                    height: 41px;
                     color: #fff;
+                    padding: 0;
                 }
             }
         }
@@ -171,17 +204,24 @@ const details = (item) => {
                 align-items: center;
                 justify-content: space-between;
                 background-color: #d5b560;
-                color: #fff;
-                padding: 10px 20px;
+                color: rgb(255, 255, 255);
+                padding: 0 14px 0 30px;
                 font-size: 18px;
+                height: 50px;
+                line-height: 52px;
+
                 .more {
-                    font-size: 14px;
                     cursor: pointer;
-                    color: #fdfdfd;
+                    font-size: 16px;
+                    color: rgb(253, 253, 253);
+                    transition: 0.1s;
+                    &:hover {
+                        transform: scale(1.1);
+                    }
                 }
             }
             .center {
-                padding: 10px 20px;
+                padding: 0px 10px 10px;
                 background-color: #fffaeb;
                 .shoping-list {
                     display: flex;
@@ -192,6 +232,10 @@ const details = (item) => {
                         gap: 15px;
                         padding: 20px 0;
                         cursor: pointer;
+                        border-bottom: 1px solid rgb(236, 236, 236);
+                        &:last-child {
+                            border: none;
+                        }
                         .left-img {
                             .flex-row;
                             background-color: #fff;
@@ -199,6 +243,10 @@ const details = (item) => {
                             img {
                                 width: 90px;
                                 height: 70px;
+                                transition: 0.2s;
+                                &:hover {
+                                    transform: scale(1.1);
+                                }
                             }
                         }
                         .right-text {
@@ -206,6 +254,10 @@ const details = (item) => {
                             flex-direction: column;
                             gap: 8px;
                             font-size: 14px;
+                            transition: 0.2s;
+                            &:hover {
+                                transform: scale(1.1);
+                            }
                         }
                     }
                 }
@@ -220,37 +272,57 @@ const details = (item) => {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 20px;
+            padding: 20px 25px;
             font-size: 20px;
-            font-weight: 600;
+            color: rgb(16, 16, 16);
+
             .more {
                 font-size: 14px;
                 font-weight: 400;
                 cursor: pointer;
+                font-size: 16px;
             }
         }
         .card-list {
             .flex-row;
             flex-wrap: wrap;
             justify-content: space-between;
-            gap: 10px;
-            padding: 0 5px;
+            gap: 8px;
+            padding: 0 5px 8px;
             .card-item {
                 display: flex;
                 flex-direction: column;
-                gap: 14px;
-                width: 24%;
+                gap: 10px;
+                min-width: 24%;
                 padding: 20px 16px;
+                flex: 1;
                 background-color: #fff;
                 cursor: pointer;
+                &:hover {
+                    color: #d5b560;
+                    .top-img {
+                        img {
+                            transform: scale(1.1);
+                        }
+                    }
+                }
                 .top-img {
                     .flex-row;
                     padding: 10px;
-                    height: 200px;
+                    height: 198px;
+                    img {
+                        max-width: 100%;
+                        max-height: 100%;
+                        transition: 0.2s;
+                    }
                 }
                 .label-title {
                     font-size: 16px;
                     font-weight: 600;
+                    line-height: 18px;
+                    overflow: hidden;
+                    text-overflow: ellipsis;
+                    white-space: nowrap;
                 }
                 .money {
                     color: #9a0000;
@@ -263,5 +335,11 @@ const details = (item) => {
             }
         }
     }
+}
+</style>
+
+<style>
+.ant-select .ant-select-arrow svg {
+    color: rgb(228, 203, 135);
 }
 </style>

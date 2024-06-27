@@ -1,4 +1,5 @@
 import instance from './index';
+import instances from './indexs';
 
 //tabbar
 export const getTabbatList = async () => instance.get('/Web/Auction/Columns');
@@ -122,7 +123,7 @@ export const getCodeParams = async (params) => instance.get(`/Web/Common/GetPubl
 
 //获取邮件
 export const getMailApi = async (params) =>
-    instance.get(
+    instances.get(
         `Member/Mail/GetMailReceiveList?PageIndex=${params.page}&PageSize=${params.pageSize}`
     );
 //查看邮件详情

@@ -313,7 +313,7 @@ const statusInfo = (index) => {
                         width: 120px;
 
                         .ant-progress-line {
-                            margin-bottom: 2px;
+                            margin-bottom: 0px;
                         }
                     }
 

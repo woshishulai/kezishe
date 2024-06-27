@@ -8,6 +8,7 @@ import { accountRules } from './rules';
 import { useUserInfo, usePassword } from '@/store/store';
 import { getCodeParams } from '@/request/api';
 import { encryptionPassword } from '@/hooks/user';
+import { info } from '@/hooks/antd/message';
 const user = useUserInfo();
 const newCodeParams = usePassword();
 const router = useRouter();
@@ -62,6 +63,8 @@ const handleFinish = async () => {
         user.addUserNameList(formState.username);
         user.changeUserInfo(res.Data);
         router.push('/');
+    } else {
+        info('error', res.Message);
     }
 };
 </script>

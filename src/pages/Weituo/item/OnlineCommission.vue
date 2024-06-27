@@ -106,7 +106,7 @@ const onFinish = async (values) => {
         if (res.Tag == 1) {
             formState.value = {};
             formState.value.remember == true;
-            info('status'), res.Message;
+            info('status', res.Message);
         }
     } else {
         openTitle.value = '请先登录在填写申请单';
@@ -211,7 +211,10 @@ const onFinish = async (values) => {
                         name="UserFile"
                         :rules="[{ required: true, message: '文档不可为空' }]"
                     >
-                        <p v-show="formState.UserFile">上传成功预览地址{{ formState.UserFile }}</p>
+                        <p v-show="formState.UserFile"
+                            >上传成功预览地址
+                            <!-- {{ formState.UserFile }} -->
+                        </p>
                         <Upload @getFiles="getFiles" :fileModule="4"></Upload>
                     </a-form-item>
                     <a-form-item name="remember" :wrapper-col="{ offset: 3, span: 10 }">
