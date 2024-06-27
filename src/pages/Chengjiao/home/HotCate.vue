@@ -49,9 +49,9 @@ onMounted(() => {});
 <style scoped lang="less">
 .hot-cate {
     margin: 12px 0 30px 0;
-    background: url('@/assets/img/chengjiao/bg.png');
+    background: url('@/assets/img/chengjiao/cjbj.jpg');
     background-size: 100% 100%;
-    padding: 0 30px 23px;
+    padding: 0 30px 25px;
     .top-title {
         .flex-row;
         gap: 20px;
@@ -86,9 +86,10 @@ onMounted(() => {});
         flex-direction: row;
         justify-content: space-between;
         flex-wrap: wrap;
-        gap: 15px;
+        gap: 16px 9px;
         .card-item {
-            width: 32.5%;
+            min-width: 32.5%;
+            flex: 1;
             .title {
                 display: flex;
                 align-items: center;
@@ -111,14 +112,15 @@ onMounted(() => {});
                 }
             }
             .center {
-                padding: 20px 20px;
+                padding: 20px 20px 25px;
                 background-color: #fff;
                 .label-item {
                     .flex-row;
                     justify-content: space-between;
-                    padding: 15px 10px;
+                    padding: 10px;
                     cursor: pointer;
                     border-bottom: 1px solid #efefef;
+                    font-size: 14px;
                     &:hover {
                         background-color: #ebebeb;
                         color: #d5b560;

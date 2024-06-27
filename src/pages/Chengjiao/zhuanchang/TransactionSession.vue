@@ -1,28 +1,25 @@
 <script setup>
-import { ref, computed, reactive, onMounted, watchEffect } from 'vue';
+import { ref, computed, reactive, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { fetchDataApi } from '@/request/chengjiao/api';
+import { fetChZhuanChangAPi } from '@/request/chengjiao/api';
 import { getImageUrl } from '@/utils';
 //参数
 const state = reactive({
-    KeyWd: '', //名称搜索
-    Lid: null, //传递当前请求专场或竞买类别ID 下称集合ID
-    AuctionStatuses: '1,2', //藏品状态，1预展中、2竞买中，多个用逗号拼接
-    AuctionBrands: '1,2', //藏品类型，1竞买、2一口价，多个用逗号拼接
-    CategoryIds: '', //藏品集合ID，下级分类,多个用逗号拼接
-    Grades: '1', //选中的 品级集合，多个用逗号拼接
-    Sort: '1', //排序，1结标时间、2价格高的、3价格低的、4热门的
-    DateStart: '', //开始时间
-    DateEnd: '', //结束时间
-    TimeRange: '0', //结标时间，0全部、1一小时、6六小时、24当天
-    PriceRange: '0' //价格区间 0,N 0,122
+    Years: [],
+    Month: '0',
+    CategoryIds: []
 });
+const fetchDataList = ref([]);
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
 onMounted(() => {});
-const activeKey = ref(['1', '2', '3', '4']);
+const activeKey = ref(['1', '2', '3']);
 const yearList = [
+    {
+        label: '2024',
+        value: '2024'
+    },
     {
         label: '2023',
         value: '2023'
@@ -121,56 +118,57 @@ const cateList1 = [
         label: '自淘'
     }
 ];
-const cateList2 = [
-    {
-        value: '竞买',
-        label: '竞买'
-    },
-    {
-        value: '一口价',
-        label: '一口价'
-    },
-    {
-        value: '周周转',
-        label: '周周转'
+const fetchList = async (page = 1, pageSize = 10) => {
+    let query = { ...state };
+    query.PageIndex = page;
+    query.PageSize = pageSize;
+    query.CategoryIds = query.CategoryIds.join(',');
+    query.Years = query.Years.join(',');
+    try {
+        let res = await fetChZhuanChangAPi(query);
+        if (res.Tag == 1) {
+            fetchDataList.value = res.Data;
+        }
+    } catch (error) {
+        console.log(error);
     }
-];
-watchEffect(() => {
-    console.log(state.value1);
-    console.log(state.value2);
-    console.log(state.value3);
-    console.log(state.value4);
-});
+};
+watch(
+    () => state,
+    () => {
+        fetchList();
+    },
+    {
+        immediate: true,
+        deep: true
+    }
+);
 </script>
 
 <template>
     <div class="transaction-session">
         <div class="left-wrap">
-            <a-collapse
-                expandIconPosition="end"
-                :expand-icon="expandIcon"
-                v-model:activeKey="activeKey"
-            >
+            <a-collapse expandIconPosition="end" v-model:activeKey="activeKey">
                 <template #expandIcon>
                     <img :src="getImageUrl('chengjiao/down.png')" alt="" />
                 </template>
                 <a-collapse-panel key="1" header="年份">
                     <a-checkbox-group
-                        v-model:value="state.value1"
+                        v-model:value="state.Years"
                         name="checkboxgrosssfffup"
                         :options="yearList"
                     />
                 </a-collapse-panel>
                 <a-collapse-panel key="2" header="月份">
                     <a-select
-                        v-model:value="state.value2"
+                        v-model:value="state.Month"
                         style="width: 100%"
                         :options="monthList"
                     ></a-select>
                 </a-collapse-panel>
                 <a-collapse-panel key="3" header="类别">
                     <a-checkbox-group
-                        v-model:value="state.value3"
+                        v-model:value="state.CategoryIds"
                         name="checkboxgsssroup"
                         :options="cateList1"
                     />
@@ -178,11 +176,10 @@ watchEffect(() => {
             </a-collapse>
         </div>
         <div class="right-wrap">
-            <div class="cate-item" v-for="(item, index) in 6" :key="index">
-                <img src="@/assets/img/chengjiao/list5.png" alt="" />
-                <div class="label">
-                    <p>9月现代金银币精品专场（一）</p>
-                </div>
+            <div class="cate-item" v-for="(item, index) in fetchDataList" :key="index">
+                <img :src="item.Img" alt="" />
+                <div class="label"> </div>
+                <p class="label-text">{{ item.Title }}</p>
             </div>
             <CatePage></CatePage>
         </div>
@@ -222,11 +219,12 @@ watchEffect(() => {
                     }
                     .ant-checkbox + span {
                         line-height: auto;
+                        font-size: 14px;
                         margin-left: 10px;
                     }
                 }
                 .ant-checkbox-group {
-                    gap: 20px;
+                    gap: 16px;
                 }
                 .ant-collapse-content-box {
                     background-color: #f8f8f8;
@@ -240,6 +238,7 @@ watchEffect(() => {
                 border-style: solid;
                 border-radius: 5px;
                 height: 46px;
+                font-size: 14px;
                 .ant-select-selection-item {
                     line-height: 45px;
                 }
@@ -256,12 +255,15 @@ watchEffect(() => {
         gap: 13px;
         .cate-item {
             position: relative;
-            height: 280px;
+            height: 319px;
             border-radius: 10px;
             cursor: pointer;
             &:hover {
                 .label {
                     z-index: 1;
+                }
+                .label-text {
+                    z-index: 3;
                 }
             }
             img {
@@ -274,11 +276,19 @@ watchEffect(() => {
                 z-index: -1;
                 bottom: 0;
                 width: 100%;
-                padding: 20px 50px;
                 color: #fff;
                 font-size: 18px;
                 background-color: #96908c;
                 border-radius: 0 0 6px 6px;
+                opacity: 0.502;
+                height: 53px;
+            }
+            .label-text {
+                position: absolute;
+                bottom: 20px;
+                color: #fff;
+                z-index: -1;
+                padding: 0 50px;
             }
         }
     }
