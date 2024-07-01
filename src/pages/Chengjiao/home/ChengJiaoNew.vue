@@ -55,7 +55,7 @@ const details = (item) => {
                         autocomplete="off"
                         @finish="onFinish"
                         @finishFailed="handleFinishFailed"
-                        :hide-required-mark="false"
+                        :hide-required-mark="true"
                         label-align="left"
                     >
                         <a-form-item label="评级公司" has-feedback name="IdType">
@@ -339,7 +339,7 @@ const details = (item) => {
 </style>
 
 <style>
-.ant-select .ant-select-arrow svg {
+.search-wrap .ant-select .ant-select-arrow svg {
     color: rgb(228, 203, 135);
 }
 </style>

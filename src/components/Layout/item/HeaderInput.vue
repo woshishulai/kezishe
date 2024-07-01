@@ -74,8 +74,8 @@ const cateInfo = (index) => {
                 padding: 12px 30px;
                 color: #fff;
                 border-radius: 8px;
-                color: #333;
                 font-size: 18px;
+                color: rgb(97, 97, 97);
             }
 
             img {
@@ -96,18 +96,23 @@ const cateInfo = (index) => {
     }
 
     :deep(.ant-input-group-wrapper .ant-input-group) {
-        border: 2px solid #9a0000;
-        border-radius: 6px;
+        border: 3px solid #9a0000;
+        border-radius: 5px;
 
         .ant-input {
-            height: 52px;
+            height: 43px;
             border-radius: 4px 0 0 4px;
+            font-size: 16px;
+            &::placeholder {
+                color: rgb(169, 169, 169);
+            }
         }
 
         .ant-btn.ant-btn-lg {
-            height: 52px;
+            height: 43px;
             width: 100px;
-
+            font-size: 20px;
+            color: rgb(255, 255, 255);
             .anticon svg {
                 color: #fff;
             }

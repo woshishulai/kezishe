@@ -154,3 +154,6 @@ export const getConfirmDetails = async (params) =>
 //确认合同
 export const confirmOrder = async (params) =>
     instance.post(`Member/Mail/SaveContractConfirm?ConfirmId=${params.id}`);
+
+//帮助中心
+export const getHelp = async (params) => instances.get(`Web/NewsHelp/HelperCategory`);

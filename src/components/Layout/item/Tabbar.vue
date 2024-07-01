@@ -9,6 +9,7 @@ const props = defineProps({});
 const tabbarList = ref([]);
 const active = ref(null);
 const sonActive = ref(0);
+const showRouters = ref(0);
 onMounted(async () => {
     try {
         let res = await getTabbatList();
@@ -22,12 +23,20 @@ const showFatherPage = (item) => {
     router.push(item.router);
 };
 const showNav = (item) => {
-    if (item.router == '/jingmai') {
-        active.value = sonActive.value ? sonActive.value : 0;
-    } else {
-        active.value = null;
+    switch (item.router) {
+        case '/jingmai':
+            active.value = sonActive.value || 0;
+            showRouters.value = 0;
+            break;
+        case '/chengjiao':
+            active.value = sonActive.value || 0;
+            showRouters.value = 1;
+            break;
+        default:
+            active.value = null;
     }
 };
+
 const changeActive = (index) => {
     active.value = index;
 };
@@ -45,25 +54,42 @@ const showStamp = (item, index) => {
         //     }
         // });
     } else if (item.TypeName == '专场') {
-        router.push({
-            path: '/jingmai/',
-            query: {
-                Id: item.Id
-            }
-        });
+        if (showRouters.value == 0) {
+            router.push({
+                path: '/jingmai/',
+                query: {
+                    Id: item.Id
+                }
+            });
+        } else {
+            router.push({
+                path: '/chengjiao/transaction-session'
+            });
+        }
     }
 };
 const showStampGoods = (i) => {
     sonActive.value = active.value;
-    router.push({
-        path: '/jingmai/show-stamp-goods',
-        query: {
-            Id: i.Id,
-            SType: 1,
-            Cate1: 2,
-            show: false
-        }
-    });
+    if (showRouters.value == 0) {
+        router.push({
+            path: '/jingmai/show-stamp-goods',
+            query: {
+                Id: i.Id,
+                SType: 1,
+                Cate1: 2,
+                show: false
+            }
+        });
+    } else {
+        router.push({
+            path: '/chengjiao/transaction-goods',
+            query: {
+                Id: i.Id,
+                Cate1: 2,
+                show: true
+            }
+        });
+    }
 };
 </script>
 
@@ -98,7 +124,7 @@ const showStampGoods = (i) => {
             </li>
         </div>
         <!-- //导航 -->
-        <div class="fixed" v-if="active != null">
+        <div class="fixed" v-show="active != null">
             <div class="con-main-wrap">
                 <!-- //二级 -->
                 <div class="two-item" v-for="(item, index) in tabbarList" :key="item.Id">
@@ -112,7 +138,7 @@ const showStampGoods = (i) => {
                 </div>
             </div>
         </div>
-        <div class="fixed san" v-if="tabbarList[active]?.Children.length">
+        <div class="fixed san" v-show="tabbarList[active]?.Children.length">
             <div class="con-main-wrap">
                 <div class="item" v-for="item in tabbarList[active]?.Children">
                     <span class="san-name">{{ item.TypeName }}</span>

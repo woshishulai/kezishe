@@ -24,7 +24,8 @@ let navList = [
         title: '成交',
         router: '/chengjiao',
         children1: '/chengjiao/transaction-session',
-        children2: '/chengjiao/details'
+        children2: '/chengjiao/details',
+        children3: '/chengjiao/transaction-goods'
     },
     {
         title: '收购',

@@ -2,7 +2,7 @@
 import { ref, computed, reactive, onMounted, watch, h } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getMenuList, getLeftMenuList, getInfoDetails, getDanYe } from '@/request/shougou/api';
-
+import { getHelp } from '@/request/api';
 import Details from './Details.vue';
 import { info } from '@/hooks/antd/message';
 import { getImageUrl } from '@/utils';
@@ -86,10 +86,8 @@ const iterator = apis();
 const fetchDataApi = async (page = 1, pageSize = 10) => {
     query.PageIndex = page;
     query.PageSize = pageSize;
-    console.log(query);
     try {
         let res = await getMenuList(query);
-        console.log(res);
         menuData.value = res.Data;
         if (menuData.value.Children.lenght <= 1) {
             return;
@@ -126,10 +124,42 @@ const fetchDataApi = async (page = 1, pageSize = 10) => {
         } else {
             iterator.next();
         }
-    } catch (error) {}
+    } catch (error) {
+        console.log(error);
+    }
+};
+const getHelpInfo = async () => {
+    try {
+        let res = await getHelp();
+        menuData.value = res.Data;
+        if (menuData.value.length) {
+            if (route.query.Id) {
+                addShowMenuItem(route.query.Id);
+                menuData.value.forEach((item, index) => {
+                    if (item.Children && item.Children.length) {
+                        let sss = item.Children.findIndex((i) => i.Id == route.query.Id);
+                        if (sss && sss >= 0) {
+                            openKeys.value.push(menuData.value[index].Id);
+                            changeShowList(menuData.value[index].Children[sss]);
+                            throw Error('找到了');
+                        }
+                    }
+                });
+            } else {
+                openKeys.value.push(menuData.value[0].Id);
+                changeShowList(menuData.value[0].Children[0]);
+            }
+        }
+    } catch (error) {
+        console.log(error);
+    }
 };
 onMounted(() => {
-    iterator.next();
+    if (!route.query.faId) {
+        getHelpInfo();
+    } else {
+        iterator.next();
+    }
 });
 
 const showDetails = (item) => {
@@ -188,6 +218,11 @@ watch(
 watch(
     () => route.query.Id,
     () => {
+        if (!route.query.Id) {
+            getHelpInfo();
+        } else {
+            iterator.next();
+        }
         if (route.query.Id) {
             let query = {
                 Id: route.query.Id,
@@ -207,14 +242,18 @@ watch(
                 <div class="left-wrap">
                     <div class="cate-nav">
                         <div class="title">
-                            <h5>{{ menuData?.Name }}</h5>
+                            <h5>{{ menuData?.Name || '帮助中心' }}</h5>
                             <p>
                                 {{ menuData?.EnName }}
                             </p>
                         </div>
                         <div class="center">
                             <div class="list">
-                                <div class="item" v-for="item in menuData?.Children" :key="item.Id">
+                                <div
+                                    class="item"
+                                    v-for="item in menuData?.Children || menuData"
+                                    :key="item.Id"
+                                >
                                     <div
                                         @click.stop="addShowMenuItem(item.Id)"
                                         class="menu-title"
@@ -315,12 +354,32 @@ watch(
     background: linear-gradient(
         to bottom,
         #fff 0,
-        #fff 76px,
-        #fee3ba 76px,
-        #fdf3e4 286px,
+        #fff 52px,
+        #fee3ba 52px,
+        #fdf1db 286px,
         #fff 286px
     );
-
+    :deep(table) {
+        width: 100%;
+        border-collapse: collapse;
+        text-align: center;
+        margin: 20px 0;
+        th,
+        td {
+            border: 1px solid black; /* 为表格单元格添加1像素的黑色边框 */
+            padding: 8px;
+            text-align: left;
+            text-align: center;
+        }
+        th {
+            text-align: center;
+            background-color: #f2f2f2; /* 设置表头的背景颜色 */
+        }
+    }
+    :deep(p) {
+        background: transparent;
+        margin: 10px 0;
+    }
     //  正常的
     :deep(.ant-menu-light) {
         background-color: #fffaeb;
@@ -484,7 +543,7 @@ watch(
     .show-element {
         display: flex;
         flex-direction: row;
-        margin-top: 40px;
+        margin-top: 36px;
         .left-wrap {
             width: 280px;
 
@@ -503,8 +562,8 @@ watch(
                     }
                 }
                 .center {
-                    min-height: 300px;
                     .list {
+                        min-height: 300px;
                         padding: 10px 5px 20px;
                         background-color: rgb(254 250 236);
                         .item {
@@ -549,6 +608,11 @@ watch(
                                         cursor: pointer;
                                         color: rgb(154, 0, 0);
                                         background-color: rgb(255 246 217);
+                                        // img {
+                                        //     opacity: 1;
+                                        // }
+                                    }
+                                    &.active {
                                         img {
                                             opacity: 1;
                                         }

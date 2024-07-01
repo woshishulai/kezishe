@@ -47,16 +47,42 @@ const onChange = () => {
     .flex-row;
     padding: 25px 0;
     height: 102px;
-    :deep(.ant-pagination .ant-pagination-options-quick-jumper input) {
-        width: 120px;
-        text-align: center;
-        background-color: #fff;
-    }
-    :deep(.ant-pagination .ant-pagination-prev) {
-        display: none;
-    }
-    :deep(.ant-pagination .ant-pagination-next) {
-        display: none;
+    :deep(.ant-pagination) {
+        .ant-pagination-item {
+            min-width: auto;
+            width: 38px;
+            height: 35px;
+            border-radius: 4px;
+            a {
+                height: 100%;
+                line-height: 35px;
+            }
+        }
+        .ant-pagination-next,
+        .ant-pagination-prev {
+            display: none;
+        }
+        .ant-pagination-options-quick-jumper input {
+            width: 120px;
+            text-align: center;
+            background-color: #fff;
+        }
+        .ant-pagination-options {
+            .ant-select {
+                .ant-select-selector {
+                    height: 36px;
+                    border: 1px solid #dbdbdb;
+                    border-radius: 3px;
+                    .ant-select-selection-search-input {
+                        height: 35px;
+                        line-height: 35px;
+                    }
+                    .ant-select-selection-item {
+                        line-height: 35px;
+                    }
+                }
+            }
+        }
     }
 }
 </style>

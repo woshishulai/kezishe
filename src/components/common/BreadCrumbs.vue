@@ -43,9 +43,10 @@ const handleBreadcrumbClick = (index) => {
     .flex-row;
     justify-content: flex-start;
     gap: 20px;
-    padding: 16px 0 16px 0;
+    padding: 8px 0 8px 0;
     width: 1400px;
     font-size: 16px;
+    height: 52px;
     margin: 0 auto;
 
     p {

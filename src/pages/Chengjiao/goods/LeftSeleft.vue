@@ -1,15 +1,8 @@
 <script setup>
 import { ref, computed, reactive, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import {
-    cateList,
-    cateList1,
-    cate2List,
-    cate3List,
-    cate4List,
-    cate5List,
-    cate8List
-} from '../data';
+import { cate2List, cate3List, cate4List, cate5List, cate8List } from '@/pages/JingMai/data';
+import { getImageUrl } from '@/utils';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({
@@ -22,15 +15,13 @@ const props = defineProps({
         default: []
     }
 });
-const requestNum = ref(0);
+onMounted(() => {});
+const emits = defineEmits(['changeFormState']);
 const state = reactive({
-    Stype: null,
     KeyWd: '', //名称搜索
-    Cate1: null, //区分专场、类别、搜索列表 1专场 2类别列表 3关键词搜索
+    Cate1: 2, //区分专场、类别、搜索列表 1专场 2类别列表 3关键词搜索
     Cate2: 1, //0是 1否 ，默认列表列表左侧参数不参与计算，
     Lid: null, //传递当前请求专场或竞买类别ID 下称集合ID
-    AuctionStatuses: '1,2', //藏品状态，1预展中、2竞买中，多个用逗号拼接
-    AuctionBrands: '1,2', //藏品类型，1竞买、2一口价，多个用逗号拼接
     CategoryIds: '', //藏品集合ID，下级分类,多个用逗号拼接
     Grades: '1', //选中的 品级集合，多个用逗号拼接
     Sort: '1', //排序，1结标时间、2价格高的、3价格低的、4热门的
@@ -39,7 +30,8 @@ const state = reactive({
     TimeRange: '0', //结标时间，0全部、1一小时、6六小时、24当天
     PriceRange: '0' //价格区间 0,N 0,122
 });
-const emits = defineEmits(['changeFormState']);
+const activeKey = ref(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']);
+
 const changeParams = () => {
     emits('changeFormState', state);
 };
@@ -47,41 +39,21 @@ watch(
     () => route.query,
     (newValue, oldValue) => {
         state.Lid = route.query.Id;
-        state.Stype = route.query.SType;
-        state.Cate1 = route.query.Cate1 || 1;
     },
     { immediate: true, deep: true }
 );
-
-onMounted(() => {
-    // changeParams();
-});
-//展开的项
-const activeKey = ref(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']);
-
 //自定义字段
 const fieldNames = {
     children: 'Children',
     title: 'Value',
     key: 'Key'
 };
-//选择的状态 经脉中 预展中
-const statusList = ref(['1', '2']);
-//发生变化
-const showStatusList = (value) => {
-    state.AuctionStatuses = value.join(',');
-};
-//选择的状态 经脉中 预展中
-const priceList = ref(['1', '2']);
-const showPriceList = (value) => {
-    state.AuctionBrands = value.join(',');
-};
 //选中了树形勾选
 const selectTree = ref([]);
 //树形集合分类 树形勾选框
 const showCheckedList = (value, options) => {
     console.log(options);
-    if (options.checkedNodes.length < 1) {
+    if (options.checkedNodes?.length < 1) {
         state.CategoryIds = '';
         //因为这个本身默认就是空的 我在获取到这个树后 将他们的每一项都添加到数组里 但是只有它有值我才传递
         //本身是空的 所有需要我手动触发
@@ -111,9 +83,6 @@ const changeEnd = (value) => {
 watch(
     state,
     () => {
-        if (!state.Stype) {
-            return;
-        }
         changeParams();
         //  selectTree.value && selectTree.value.length >= 1
         //         ? (state.CategoryIds = selectTree.value.join(','))
@@ -129,7 +98,7 @@ watch(
         //     console.log('一样的');
         //     return;
         // }
-        if (selectTree.value.length) {
+        if (selectTree.value?.length) {
             return;
         }
         const cate = props.BidderType.map((item) => item.Key);
@@ -150,26 +119,10 @@ watch(
 
 <template>
     <div class="left-menu">
-        <div class="top-cate">
-            <a-checkbox-group
-                v-model:value="statusList"
-                name="checkboxddddddgros234ssfffup"
-                :options="cateList"
-                @change="showStatusList"
-            />
-        </div>
-        <div class="top-cate">
-            <a-checkbox-group
-                v-model:value="priceList"
-                name="checkboxdd322323ddddgros234ssfffup"
-                :options="cateList1"
-                @change="showPriceList"
-            />
-        </div>
         <a-collapse v-model:activeKey="activeKey">
-            <a-collapse-panel key="1" header="分类" v-if="props?.BidderType.length">
+            <a-collapse-panel key="1" header="分类" v-if="props?.BidderType?.length">
                 <a-tree
-                    v-if="props.BidderType.length"
+                    v-if="props.BidderType?.length"
                     checkable
                     defaultExpandAll
                     v-model:selectedKeys="selectTree"
@@ -233,7 +186,7 @@ watch(
                     :options="cate6List"
                 />
             </a-collapse-panel> -->
-            <a-collapse-panel key="9" header="评级公司" v-if="props?.RatingCompanyType.length">
+            <a-collapse-panel key="9" header="评级公司" v-if="props?.RatingCompanyType?.length">
                 <a-radio-group v-model:value="state.value10" name="radioGroup">
                     <a-radio
                         :value="item.Value"

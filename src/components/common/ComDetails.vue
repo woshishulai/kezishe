@@ -438,7 +438,7 @@ watch(
                 >
                 <div class="info" v-show="props.goodsDtails?.BaseData?.Status != 1">
                     <p> ¥ {{ service }}(服务费率 {{ props.goodsDtails?.offerData?.TipsRate }}%) </p>
-                    <a-tooltip color="#9a0000" v-show="props.goodsDtails?.BaseData?.Status != 1">
+                    <a-tooltip color="#9a0000" v-if="props.goodsDtails?.BaseData?.Status != 1">
                         <template #title>
                             <div class="info-fuwu">
                                 <p>服务费基础服务费{{ props.goodsDtails?.offerData?.Tips }}</p>
@@ -533,7 +533,7 @@ watch(
             >查看详细</button
         >
     </div>
-    <Item v-if="route.query.show == true"></Item>
+    <Item v-show="route.query.show == 'true'"></Item>
     <FooterSwiper></FooterSwiper>
     <Fixed></Fixed>
 </template>

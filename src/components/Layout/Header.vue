@@ -2,12 +2,11 @@
 import { ref, onMounted, watchEffect } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserInfo } from '@/store/store';
-import { defaultUserNickName } from '@/request/api';
-import { getUserNikeNameApi } from '@/request/api';
-import { DownOutlined } from '@ant-design/icons-vue';
+import { defaultUserNickName, getUserNikeNameApi } from '@/request/api';
 import HeaderInput from './item/HeaderInput.vue';
 import Tabbar from './item/Tabbar.vue';
 import { removeUserInfo } from '@/hooks/user/outLoading';
+import { CaretDownOutlined } from '@ant-design/icons-vue';
 const router = useRouter();
 const selector = ref('登录');
 const nikeNameList = ref([]);
@@ -51,6 +50,9 @@ const changeUserName = async (item) => {
 watchEffect(async () => {
     selector.value = user.userNickName.NickName;
 });
+const showHelp = () => {
+    router.push('/help');
+};
 // const removeUserInfo = () => {
 //     user.removeUserInfo();
 //     user.removeUserTranslate();
@@ -65,11 +67,11 @@ watchEffect(async () => {
             <div class="con-main-wrap">
                 <div class="welcome-login">
                     <h5>您好，欢迎来到中邮网</h5>
-                    <a-divider type="vertical" style="background-color: #a2887d" />
+                    <a-divider type="vertical" />
                     <div class="login" v-if="!user.userInfo.ApiToken">
                         <span class="active" @click="router.push('/login')">登录</span>
                         {{ user.userInfo.ApiToken }}
-                        <a-divider type="vertical" style="background-color: #a2887d" />
+                        <a-divider type="vertical" />
                         <span @click="router.push('/register')">注册</span>
                     </div>
                     <div v-else class="user-name">{{ user.userInfo.UserName }}</div>
@@ -78,8 +80,11 @@ watchEffect(async () => {
                     <span v-if="!user.userInfo.ApiToken" @click="router.push('/login')" value="登录"
                         >登录</span
                     >
-                    <a-dropdown v-else :arrow="true">
-                        <span @click="router.push('/user')">{{ selector }}</span>
+                    <a-dropdown v-else>
+                        <span @click="router.push('/user')"
+                            >{{ selector }}
+                            <CaretDownOutlined />
+                        </span>
                         <template #overlay>
                             <a-menu>
                                 <a-menu-item
@@ -96,11 +101,13 @@ watchEffect(async () => {
                             </a-menu>
                         </template>
                     </a-dropdown>
-                    <a-divider type="vertical" style="background-color: #a2887d" />
+                    <a-divider type="vertical" />
                     <li>
                         购物车 <span class="active"> {{ 0 }}</span> 件
                     </li>
-                    <a-divider type="vertical" style="background-color: #a2887d" />
+                    <a-divider type="vertical" />
+                    <li @click="showHelp" class="help"> 帮助中心 </li>
+                    <a-divider type="vertical" />
                     <li>免费咨询热线: 4000-888-0888</li>
                 </div>
             </div>
@@ -125,6 +132,7 @@ watchEffect(async () => {
 <style scoped lang="less">
 .header-wrap {
     background-color: #fff;
+    font-size: 14px;
 
     .header-user-wrap {
         border-bottom: 1px solid #ebebeb;
@@ -132,12 +140,12 @@ watchEffect(async () => {
         .con-main-wrap {
             .flex-row;
             justify-content: space-between;
-            padding: 12px;
+            padding: 6px 12px;
             font-weight: 500;
 
             .welcome-login {
                 .flex-row;
-                gap: 30px;
+                gap: 16px;
 
                 h5 {
                     font-weight: 600;
@@ -155,9 +163,16 @@ watchEffect(async () => {
 
             .user-info {
                 .flex-row;
-                gap: 20px;
+                gap: 16px;
+
                 span {
                     padding: 10px 0;
+                    cursor: pointer;
+                    &:hover {
+                        color: #9a0000;
+                    }
+                }
+                .help {
                     cursor: pointer;
                     &:hover {
                         color: #9a0000;
@@ -177,6 +192,10 @@ watchEffect(async () => {
     }
 
     .header-search-wrap {
+        .code {
+            width: 94px;
+            height: 94px;
+        }
         .con-main-wrap {
             .flex-row;
             justify-content: space-between;
@@ -191,5 +210,16 @@ watchEffect(async () => {
             }
         }
     }
+}
+</style>
+<style>
+.header-wrap .anticon svg {
+    color: rgb(0, 0, 0);
+    height: 11px;
+    width: 18px;
+}
+.header-wrap .ant-divider-vertical {
+    top: 0;
+    background-color: #a2887d;
 }
 </style>

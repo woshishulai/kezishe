@@ -340,7 +340,8 @@ const showUserInfo = () => {
     display: flex;
     align-items: center;
     color: rgb(74, 74, 74);
-    padding: 20px 8px 17px;
+    padding: 0 8px 0;
+    height: 57px;
     font-size: 16px;
     cursor: pointer;
 }
@@ -355,14 +356,15 @@ const showUserInfo = () => {
 }
 .title span {
     position: absolute;
-    top: 50%;
+    top: 44%;
     right: 10%;
+    left: 33%;
     transform: translateX(-50%);
     display: block;
-    width: 6px;
-    height: 6px;
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    background-color: #9a0000;
+    background-color: #ea1b2b;
 }
 .i {
     padding-bottom: 10px;

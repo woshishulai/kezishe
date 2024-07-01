@@ -450,6 +450,13 @@ const addRoutes = [
                             import('@/pages/Chengjiao/zhuanchang/TransactionSession.vue')
                     },
                     {
+                        path: 'transaction-goods',
+                        meta: {
+                            name: '成交藏品'
+                        },
+                        component: () => import('@/pages/Chengjiao/goods/index.vue')
+                    },
+                    {
                         path: 'details',
                         meta: {
                             name: '成交详情'

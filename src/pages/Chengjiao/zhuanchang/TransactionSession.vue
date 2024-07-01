@@ -7,7 +7,8 @@ import { getImageUrl } from '@/utils';
 const state = reactive({
     Years: [],
     Month: '0',
-    CategoryIds: []
+    CategoryIds: [],
+    total: 1
 });
 const fetchDataList = ref([]);
 const router = useRouter();
@@ -127,6 +128,7 @@ const fetchList = async (page = 1, pageSize = 10) => {
     try {
         let res = await fetChZhuanChangAPi(query);
         if (res.Tag == 1) {
+            state.total = res.Total;
             fetchDataList.value = res.Data;
         }
     } catch (error) {
@@ -143,6 +145,15 @@ watch(
         deep: true
     }
 );
+//查看专场详情
+const showGoods = (item) => {
+    router.push({
+        path: '/chengjiao/transaction-goods',
+        query: {
+            Id: item.Id
+        }
+    });
+};
 </script>
 
 <template>
@@ -176,12 +187,17 @@ watch(
             </a-collapse>
         </div>
         <div class="right-wrap">
-            <div class="cate-item" v-for="(item, index) in fetchDataList" :key="index">
+            <div
+                class="cate-item"
+                v-for="(item, index) in fetchDataList"
+                :key="index"
+                @click="showGoods(item)"
+            >
                 <img :src="item.Img" alt="" />
                 <div class="label"> </div>
                 <p class="label-text">{{ item.Title }}</p>
             </div>
-            <CatePage></CatePage>
+            <CatePage :paginations="state" @fetchList="fetchList"></CatePage>
         </div>
     </div>
 </template>
