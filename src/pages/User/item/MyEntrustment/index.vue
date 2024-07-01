@@ -20,6 +20,7 @@ import {
 import { getGoodsCateApi, getSelectCateApi, getGoodsListApi } from '@/request/user/api.js';
 import { info } from '@/hooks/antd/message';
 import { useRouter } from 'vue-router';
+const loading = ref(false);
 const router = useRouter();
 const props = defineProps({});
 const tableList = ref([]);
@@ -52,7 +53,6 @@ const getNavCateList = async () => {
         let res = await getGoodsCateApi(0);
         navList.value = res.Data;
         query.Status = navList.value[0].Key;
-        console.log(navList.value, '我是顶部的类型');
     } catch (error) {}
 };
 //获取所有的分类
@@ -64,20 +64,18 @@ const getSelectCate = async () => {
             Key: '-1',
             Value: '全部'
         });
-        console.log(selectList.value, '我是select的类型');
     } catch (error) {}
 };
 const getTableList = async (page, pageSize) => {
+    loading.value = true;
     query.PageIndex = page;
     query.PageSize = pageSize;
     try {
         let newRes = await getGoodsListApi(query);
         tableList.value = newRes.Data;
         query.total = newRes.Total;
-        console.log(newRes, '我是返回的数据', query.total);
-    } catch (error) {
-        info('error');
-    }
+    } catch (error) {}
+    loading.value = false;
 };
 onMounted(() => {
     Promise.all([getNavCateList(), getSelectCate()]).then(() => {});
@@ -92,11 +90,6 @@ const showGoodsDetails = (i) => {
     });
 };
 const columnsList = ref([]);
-const params = ref({});
-var a = 2;
-var b = 5;
-console.log(a === 2 || (1 && b == 3) || 4);
-
 watch(
     () => showModals.value?.params,
     () => {
@@ -108,7 +101,7 @@ watch(
         }
         query.Status = showModals.value?.params?.statusCate;
 
-        getTableList(1, 10);
+        // getTableList(1, 10);
     },
     {
         deep: true
@@ -207,7 +200,10 @@ const statusTexts = (value) => {
                             class="item-input"
                             placeholder="名称和藏品"
                         />
-                        <a-button @click="getTableList(1, 10)" :icon="h(SearchOutlined)"
+                        <a-button
+                            @click="getTableList(1, 10)"
+                            :loading="loading"
+                            :icon="h(SearchOutlined)"
                             >搜索</a-button
                         >
                     </div>
@@ -223,7 +219,7 @@ const statusTexts = (value) => {
                             style="width: 316px"
                             placeholder="名称/藏品/合同号"
                         />
-                        <a-button :icon="h(SearchOutlined)">搜索</a-button>
+                        <a-button :icon="h(SearchOutlined)" :loading="loading">搜索</a-button>
                     </div>
                 </template>
                 <template v-slot:active4>
@@ -287,6 +283,33 @@ const statusTexts = (value) => {
 
 <style scoped lang="less">
 .my-entrustment {
+    .ant-input {
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 4px;
+        border-color: rgb(218, 225, 232);
+        height: 43px;
+        background-color: rgb(255, 255, 255);
+        font-size: 14px;
+    }
+    :deep(.ant-select-selection-item) {
+        line-height: 43px;
+        font-size: 14px;
+    }
+    :deep(.ant-select-selection-placeholder) {
+        line-height: 43px;
+    }
+    :deep(.ant-select-selector) {
+        font-size: 14px;
+
+        .ant-select-selection-search-input {
+            height: 43px;
+            line-height: 43px;
+            font-size: 14px;
+            &:placeholder-shown {
+            }
+        }
+    }
     :deep(.ant-table-wrapper .ant-table-thead > tr > th) {
         background-color: #eef3f8;
     }

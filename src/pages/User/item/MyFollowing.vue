@@ -12,6 +12,7 @@ const tableList = ref([]);
 const showModals = ref(null);
 const options1 = ref([]);
 const list = ref([]);
+const loading = ref(false);
 const query = reactive({
     Cid: '',
     Kw: '',
@@ -21,6 +22,7 @@ const query = reactive({
     total: 1
 });
 const getTableList = async (page = 1, pageSize = 10) => {
+    loading.value = true;
     query.PageIndex = page;
     query.PageSize = pageSize;
     try {
@@ -47,6 +49,7 @@ const getTableList = async (page = 1, pageSize = 10) => {
             query.total = res.Total;
         }
     } catch (error) {}
+    loading.value = false;
 };
 onMounted(async () => {
     getTableList();
@@ -203,8 +206,14 @@ const getAll = () => {
                             v-model:value="query.Kw"
                             style="width: 316px"
                             placeholder="名称和藏品"
+                            @keydown.enter="getTableList()"
                         />
-                        <a-button @click="getTableList()" :icon="h(SearchOutlined)">搜索</a-button>
+                        <a-button
+                            @click="getTableList()"
+                            :loading="loading"
+                            :icon="h(SearchOutlined)"
+                            >搜索</a-button
+                        >
                     </div>
                 </template>
                 <template v-slot:active3>
@@ -256,16 +265,34 @@ const getAll = () => {
 <style scoped lang="less">
 /* 在这里添加你的 Less 样式 */
 .my-following {
+    .ant-input {
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 4px;
+        border-color: rgb(218, 225, 232);
+        height: 43px;
+        background-color: rgb(255, 255, 255);
+        font-size: 14px;
+    }
+    :deep(.ant-select-selection-item) {
+        line-height: 43px;
+        font-size: 14px;
+    }
     .footer {
-        padding: 20px 20px;
+        padding: 20px 25px;
         border-bottom: 1px solid #f0f0f0;
-        font-size: 16px;
+        font-size: 14px;
         .hover:hover {
             cursor: pointer;
             color: #9a0000;
         }
         .all {
             margin-right: 30px;
+        }
+        :deep(.ant-checkbox-wrapper) {
+            span {
+                font-size: 14px;
+            }
         }
     }
     :deep(.ant-checkbox .ant-checkbox-inner) {

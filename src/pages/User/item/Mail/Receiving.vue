@@ -92,14 +92,14 @@ const columns = [
     {
         title: '主题',
         dataIndex: 'Title',
-        key: 'Title'
-        // align: 'left'
+        key: 'Title',
+        align: 'left'
     },
     {
         title: '时间',
         dataIndex: 'BaseCreateTime',
         key: 'BaseCreateTime',
-        align: 'center'
+        align: 'left'
     }
 ];
 const showDetails = async (record) => {
@@ -136,6 +136,18 @@ const showXin = () => {
 <template>
     <div class="receiving" v-if="!isShowDetails">
         <a-table :pagination="false" :columns="columns" :data-source="list">
+            <template #headerCell="{ column, record }">
+                <template v-if="column.key === 'Title'">
+                    <div style="padding-left: 100px; font-size: 15px">
+                        {{ column.title }}
+                    </div>
+                </template>
+                <template v-if="column.key === 'BaseCreateTime'">
+                    <div style="padding-left: 14px; font-size: 15px">
+                        {{ column.title }}
+                    </div>
+                </template>
+            </template>
             <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'Title'">
                     <div class="title-item">
@@ -229,12 +241,20 @@ const showXin = () => {
         }
     }
 }
+:deep(.ant-table-wrapper) {
+    .ant-table-thead {
+        .ant-table-cell {
+            font-weight: 400;
+            font-size: 16px;
+        }
+    }
+}
 .footer {
     display: flex;
     align-items: center;
     gap: 20px;
-    padding: 10px 16px;
-    font-size: 16px;
+    padding: 10px 25px;
+    font-size: 14px;
     color: #333333;
     .all {
     }

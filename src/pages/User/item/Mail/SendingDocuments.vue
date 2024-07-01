@@ -35,19 +35,19 @@ watchEffect(() => {
     props.params?.titleCate == '发件' ? getMailList(1, 10) : '';
 });
 const emits = defineEmits(['changePage']);
-
 const columns = [
     {
         title: '主题',
         dataIndex: 'Title',
-        key: 'Title'
+        key: 'Title',
+        align: 'left',
+        width: 780
     },
     {
         title: '时间',
         dataIndex: 'BaseCreateTime',
         key: 'BaseCreateTime',
-        align: 'center',
-        width: 328
+        align: 'left'
     }
 ];
 const checkList = ref({
@@ -119,6 +119,18 @@ const showDetails = async (record) => {
 <template>
     <div class="send-element" v-if="!isShowDetails">
         <a-table :pagination="false" :columns="columns" :data-source="list">
+            <template #headerCell="{ column, record }">
+                <template v-if="column.key === 'Title'">
+                    <div style="padding-left: 100px; font-size: 15px">
+                        {{ column.title }}
+                    </div>
+                </template>
+                <template v-if="column.key === 'BaseCreateTime'">
+                    <div style="padding-left: 14px; font-size: 15px">
+                        {{ column.title }}
+                    </div>
+                </template>
+            </template>
             <template #bodyCell="{ column, record }">
                 <template v-if="column.key === 'Title'">
                     <div class="title-item">
@@ -217,12 +229,20 @@ const showDetails = async (record) => {
         }
     }
 }
+:deep(.ant-table-wrapper) {
+    .ant-table-thead {
+        .ant-table-cell {
+            font-weight: 400;
+            font-size: 16px;
+        }
+    }
+}
 .footer {
     display: flex;
     align-items: center;
     gap: 20px;
-    padding: 10px 16px;
-    font-size: 16px;
+    padding: 10px 25px;
+    font-size: 14px;
     color: #333333;
     .all {
     }

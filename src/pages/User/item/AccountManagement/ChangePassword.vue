@@ -153,11 +153,12 @@ const onPayFinish = async () => {
                         :model="formState"
                         name="basicsssssss"
                         :rules="resetRules"
-                        :label-col="{ span: 9 }"
+                        :label-col="{ span: 7 }"
                         :wrapper-col="{ span: 14 }"
                         autocomplete="off"
                         @finish="onFinish"
                         @finishFailed="handleFinishFailed"
+                        :hide-required-mark="true"
                     >
                         <h5>登录密码</h5>
                         <a-form-item
@@ -185,7 +186,7 @@ const onPayFinish = async () => {
                                 v-model:value="formState.confirmLoginPassword"
                             />
                         </a-form-item>
-                        <a-form-item :wrapper-col="{ offset: 9, span: 6 }">
+                        <a-form-item :wrapper-col="{ offset: 7, span: 6 }">
                             <a-button type="primary" html-type="submit">确认</a-button>
                         </a-form-item>
                     </a-form>
@@ -196,11 +197,12 @@ const onPayFinish = async () => {
                         :model="formState"
                         :rules="payPasswordRules"
                         name="bddddddasic"
-                        :label-col="{ span: 9 }"
+                        :label-col="{ span: 7 }"
                         :wrapper-col="{ span: 14 }"
                         autocomplete="off"
                         @finish="onPayFinish"
                         @finishFailed="handleFinishFailed"
+                        :hide-required-mark="true"
                     >
                         <h5>支付密码</h5>
                         <a-form-item
@@ -228,7 +230,7 @@ const onPayFinish = async () => {
                                 v-model:value="formState.confirmPayPassword"
                             />
                         </a-form-item>
-                        <a-form-item :wrapper-col="{ offset: 9, span: 6 }">
+                        <a-form-item :wrapper-col="{ offset: 7, span: 6 }">
                             <a-button type="primary" html-type="submit">确认</a-button>
                         </a-form-item>
                     </a-form>
@@ -253,7 +255,7 @@ const onPayFinish = async () => {
 
         .change-login-password {
             flex: 1;
-            padding: 0 0 0 20px;
+            padding: 0 0 0 33px;
             border-right: 1px solid #dbdbdb;
         }
 
@@ -261,6 +263,11 @@ const onPayFinish = async () => {
             padding: 0 0 0 40px;
             flex: 1;
         }
+    }
+    .ant-btn {
+        width: 100px;
+        height: 43px;
+        border-radius: 4px;
     }
 }
 </style>

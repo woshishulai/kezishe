@@ -75,7 +75,6 @@ onMounted(() => {});
         //     background-color: rgb(255, 255, 255);
         // }
     }
-
     .con-main-wrap {
         .cen-wrap {
             display: flex;
@@ -86,6 +85,11 @@ onMounted(() => {});
             .user-item {
                 flex: 1;
                 width: 0;
+            }
+            :deep(.ant-table-wrapper) {
+                .ant-table-thead > tr > th {
+                    font-size: 15px;
+                }
             }
             :deep(.ant-form) {
                 .ant-form-item-label > label {

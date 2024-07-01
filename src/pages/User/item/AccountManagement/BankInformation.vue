@@ -9,7 +9,6 @@ import {
     getCountList
 } from '@/request/api';
 import { info } from '@/hooks/antd/message';
-import { message } from 'ant-design-vue';
 import RemoveTableList from './item/RemoveTableList.vue';
 import { handleFinishFailed } from '@/utils/form/rules.js';
 const countList = ref([]);
@@ -373,7 +372,7 @@ const handleFinishs = async () => {
                             :auto-size="{ minRows: 2, maxRows: 5 }"
                         />
                     </a-form-item>
-                    <a-form-item :wrapper-col="{ offset: 3, span: 3 }">
+                    <a-form-item :wrapper-col="{ offset: 3 }">
                         <a-button type="primary" html-type="submit">保存</a-button>
                     </a-form-item>
                 </a-form>
@@ -516,6 +515,11 @@ const handleFinishs = async () => {
             border-color: rgb(218, 225, 232);
             height: 43px;
             background-color: rgb(255, 255, 255);
+        }
+        .ant-btn {
+            width: 100px;
+            height: 43px;
+            border-radius: 4px;
         }
     }
 }

@@ -349,10 +349,8 @@ const handleFinishs = async () => {
                     >
                         <a-input v-model:value="formState.phone" />
                     </a-form-item>
-                    <a-form-item :wrapper-col="{ offset: 3, span: 4 }">
-                        <a-button style="height: 43px; padding: 0" type="primary" html-type="submit"
-                            >保存</a-button
-                        >
+                    <a-form-item :wrapper-col="{ offset: 3 }">
+                        <a-button type="primary" html-type="submit">保存</a-button>
                     </a-form-item>
                 </a-form>
             </div>
@@ -491,6 +489,11 @@ const handleFinishs = async () => {
             border-color: rgb(218, 225, 232);
             height: 43px;
             background-color: rgb(255, 255, 255);
+        }
+        .ant-btn {
+            width: 100px;
+            height: 43px;
+            border-radius: 4px;
         }
     }
 }

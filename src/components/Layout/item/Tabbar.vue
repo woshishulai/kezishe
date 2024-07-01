@@ -138,6 +138,7 @@ const showStampGoods = (i) => {
                 </div>
             </div>
         </div>
+
         <div class="fixed san" v-show="tabbarList[active]?.Children.length">
             <div class="con-main-wrap">
                 <div class="item" v-for="item in tabbarList[active]?.Children">

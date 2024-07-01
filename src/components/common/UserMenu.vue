@@ -157,7 +157,7 @@ const list = ref([
         icon: 'jurassic_currency'
     }
 ]);
-const url = route.fullPath.replace('/user/', '');
+const url = route.path.replace('/user/', '');
 
 list.value.forEach((item, index) => {
     if (item.router === url) {
@@ -189,7 +189,7 @@ const getEmail = async () => {
 const timer = ref(null);
 timer.value = setInterval(() => {
     getEmail();
-}, 10000);
+}, 5000);
 onUnmounted(() => {
     timer.value = null;
 });
@@ -356,7 +356,7 @@ const showUserInfo = () => {
 }
 .title span {
     position: absolute;
-    top: 44%;
+    top: 46%;
     right: 10%;
     left: 33%;
     transform: translateX(-50%);

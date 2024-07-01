@@ -104,6 +104,7 @@ const handleFinish = async (bool) => {
             autocomplete="off"
             @finish="handleFinish"
             @finishFailed="handleFinishFailed"
+            :hide-required-mark="true"
         >
             <a-form-item
                 :rules="[{ required: true, message: '标题不能为空' }]"
@@ -165,5 +166,17 @@ const handleFinish = async (bool) => {
     padding-left: 100px;
     min-height: 600px;
     padding-top: 40px;
+    .ant-input {
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 4px;
+        height: 43px;
+        background-color: rgb(255, 255, 255);
+    }
+    .ant-btn {
+        width: 100px;
+        height: 43px;
+        border-radius: 4px;
+    }
 }
 </style>

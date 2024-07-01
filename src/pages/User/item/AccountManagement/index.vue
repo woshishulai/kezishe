@@ -22,7 +22,7 @@ onMounted(() => {});
 
 <style scoped lang="less">
 :deep(.ant-btn-primary) {
-    border-radius: 5px;
+    border-radius: 4px;
 }
 :deep(.ant-select-selector) {
     border-radius: 4px;

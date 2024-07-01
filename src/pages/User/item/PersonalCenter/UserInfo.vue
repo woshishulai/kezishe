@@ -407,7 +407,7 @@ const statusInfo = (index) => {
             .flex-row;
             justify-content: space-between;
             padding: 50px 40px;
-            font-size: 18px;
+            font-size: 14px;
         }
 
         .active {

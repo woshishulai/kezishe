@@ -3,6 +3,7 @@ import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
 const props = defineProps({});
+const router = useRouter();
 onMounted(() => {});
 const inputValue = ref('');
 const active = ref(0);
@@ -18,10 +19,19 @@ const list = [
         cate: '成交'
     }
 ];
-const onSearch = (searchValue) => {
-    showLoading.value = true;
-    console.log('use value', searchValue);
-    console.log('or use this.value', inputValue.value);
+const onSearch = () => {
+    if (active.value == 0) {
+        router.push({
+            path: '/jingmai/show-stamp-goods',
+            query: {
+                Id: '',
+                SType: 1,
+                Cate1: 2,
+                show: false,
+                Kw: inputValue.value
+            }
+        });
+    }
 };
 const cateInfo = (index) => {
     active.value = index;

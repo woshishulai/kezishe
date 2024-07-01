@@ -104,7 +104,7 @@ defineExpose({
             max-width: 200px;
             font-size: 16px;
             cursor: pointer;
-            font-weight: 600;
+            // font-weight: 600;
 
             &.active {
                 background-color: #fff;
@@ -125,10 +125,10 @@ defineExpose({
         p {
             cursor: pointer;
             height: 17px;
+            font-size: 14px;
 
             &.active {
                 color: #9a0000;
-                font-weight: 700;
                 border-bottom: 1px solid #9a0000;
             }
         }
@@ -158,13 +158,16 @@ defineExpose({
     }
     :deep(.ant-btn) {
         border-radius: 6px;
-        width: 120px;
+        width: 100px;
         .flex-row;
+        height: 43px;
+        line-height: 43px;
+        font-size: 14px;
         // background-color: #566777;
         color: #fff;
         .anticon svg {
             color: #fff;
-            font-size: 18px;
+            font-size: 16px;
         }
     }
     :deep(.table-wrap) {

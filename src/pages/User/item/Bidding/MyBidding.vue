@@ -20,6 +20,7 @@ import Item4 from './Item4.vue';
 import { info } from '@/hooks/antd/message';
 import { watch } from 'vue';
 const route = useRoute();
+const loading = ref(false);
 const jingMaiList = ref([
     {
         cate: '竞买中'
@@ -105,28 +106,33 @@ const apiList = {
 };
 const fetchData = ref(null);
 const getFetchData = async (page = 1, pageSize = 10) => {
+    loading.value = true;
     params.value.PageIndex = page;
     params.value.PageSize = pageSize;
+
     try {
         let res = await apiList[showModals.value?.params?.titleCate](params.value); // 调用函数来获取数据
         if (res.Tag != 1) {
+            loading.value = false;
+
             return;
         }
         params.total = res.Total;
         let index = jingMaiList.value.findIndex((item) => {
             return item.cate == showModals.value?.params?.titleCate;
         });
+
         jingMaiList.value.forEach((item) => {
             item.num = '';
         });
+
         jingMaiList.value[index].num = res.Data.length;
         if (index == 3) {
             jingMaiList.value[index].showText = '预约';
         }
         fetchData.value = res.Data;
-    } catch (error) {
-        info('error', error);
-    }
+    } catch (error) {}
+    loading.value = false;
 };
 
 watch(
@@ -279,7 +285,10 @@ const zhiFu = () => {
                             class="item-input"
                             placeholder="名称和藏品"
                         />
-                        <a-button :icon="h(SearchOutlined)" @click="getFetchData(1, 10)"
+                        <a-button
+                            :icon="h(SearchOutlined)"
+                            :loading="loading"
+                            @click="getFetchData(1, 10)"
                             >搜索</a-button
                         >
                     </div>
@@ -368,6 +377,33 @@ const zhiFu = () => {
 
 <style scoped lang="less">
 .my-bidding {
+    .ant-input {
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 4px;
+        border-color: rgb(218, 225, 232);
+        height: 43px;
+        background-color: rgb(255, 255, 255);
+        font-size: 14px;
+    }
+    :deep(.ant-select-selection-item) {
+        line-height: 43px;
+        font-size: 14px;
+    }
+    :deep(.ant-select-selection-placeholder) {
+        line-height: 43px;
+    }
+    :deep(.ant-select-selector) {
+        font-size: 14px;
+
+        .ant-select-selection-search-input {
+            height: 43px;
+            line-height: 43px;
+            font-size: 14px;
+            &:placeholder-shown {
+            }
+        }
+    }
     :deep(.ant-table-wrapper) {
         .ant-table-thead > tr > th {
             background-color: #eef3f8;
@@ -414,14 +450,13 @@ const zhiFu = () => {
         }
         :deep(.ant-table-wrapper .ant-table-thead > tr > th) {
             background-color: #fff;
-            font-size: 16px;
             font-weight: 400;
         }
         .title-item {
             display: flex;
         }
         .ant-btn {
-            width: 120px;
+            width: 100px;
             border-radius: 6px;
         }
         .footer {

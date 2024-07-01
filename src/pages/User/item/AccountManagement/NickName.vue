@@ -233,7 +233,7 @@ const changeDefault = async (query) => {
                             :auto-size="{ minRows: 2, maxRows: 5 }"
                         />
                     </a-form-item>
-                    <a-form-item :wrapper-col="{ offset: 2, span: 3 }">
+                    <a-form-item :wrapper-col="{ offset: 2 }">
                         <a-button type="primary" html-type="submit">保存</a-button>
                     </a-form-item>
                 </a-form>
@@ -282,6 +282,11 @@ const changeDefault = async (query) => {
             border-color: rgb(218, 225, 232);
             height: 43px;
             background-color: rgb(255, 255, 255);
+        }
+        .ant-btn {
+            width: 100px;
+            height: 43px;
+            border-radius: 4px;
         }
     }
 }
