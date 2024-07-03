@@ -1,10 +1,9 @@
 <script setup>
-import { ref, computed, reactive, onMounted, h, watchEffect } from 'vue';
+import { ref, computed, reactive, onMounted, h, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { SearchOutlined } from '@ant-design/icons-vue';
-import { getImageUrl } from '@/utils';
 import CatePage from '@/components/common/CatePage.vue';
-import { yifahuoapi, yifahuoDetailsapi } from '@/request/user/api';
+import { yifahuoapi, yifahuoDetailsapi, cangChuFeiApi } from '@/request/user/api';
 import { timeOptions, cateOptions, seeOptions } from './data';
 import ShippedDetails from './ShippedDetails.vue';
 const router = useRouter();
@@ -23,23 +22,50 @@ const query = reactive({
 const loading = ref(false);
 
 const getTableList = async (PageIndex = 1, PageSize = 10) => {
+    loading.value = true;
     query.PageIndex = PageIndex;
     query.PageSize = PageSize;
+    let res;
+
     try {
-        let res = await yifahuoapi(query);
+        if (route.query.price) {
+            res = await cangChuFeiApi(query);
+        } else {
+            res = await yifahuoapi(query);
+        }
+        loading.value = false;
         tableList.value = res.Data;
         query.total = res.Total;
     } catch (error) {}
 };
 
-onMounted(() => {
-    getTableList();
-});
+onMounted(() => {});
 const showModals = ref();
-const params = ref();
-watchEffect(() => {
-    params.value = showModals.value?.params;
-});
+const params = ref({});
+watch(
+    () => showModals.value?.params?.titleCate,
+    () => {
+        if (showModals.value?.params?.titleCate == '已发货') {
+            router
+                .replace({
+                    query: {}
+                })
+                .finally(() => {
+                    getTableList();
+                });
+        } else if (showModals.value?.params?.titleCate == '仓储费') {
+            router
+                .replace({
+                    query: { price: 3333 }
+                })
+                .finally(() => {
+                    getTableList();
+                });
+        }
+        tableList.value.length = 0;
+        params.value.titleCate = showModals.value?.params?.titleCate;
+    }
+);
 const list = [
     {
         cate: '已发货'
@@ -115,90 +141,54 @@ const columns = [
         key: 'caozuo'
     }
 ];
-const data = reactive([]);
-for (let i = 0; i < 10; i++) {
-    data.push({
-        key: i,
-        code: '63932729',
-        cate: '竞买',
-        num: '1',
-        name: '清朝瓷器',
-        chengjiao: '112.00元',
-        laoban: '中邮网',
-        time: '2023.10.02',
-        zhaopian: 'register/logo.png',
-        qixian: '',
-        zhengshu: '否',
-        caozuo: '查看详情'
-    });
-}
 const cangChuColumns = [
     {
         title: '藏品编号',
-        key: 'goodsCode',
-        dataIndex: 'goodsCode',
+        key: 'Bn',
+        dataIndex: 'Bn',
         align: 'center'
     },
     {
-        title: '藏品图片',
-        dataIndex: 'zhaopian',
-        key: 'zhaopian',
-        align: 'center'
-    },
-    {
-        title: '名称',
-        key: 'name',
-        dataIndex: 'name',
+        title: '藏品名称',
+        key: 'Title',
+        dataIndex: 'Title',
         align: 'center'
     },
     {
         title: '结标时间',
-        key: 'time',
-        dataIndex: 'time',
+        key: 'Ontime',
+        dataIndex: 'Ontime',
         align: 'center'
     },
     {
         title: '收费仓储期',
-        key: 'details',
-        dataIndex: 'details',
+        key: 'Days',
+        dataIndex: 'Days',
         align: 'center'
     },
     {
         title: '仓储费率',
-        key: 'feilv',
-        dataIndex: 'feilv',
+        key: 'fee',
+        dataIndex: 'fee',
         align: 'center'
     },
     {
         title: '已收仓储费',
-        key: 'yishou',
-        dataIndex: 'yishou',
+        key: 'FeeReceived',
+        dataIndex: 'FeeReceived',
         align: 'center'
     },
     {
         title: '待收仓储费',
-        key: 'daishou',
-        dataIndex: 'daishou',
+        key: 'FeePending',
+        dataIndex: 'FeePending',
         align: 'center'
     },
     {
         title: '仓储费总额',
-        key: 'zonge',
-        dataIndex: 'zonge',
+        key: 'FeeTotal',
+        dataIndex: 'FeeTotal',
         align: 'center'
-    }
-];
-const cangChuDataSource = [
-    {
-        goodsCode: '4873883',
-        name: '文2公报带直角边新',
-        time: '2023-09-23 20:30:40',
-        details: '5天',
-        feilv: '0.2元/天',
-        yishou: '1.00',
-        daishou: '0.00',
-        zonge: '1.00',
-        zhaopian: 'register/logo.png'
     }
 ];
 const value = ref('');
@@ -213,9 +203,6 @@ const changeShowDeatails = (Number) => {
     });
 };
 
-const getGoodsList = () => {
-    loading.value = true;
-};
 const showGoodsDetails = (i) => {
     router.push({
         path: '/jingmai/goods-details',
@@ -232,7 +219,7 @@ const showGoodsDetails = (i) => {
             <div class="title"> 已发货 </div>
             <show-modal ref="showModals" :titleList="list">
                 <template v-slot:active2>
-                    <div class="search-cate" v-if="params?.titleCate == list[0].cate">
+                    <div class="search-cate" v-show="!route.query.price">
                         <a-select
                             ref="select"
                             placeholder="所有时间"
@@ -267,16 +254,19 @@ const showGoodsDetails = (i) => {
                             >搜索</a-button
                         >
                     </div>
-                    <div class="search-cate" v-else>
+                    <!-- <div class="search-cate" v-show="route.query.price">
                         <a-input
                             v-model:value="value"
                             style="width: 330px"
                             placeholder="名称和藏品"
                         />
-                        <a-button type="primary" @click="getGoodsList" :icon="h(SearchOutlined)"
+                        <a-button
+                            :loading="loading"
+                            @click="getTableList()"
+                            :icon="h(SearchOutlined)"
                             >搜索</a-button
                         >
-                    </div>
+                    </div> -->
                 </template>
                 <template v-slot:active3>
                     <a-table
@@ -310,6 +300,8 @@ const showGoodsDetails = (i) => {
                                               : '全部'
                                 }}
                             </template>
+                            <template v-if="column.key === 'Days'"> {{ record.fee }}/天 </template>
+                            <template v-if="column.key === 'fee'"> {{ record.fee }}/天 </template>
                             <template v-if="column.key === 'caozuo'">
                                 <div class="btns" @click="changeShowDeatails(record.DeliverNo)">
                                     查看详情
@@ -329,6 +321,36 @@ const showGoodsDetails = (i) => {
 </template>
 <style scoped lang="less">
 .my-bidding {
+    .ant-input {
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 4px;
+        border-color: rgb(218, 225, 232);
+        height: 43px;
+        background-color: rgb(255, 255, 255);
+        font-size: 14px;
+    }
+    :deep(.ant-select-selection-item) {
+        line-height: 43px;
+        font-size: 14px;
+    }
+    :deep(.ant-select-selection-placeholder) {
+        line-height: 43px;
+    }
+    :deep(.ant-select-selector) {
+        font-size: 14px;
+
+        .ant-select-selection-search-input {
+            height: 43px;
+            line-height: 43px;
+            font-size: 14px;
+            &:placeholder-shown {
+            }
+        }
+    }
+    .ant-btn-default {
+        background-color: #85909b;
+    }
     .goods-info {
         display: flex;
         align-items: center;

@@ -66,12 +66,13 @@ const getSelectCate = async () => {
         });
     } catch (error) {}
 };
-const getTableList = async (page, pageSize) => {
+const getTableList = async (page = 1, pageSize = 10) => {
     loading.value = true;
     query.PageIndex = page;
     query.PageSize = pageSize;
     try {
         let newRes = await getGoodsListApi(query);
+        tableList.value.length = 0;
         tableList.value = newRes.Data;
         query.total = newRes.Total;
     } catch (error) {}
@@ -101,7 +102,7 @@ watch(
         }
         query.Status = showModals.value?.params?.statusCate;
 
-        // getTableList(1, 10);
+        getTableList(1, 10);
     },
     {
         deep: true
@@ -109,7 +110,6 @@ watch(
 );
 
 watchEffect(() => {
-    console.log(query.Status, '这里');
     columnsList.value =
         //结算成交
         query.Status == 3 || query.Status == 6
@@ -165,7 +165,7 @@ const statusTexts = (value) => {
             <div class="title"> 我的藏品 </div>
             <show-modal ref="showModals" :titleList="list" :statusList="navList">
                 <template v-slot:active3>
-                    <div class="search-cate" v-if="showModals?.params?.titleCate == list[0].cate">
+                    <div class="search-cate" v-show="showModals?.params?.titleCate == list[0].cate">
                         <a-select
                             ref="select"
                             class="item"
@@ -207,7 +207,7 @@ const statusTexts = (value) => {
                             >搜索</a-button
                         >
                     </div>
-                    <div class="search-cate" v-else>
+                    <div class="search-cate" v-show="showModals?.params?.titleCate == list[1].cate">
                         <a-select
                             placeholder="全部属性"
                             v-model:value="query.status"
@@ -215,11 +215,13 @@ const statusTexts = (value) => {
                             :options="statusLists"
                         ></a-select>
                         <a-input
-                            v-model:value="query.kw"
+                            v-model:value="query.Kw"
                             style="width: 316px"
                             placeholder="名称/藏品/合同号"
                         />
-                        <a-button :icon="h(SearchOutlined)" :loading="loading">搜索</a-button>
+                        <a-button :icon="h(SearchOutlined)" :loading="loading || false"
+                            >搜索</a-button
+                        >
                     </div>
                 </template>
                 <template v-slot:active4>

@@ -15,6 +15,7 @@ import {
     gouWuDataSource
 } from './data';
 const allOrderInfo = ref({});
+const loading = ref(false);
 const getOrderAllInfos = async () => {
     let res = await getOrderAllInfo();
     allOrderInfo.value = res.Data;
@@ -83,6 +84,7 @@ const tableList = ref([]);
 
 const cate = ref('0');
 const getGoodsList = async (page = 1, pageSize = 10) => {
+    loading.value = true;
     query.PageIndex = page;
     query.PageSize = pageSize;
     try {
@@ -95,6 +97,7 @@ const getGoodsList = async (page = 1, pageSize = 10) => {
         tableList.value = res.Data;
         query.total = res.Tag;
     } catch (error) {}
+    loading.value = false;
 };
 const router = useRouter();
 const route = useRoute();
@@ -135,7 +138,7 @@ const changeShowDetails = (number) => {
             <div class="title"> 结算明细 </div>
             <show-modal ref="showModals" :titleList="list">
                 <template v-slot:active2>
-                    <div class="search-cate" v-if="params.titleCate == list[0].cate">
+                    <div class="search-cate" v-show="params.titleCate == list[0].cate">
                         <a-select
                             ref="select"
                             placeholder="按合同查看"
@@ -155,15 +158,22 @@ const changeShowDetails = (number) => {
                             class="item-input"
                             placeholder="名称和藏品"
                         />
-                        <a-button @click="getGoodsList()" :icon="h(SearchOutlined)">搜索</a-button>
+                        <a-button
+                            @click="getGoodsList()"
+                            :loading="loading"
+                            :icon="h(SearchOutlined)"
+                            >搜索</a-button
+                        >
                     </div>
-                    <div class="search-cate" v-else>
+                    <div class="search-cate" v-show="params.titleCate == list[1].cate">
                         <a-input
                             v-model:value="query.Kw"
                             style="width: 330px"
                             placeholder="结算单号"
                         />
-                        <a-button @click="getGoodsList" :icon="h(SearchOutlined)">搜索</a-button>
+                        <a-button @click="getGoodsList" :loading="loading" :icon="h(SearchOutlined)"
+                            >搜索</a-button
+                        >
                     </div>
                 </template>
                 <template v-slot:active3>
@@ -250,6 +260,7 @@ const changeShowDetails = (number) => {
         padding: 21px 16px;
         gap: 35px;
         margin-top: 20px;
+        font-size: 14px;
     }
     :deep(.ant-table-thead) {
         display: none;
@@ -260,6 +271,7 @@ const changeShowDetails = (number) => {
         gap: 35px;
         padding: 20px 16px;
         span {
+            font-size: 14px;
             color: #9a0000;
         }
     }
@@ -275,6 +287,8 @@ const changeShowDetails = (number) => {
     .flex {
         .flex-row;
         gap: 6px;
+        font-size: 14px;
+        color: #333333;
         img {
             height: 15px;
         }
@@ -291,6 +305,7 @@ const changeShowDetails = (number) => {
             background-color: #eef3f8;
 
             span {
+                font-size: 15px;
                 text-align: center;
             }
         }
@@ -308,6 +323,31 @@ const changeShowDetails = (number) => {
             color: #3a84e6;
             cursor: pointer;
             text-decoration: underline;
+        }
+    }
+    .ant-input {
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 4px;
+        border-color: rgb(218, 225, 232);
+        height: 43px;
+        background-color: rgb(255, 255, 255);
+        font-size: 14px;
+    }
+    :deep(.ant-select-selection-item) {
+        line-height: 43px;
+        font-size: 14px;
+    }
+    :deep(.ant-select-selection-placeholder) {
+        line-height: 43px;
+    }
+    :deep(.ant-select-selector) {
+        font-size: 14px;
+
+        .ant-select-selection-search-input {
+            height: 43px;
+            line-height: 43px;
+            font-size: 14px;
         }
     }
 }

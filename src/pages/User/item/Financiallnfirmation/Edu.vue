@@ -317,28 +317,32 @@ const handleFinishss = async () => {
     .left-user-info {
         border-radius: 12px;
         background-color: #f7f7f7;
-        padding: 40px;
+        padding: 40px 15px 13px 40px;
         min-width: 334px;
         .flex-col;
-        gap: 10px;
         align-items: flex-start;
 
         .title {
-            font-size: 24px;
+            font-size: 18px;
+            font-family: 'MicrosoftYaHei';
+            color: rgb(82, 82, 82);
         }
 
         .num {
-            color: #9a0000;
             font-size: 30px;
-            margin: 10px 0 20px;
+            margin: 18px 0 30px;
+            font-family: 'PingFang SC';
+            color: rgb(154, 0, 0);
+
             span {
                 font-size: 16px;
             }
         }
 
         p {
-            margin-top: 20px;
-            color: #6a6a6a;
+            margin-bottom: 14px;
+            color: rgb(74, 74, 74);
+            font-size: 16px;
         }
 
         .label {

@@ -157,7 +157,9 @@ const handleAfterChange = (index) => {
 };
 //成交价格
 const transactionPrice = computed(
-    () => value.value + (value.value * Number(props.goodsDtails?.offerData?.TipsRate)) / 100
+    () =>
+        Number(value.value) +
+        (Number(value.value) * Number(props.goodsDtails?.offerData?.TipsRate)) / 100
 );
 //服务费
 const service = computed(

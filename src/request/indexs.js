@@ -36,7 +36,7 @@ instances.interceptors.response.use(
         return res.data;
     },
     (resError) => {
-        Loading.changeSpinning(false);
+        // Loading.changeSpinning(false);
         if (resError && resError.response) {
             switch (resError.response.status) {
                 case 400:

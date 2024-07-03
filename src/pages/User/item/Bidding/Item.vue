@@ -16,8 +16,60 @@ import {
     addUserAddressInfo,
     getCountList
 } from '@/request/api';
+import { sumbitOrder } from '@/request/jingmai';
 import { youHuiQuan, getKuaiDi } from '@/request/user/api';
-
+//优惠券数组
+const youhuiquanList = ref({
+    CouponUserData: [],
+    lengths: '',
+    CouponData: {}
+});
+const getYouHuiQuanList = async () => {
+    const res = await youHuiQuan();
+    if (res.Tag !== 1) {
+        return;
+    }
+    youhuiquanList.value.CouponUserData = res.Data.CouponUserData.filter((item) => {
+        return item.Status == 0;
+    });
+    youhuiquanList.value.CouponData = res.Data.CouponData;
+    youhuiquanList.value.lengths = res.Data.CouponUserData.length;
+};
+const youhuiquanDetails = (item) => {
+    const getItem = youhuiquanList.value.CouponData.find(
+        (items) => (items.CouponId = item.CouponId)
+    );
+    return getItem.Title + getItem.Price;
+};
+const getAddressList = async () => {
+    const res = await getUserAddressApi();
+    if (res.Tag !== 1) {
+        return;
+    }
+    addressList.value = res.Data;
+};
+const initCountList = async () => {
+    const ress = await getCountList();
+    if (ress.Tag !== 1) {
+        return;
+    }
+    countList.value = ress.Data;
+    formState.region = countList.value[0].AreaName;
+    formState.statusList = countList.value[0].ChildList;
+};
+const getZhiFuInfoList = async () => {
+    try {
+        let res = await getZhiFu(1);
+        if (res.Tag !== 1) {
+            return;
+        }
+        peisongList.value = res.Data.DeliveryList;
+        zhiFuList.value = res.Data.PayList;
+        wuLiuList.value = res.Data.ExpressList;
+    } catch (error) {
+        console.log(error);
+    }
+};
 const router = useRouter();
 const route = useRoute();
 const user = useUserInfo();
@@ -44,24 +96,29 @@ const props = defineProps({
         default: []
     }
 });
+let isUpdatingQuery = false;
 const goodsLists = ref([]);
-watchEffect(() => {
-    if (props?.fetchData.length >= 1 || route.query.goodsList) {
-        goodsLists.value = props?.fetchData || route.query.goodsList;
-        getYouHuiQuanList();
-    } else {
-        goodsLists.value = JSON.parse(localStorage.getItem('goodsList'));
-    }
-});
 watchEffect(async () => {
-    if (route.query.show == 2 && route.query.goodsList) {
-        await initCountList();
-        await getAddressList();
-        await getZhiFuInfoList();
-        await getKuaiDiLists();
+    if (isUpdatingQuery) {
+        return;
+    }
+    if (route.query.goodsList) {
+        let arr = JSON.parse(route.query.goodsList);
+        if (arr.length) {
+            goodsLists.value = arr;
+            getYouHuiQuanList();
+            await initCountList();
+            await getAddressList();
+            await getZhiFuInfoList();
+            await getKuaiDiLists();
+        }
+    } else {
+        if (route.path == '/user/zhifu') {
+            goodsLists.value = [];
+            router.back();
+        }
     }
 });
-
 //快递价格
 const kuaidiPriceList = ref([]);
 const getKuaiDiLists = async () => {
@@ -75,6 +132,9 @@ const getKuaiDiLists = async () => {
 //计算快递价格
 const goodsList = computed(() => {
     let arr = [];
+    if (goodsLists.value.length < 1) {
+        return arr;
+    }
     goodsLists.value?.forEach((item) => {
         const existingIndex = arr.findIndex((group) => group[0]?.CTypeId === item.CTypeId);
         if (existingIndex !== -1) {
@@ -111,61 +171,6 @@ const kuaidiPriceAll = computed(() => {
     return totalPrice;
 });
 
-//优惠券数组
-const youhuiquanList = ref({
-    CouponUserData: [],
-    lengths: '',
-    CouponData: {}
-});
-const getYouHuiQuanList = async () => {
-    const res = await youHuiQuan();
-    if (res.Tag !== 1) {
-        return;
-    }
-    console.log(res);
-    youhuiquanList.value.CouponUserData = res.Data.CouponUserData.filter((item) => {
-        return item.Status == 0;
-    });
-    youhuiquanList.value.CouponData = res.Data.CouponData;
-    youhuiquanList.value.lengths = res.Data.CouponUserData.length;
-};
-const youhuiquanDetails = (item) => {
-    const getItem = youhuiquanList.value.CouponData.find(
-        (items) => (items.CouponId = item.CouponId)
-    );
-    return getItem.Title + getItem.Price;
-};
-
-const getAddressList = async () => {
-    const res = await getUserAddressApi();
-    if (res.Tag !== 1) {
-        return;
-    }
-    addressList.value = res.Data;
-};
-const initCountList = async () => {
-    const ress = await getCountList();
-    if (ress.Tag !== 1) {
-        return;
-    }
-    countList.value = ress.Data;
-    formState.region = countList.value[0].AreaName;
-    formState.statusList = countList.value[0].ChildList;
-};
-const getZhiFuInfoList = async () => {
-    try {
-        let res = await getZhiFu(1);
-        if (res.Tag !== 1) {
-            return;
-        }
-        peisongList.value = res.Data.DeliveryList;
-        zhiFuList.value = res.Data.PayList;
-        wuLiuList.value = res.Data.ExpressList;
-        console.log(res);
-    } catch (error) {
-        console.log(error);
-    }
-};
 //配送方式
 const peisongList = ref([]);
 //物流方式
@@ -276,16 +281,15 @@ const handleFinish = async () => {
 };
 //勾选框 优惠券
 const checkedss = ref(false);
-const emits = defineEmits(['changeShowPage']);
 //选择的地址
 const checked = ref(true);
 const addressList = ref([]);
 //选择的配送方式
-const checkedStatusLocalStorage = localStorage.getItem('checkedStatus');
-const checkedStatus = ref(0);
+const checkedStatusLocalStorage = route.query.checkedStatus;
+const checkedStatus = ref('');
 checkedStatusLocalStorage
     ? (checkedStatus.value = checkedStatusLocalStorage)
-    : (checkedStatus.value = 0);
+    : (checkedStatus.value = '');
 const changePeiSong = (e) => {
     zhifu.value = '';
     if (e.target.value != 2) {
@@ -293,7 +297,7 @@ const changePeiSong = (e) => {
     }
 };
 //快递公司
-const kuaidis = localStorage.getItem('kuaidis');
+const kuaidis = route.query.kuaidis;
 const kuaidi = ref(0);
 kuaidis ? (kuaidi.value = kuaidis) : (kuaidi.value = 0);
 const chanegKuaiDi = (index) => {
@@ -302,7 +306,7 @@ const chanegKuaiDi = (index) => {
     zhifu.value = 1;
 };
 //z公司
-const zhifus = localStorage.getItem('zhifus');
+const zhifus = route.query.zhifus;
 const zhifu = ref(0);
 zhifus ? (zhifu.value = zhifus) : (zhifu.value = 0);
 const chanegZhiFu = (index) => {
@@ -311,7 +315,7 @@ const chanegZhiFu = (index) => {
 
 //我要保价
 const baojia = ref(true);
-let baojias = localStorage.getItem('baojias');
+let baojias = route.query.baojias;
 if (baojias) {
     baojias = true;
 }
@@ -326,24 +330,26 @@ const changeInput = (e) => {
 };
 //保价的价格
 const iptValue = ref('');
-const iptValues = localStorage.getItem('iptValues');
-iptValues ? (iptValue.value = iptValues) : (iptValue.value = '');
+// let iptValueValue = router.query?.iptValues || '';
+// iptValueValue ? (iptValue.value = iptValueValue) : (iptValue.value = '');
 const addPrice = () => {
     baojia.value = true;
     if (!kuaidi.value) {
         return;
     } else {
-        if (iptValue.value > startPrice.value) {
+        if (Number(iptValue.value) >= Number(startPrice.value)) {
             iptValue.value = startPrice.value;
+            console.log(2);
             return;
         }
-        if (iptValue.value < endPrice.value) {
+        if (Number(iptValue.value) <= Number(endPrice.value)) {
+            console.log(3);
             iptValue.value = endPrice.value;
         }
     }
 };
 const quan = ref(false);
-// let quans = localStorage.getItem('quans');
+// let quans = route.query.quans;
 // if (quans) {
 //     quans = true;
 // }
@@ -355,19 +361,18 @@ const changeQuan = (e) => {
     }
 };
 const quanList = ref([]);
-const quanLists = localStorage.getItem('quanLists');
+const quanLists = route.query?.quanLists;
 quanLists ? (quanList.value = JSON.parse(quanLists)) : (quanList.value = []);
 const checkList = ref({
     DelList: []
 });
-const DelLists = localStorage.getItem('DelLists');
+const DelLists = route.query?.DelLists;
 DelLists ? (checkList.value.DelList = JSON.parse(DelLists)) : (checkList.value.DelList = []);
 
 //下拉选择勾选框
 const selectCheckes = ref([]);
 const changeGetYouhuiquan = (e) => {
     const index = selectCheckes.value.findIndex((item) => item.Id == e.Id);
-    console.log(selectCheckes.value);
     if (index == -1) {
         let query = {
             Id: e.Id,
@@ -386,7 +391,7 @@ const getActives = (e) => {
         return true;
     }
 };
-const submit = () => {
+const submit = async () => {
     if (!user.userAddress.Id) {
         info('error', '请先添加地址');
         return;
@@ -419,7 +424,7 @@ const submit = () => {
     });
     const CouponData = selectCheckes.value;
     const query = {
-        OrderType: route.query.wuliu == 'true' ? 2 : 1,
+        OrderType: route.query?.wuliu == 'true' ? 2 : 1,
         AddrId: user.userAddress.Id, //地址ID
         DeliveryType: checkedStatus.value, //暂存还是上门
         PayType: zhifu.value, //怎么支付
@@ -436,11 +441,35 @@ const submit = () => {
         CouponData
     };
     quan.value = false;
+    let AllTotal = '';
+    let orderId = '';
+    try {
+        let res = await sumbitOrder(query);
+        if (res.Tag == 1) {
+            AllTotal = res.Data.AllTotal;
+            orderId = res.Data.OrderNo;
+        }
+    } catch (error) {
+        console.log(error);
+    }
     if (zhifu.value == 1) {
-        emits('changeShowPage', 5, query);
+        router.push({
+            path: '/user/select-zhifu',
+            query: {
+                AllTotal,
+                orderId
+            }
+        });
         return;
     } else {
-        emits('changeShowPage', 3, query);
+        router.push({
+            path: '/user/writ-form',
+            query: {
+                AllTotal,
+                orderId
+            }
+        });
+        return;
     }
 };
 //仓储费
@@ -507,23 +536,47 @@ const allPrice = computed(() => {
         );
     }
 });
+const updateQuery = (params) => {
+    isUpdatingQuery = true;
+    router
+        .replace({
+            query: { ...router.currentRoute.value.query, ...params }
+        })
+        .finally(() => {
+            isUpdatingQuery = false;
+        });
+};
+
 watchEffect(() => {
-    localStorage.setItem('checkedStatus', checkedStatus.value);
-    localStorage.setItem('kuaidis', kuaidi.value);
-    localStorage.setItem('zhifus', zhifu.value);
-    localStorage.setItem('baojias', baojia.value);
-    localStorage.setItem('iptValues', iptValue.value);
-    // localStorage.setItem('quans', quan.value);
-    localStorage.setItem('quanLists', quanList.value);
-    if (checkList.value && checkList.value.DelList) {
-        localStorage.setItem('DelLists', JSON.stringify(checkList.value.DelList));
+    const checkedStatusValue = checkedStatus.value;
+    const kuaidiValue = kuaidi.value;
+    const zhifuValue = zhifu.value;
+    const baojiaValue = baojia.value;
+    // const iptValueValue = iptValue.value;
+    const quanListValue = quanList.value;
+    const delListsValue =
+        checkList.value && checkList.value.DelList ? JSON.stringify(checkList.value.DelList) : null;
+
+    const queryParams = {
+        checkedStatus: checkedStatusValue,
+        kuaidis: kuaidiValue,
+        zhifus: zhifuValue,
+        baojias: baojiaValue,
+        // iptValues: iptValueValue,
+        quanLists: quanListValue
+    };
+    if (delListsValue) {
+        queryParams.DelLists = delListsValue;
     }
+
+    updateQuery(queryParams);
 });
+
 //最低报价最高报价
 const endPrice = ref(0);
 const startPrice = ref(0);
 //折扣比例
-const news = ref(0);
+const news = ref('');
 watchEffect(() => {
     if (!kuaidi.value) {
         iptValue.value = '';
@@ -535,7 +588,6 @@ watchEffect(() => {
     if (wuLiuList.value.length) {
         const item = wuLiuList.value.find((item) => item.Types == kuaidi.value);
         if (item) {
-            console.log(item);
             endPrice.value = item.MinCoverage || '';
             startPrice.value = item.Maxcoverage || '';
             news.value = item.InsuranceRate || '';
@@ -544,7 +596,7 @@ watchEffect(() => {
     }
 });
 const deletes = () => {
-    route.query.wuliu ? router.push('/user/logistics/') : emits('changeShowPage', 1);
+    route.query.wuliu ? router.push('/user/logistics/') : router.back();
 };
 </script>
 
@@ -667,7 +719,7 @@ const deletes = () => {
             <a-checkbox @change="changeInput" v-model:checked="baojia">我要保价</a-checkbox>
             {{ endPrice }} - {{ startPrice }}
             <a-input
-                @input="addPrice"
+                @blur="addPrice"
                 style="width: 150px; background-color: #f3f3f3; height: 40px; border-radius: 10px"
                 v-model:value="iptValue"
             />

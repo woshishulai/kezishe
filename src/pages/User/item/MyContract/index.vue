@@ -13,6 +13,7 @@ const route = useRoute();
 const props = defineProps({});
 const showModals = ref(null);
 const tableList = ref([]);
+const loading = ref(false);
 const statusInfo = (index) => {
     let statuses = {
         '-1': '全部',
@@ -75,6 +76,7 @@ const query = reactive({
     total: 1
 });
 const getTableList = async (page = 1, pageSize = 10) => {
+    loading.value = true;
     query.PageIndex = page;
     query.PageSize = pageSize;
     try {
@@ -84,9 +86,8 @@ const getTableList = async (page = 1, pageSize = 10) => {
         }
         tableList.value = newRes.Data;
         query.total = newRes.Total;
-    } catch (error) {
-        info('error');
-    }
+    } catch (error) {}
+    loading.value = false;
 };
 const list = [
     {
@@ -143,7 +144,12 @@ const showDetails = (Number) => {
                             @keydown.enter="getTableList()"
                             placeholder="合同号"
                         />
-                        <a-button @click="getTableList()" :icon="h(SearchOutlined)">搜索</a-button>
+                        <a-button
+                            @click="getTableList()"
+                            :loading="loading"
+                            :icon="h(SearchOutlined)"
+                            >搜索</a-button
+                        >
                     </div>
                 </template>
                 <template v-slot:active3>
@@ -169,17 +175,44 @@ const showDetails = (Number) => {
 </template>
 
 <style scoped lang="less">
-:deep(.ant-table-wrapper) {
-    .ant-table-thead > tr > th {
-        background-color: #eef3f8;
+.my-entrustment {
+    .ant-input {
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 4px;
+        border-color: rgb(218, 225, 232);
+        height: 43px;
+        background-color: rgb(255, 255, 255);
+        font-size: 14px;
     }
-    .active {
-        color: #a11111;
+    :deep(.ant-select-selection-item) {
+        line-height: 43px;
+        font-size: 14px;
     }
-    .details {
-        cursor: pointer;
-        &:hover {
+    :deep(.ant-select-selection-placeholder) {
+        line-height: 43px;
+    }
+    :deep(.ant-select-selector) {
+        font-size: 14px;
+
+        .ant-select-selection-search-input {
+            height: 43px;
+            line-height: 43px;
+            font-size: 14px;
+        }
+    }
+    :deep(.ant-table-wrapper) {
+        .ant-table-thead > tr > th {
+            background-color: #eef3f8;
+        }
+        .active {
             color: #a11111;
+        }
+        .details {
+            cursor: pointer;
+            &:hover {
+                color: #a11111;
+            }
         }
     }
 }

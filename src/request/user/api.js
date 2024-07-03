@@ -101,6 +101,10 @@ export const getNotShippedList = async (params) =>
 export const yifahuoapi = async (params) =>
     instances.get(`Member/UserDeliver/DeliverList?Bot=${params.Bot}&AuctionType=${params.AuctionType}&DateRange=${params.DateRange}&PageSize=${params.PageSize}&PageIndex=${params.PageIndex}
 `);
+//获取仓储费
+export const cangChuFeiApi = async (params) =>
+    instances.get(`Member/UserDeliver/StorageFeeList?PageSize=${params.PageSize}&PageIndex=${params.PageIndex}
+`);
 //获取发货详情
 export const yifahuoDetailsapi = async (params) =>
     instances.get(`Member/UserDeliver/DeliverInfo?DeliverNo=${params.DeliverNo}
@@ -143,3 +147,15 @@ export const jifenParams = async (params) =>
 export const getjiFenInfo = async (params) =>
     instances.post(`Member/Point/PointList?TimeRange=${params.TimeRange}&PointFunType=${params.PointFunType}&PointMold=${params.PointMold}&PageSize=${params.PageSize}&PageIndex=${params.PageIndex}
 `);
+//退款方式
+export const getTuiKuanCateApi = async (params) => instances.post(`Member/RecordRefund/Types`);
+//账户的余额
+export const getAccountYuEApi = async (params) =>
+    instances.get(`Member/RecordBidquota/BalanceToQuotaInfo`);
+export const refundApi = async (data) => instances.post(`/Member/RecordRefund/Create`, data);
+
+//退款记录
+export const getTuiKuanJiLuApi = async (params) =>
+    instances.post(
+        `Member/RecordRefund/List?PageSize=${params.PageSize}&PageIndex=${params.PageIndex}`
+    );

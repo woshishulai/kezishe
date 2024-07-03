@@ -250,6 +250,7 @@ const detailsColumns = [
 
 <style scoped lang="less">
 .jiesuan-details {
+    font-size: 14px;
     :deep(.ant-table-wrapper .ant-table-thead > tr > th) {
         padding: 16px 15px;
         background-color: #eef3f8;
@@ -295,9 +296,10 @@ const detailsColumns = [
         border-radius: 10px;
 
         .title {
-            padding: 0 20px;
+            padding: 0 32px;
             margin-bottom: 20px;
-            font-size: 18px;
+            font-size: 16px;
+            color: #333;
         }
 
         .details {

@@ -116,9 +116,37 @@ const userRoutes = [
             },
             {
                 path: 'my-bidding',
-                component: () => import('@/pages/User/item/Bidding/MyBidding.vue'),
+                component: () => import('@/pages/User/item/Bidding/index.vue'),
                 meta: {
                     name: '我的竞买'
+                }
+            },
+            {
+                path: 'zhifu',
+                component: () => import('@/pages/User/item/Bidding/Item.vue'),
+                meta: {
+                    name: '支付'
+                }
+            },
+            {
+                path: 'select-zhifu',
+                component: () => import('@/pages/User/item/Bidding/Item4.vue'),
+                meta: {
+                    name: '支付'
+                }
+            },
+            {
+                path: 'writ-form',
+                component: () => import('@/pages/User/item/Bidding/Item2.vue'),
+                meta: {
+                    name: '填写汇款告知单'
+                }
+            },
+            {
+                path: 'yu-yue',
+                component: () => import('@/pages/User/item/Bidding/Item3.vue'),
+                meta: {
+                    name: '预约柜台业务'
                 }
             },
             {
@@ -511,10 +539,13 @@ const router = createRouter({
     history: createWebHashHistory(),
     routes,
     // 路由滚动行为定制
-    scrollBehavior() {
-        return {
-            top: 0
-        };
+    scrollBehavior(to, from, savedPosition) {
+        // 只有当路径（不包括查询参数）改变时才滚动到顶部
+        if (to.path !== from.path) {
+            return { top: 0 };
+        }
+        // 否则，保持当前位置
+        return savedPosition || {};
     }
 });
 // 添加全局前置守卫

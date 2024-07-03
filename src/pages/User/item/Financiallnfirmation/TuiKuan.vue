@@ -3,81 +3,135 @@ import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
 import { handleFinishFailed } from '@/utils/form/rules';
+import {
+    getTuiKuanCateApi,
+    getAccountYuEApi,
+    refundApi,
+    getTuiKuanJiLuApi
+} from '@/request/user/api';
+import { encryptionPassword } from '@/hooks/user';
+import { getCodeParams } from '@/request/api';
+import { useUserInfo, usePassword } from '@/store/store';
+import { info } from '@/hooks/antd/message';
+const newCodeParams = usePassword();
+const typeList = ref([]);
+const getFetchType = async () => {
+    try {
+        let res = await getTuiKuanCateApi();
+        typeList.value = res.Data;
+    } catch (error) {
+        console.log(error);
+    }
+};
+const userInfoDetails = ref({});
+const getUserYue = async () => {
+    try {
+        let res = await getAccountYuEApi();
+        console.log(res);
+        userInfoDetails.value = res.Data;
+    } catch (error) {
+        console.log(error);
+    }
+};
+const newQuery = ref({
+    total: 1
+});
+const tableDataList = ref([]);
+const getTableDataList = async (page = 1, pageSize = 10) => {
+    newQuery.value.PageIndex = page;
+    newQuery.value.PageSize = pageSize;
+    try {
+        let res = await getTuiKuanJiLuApi(newQuery.value);
+        tableDataList.value = res.Data;
+    } catch (error) {
+        console.log(error);
+    }
+};
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
-onMounted(() => {});
-const formState = reactive({
-    username: '',
-    password: '',
-    selector: undefined
-});
-const tableDataList = [
-    {
-        order: '1683762',
-        time: '2023-05-15',
-        price: '10,403,46',
-        way: '银行划账  支行',
-        status: '客服处理已受理'
-    },
-    {
-        order: '1683762',
-        time: '2023-05-15',
-        price: '10,403,46',
-        way: '银行划账  支行',
-        status: '客服处理已受理'
-    },
-    {
-        order: '1683762',
-        time: '2023-05-15',
-        price: '10,403,46',
-        way: '银行划账  支行',
-        status: '客服处理已受理'
-    },
-    {
-        order: '1683762',
-        time: '2023-05-15',
-        price: '10,403,46',
-        way: '银行划账  支行',
-        status: '客服处理已受理'
+onMounted(() => {
+    getFetchType();
+    getUserYue();
+    getTableDataList();
+    const codeTime = newCodeParams.codePasswords.ExpireTime;
+    const currentTime = Date.now();
+    if (!codeTime || currentTime > codeTime) {
+        getCodeParamsApi();
     }
-];
+});
+const getCodeParamsApi = async () => {
+    try {
+        let res = await getCodeParams();
+        if (res.Tag == 1) {
+            console.log(res);
+            newCodeParams.changeCodePasswords(res.Data);
+        }
+    } catch (error) {
+        info('error', error);
+    }
+};
+const formState = reactive({
+    Prices: '',
+    Password: '',
+    RefundType: undefined
+});
+
 const columns = [
     {
         title: '申请单号',
-        dataIndex: 'order',
-        key: 'order',
+        dataIndex: 'Rbn',
+        key: 'Rbn',
         align: 'center',
         ellipsis: true
     },
     {
         title: '申请时间',
-        dataIndex: 'time',
-        key: 'time',
+        dataIndex: 'Time',
+        key: 'Time',
         align: 'center'
     },
     {
         title: '退款金额',
-        dataIndex: 'price',
-        key: 'price',
+        dataIndex: 'Prices',
+        key: 'Prices',
         align: 'center'
     },
     {
         title: '退款方式',
-        dataIndex: 'way',
-        key: 'way',
+        dataIndex: 'RefundType',
+        key: 'RefundType',
         align: 'center'
     },
 
     {
         title: '状态',
-        dataIndex: 'status',
-        key: 'status',
+        dataIndex: 'Status',
+        key: 'Status',
         align: 'center'
     }
 ];
-const onFinish = (values) => {
-    console.log('Success:', values);
+const onFinish = async (values) => {
+    let params = {
+        Password: values.Password
+    };
+    let query = encryptionPassword(params, newCodeParams.codePasswords.PublicKey);
+    query.Prices = values.Prices;
+    query.RefundType = values.RefundType;
+    try {
+        let res = await refundApi(query);
+        console.log(res);
+        if (res.Tag == 1) {
+            Object.keys(formState).forEach((item) => {
+                formState[item] = '';
+            });
+            info('success', res.Message);
+        } else {
+            info('error', res.Message);
+        }
+    } catch (error) {
+        console.log(error);
+    }
 };
 </script>
 
@@ -85,15 +139,13 @@ const onFinish = (values) => {
     <div class="tui-kuan">
         <div class="top-wrap">
             <div class="left-user-info">
-                <div class="title">余额(¥)</div>
-                <div class="num">143.40 <span>元</span></div>
-                <p>竞卖额度</p>
-                <p>¥453423</p>
-                <p>¥453423可用</p>
+                <div class="title">账户余额(¥)</div>
+                <div class="num">{{ userInfoDetails.Balance }} <span>元</span></div>
                 <div class="bi">
                     <div>
-                        <p class="label">涌币</p>
-                        <p>0(赠送0)</p>
+                        <p>竞卖额度</p>
+                        <p>¥{{ userInfoDetails.Quota || '' }}</p>
+                        <p>¥{{ userInfoDetails.AvailableQuotas || '' }}可用</p>
                     </div>
                     <img :src="getImageUrl('user/caiwu/list1.png')" alt="" />
                 </div>
@@ -111,26 +163,31 @@ const onFinish = (values) => {
                     style="max-width: 400px"
                 >
                     <a-form-item
-                        name="username"
+                        name="Prices"
                         :rules="[{ required: true, message: '请输入退款金额' }]"
                     >
                         <a-input
+                            style="width: 260px"
                             placeholder="金额（RMB）"
-                            v-model:value.trim="formState.username"
+                            type="number"
+                            v-model:value.trim="formState.Prices"
                         />
                     </a-form-item>
 
                     <a-form-item
-                        name="password"
+                        name="Password"
+                        id="login-account"
                         :rules="[{ required: true, message: '请输入支付密码' }]"
                     >
                         <a-input-password
+                            style="width: 260px"
+                            autocomplete="92ifelkfmaslk"
                             placeholder="支付密码"
-                            v-model:value.trim="formState.password"
+                            v-model:value.trim="formState.Password"
                         />
                     </a-form-item>
                     <a-form-item
-                        name="selector"
+                        name="RefundType"
                         :rules="[
                             {
                                 required: true,
@@ -139,11 +196,17 @@ const onFinish = (values) => {
                             }
                         ]"
                     >
-                        <a-select placeholder="退款方式" v-model:value="formState.selector">
-                            <a-select-option value="1">中国银行 1314520</a-select-option>
-                            <a-select-option value="2">邮政银行 5201314</a-select-option>
-                            <a-select-option value="3">工商银行 999666</a-select-option>
-                            <a-select-option value="4">建设银行 666999</a-select-option>
+                        <a-select
+                            style="width: 260px"
+                            placeholder="退款方式"
+                            v-model:value="formState.RefundType"
+                            :options="typeList"
+                            :field-names="{
+                                label: 'Value',
+                                value: 'RefundType',
+                                options: 'children'
+                            }"
+                        >
                         </a-select>
                     </a-form-item>
                     <a-form-item>
@@ -155,12 +218,25 @@ const onFinish = (values) => {
         <div class="title-jilu">退款申请记录</div>
         <a-table :pagination="false" :columns="columns" :data-source="tableDataList">
             <template #bodyCell="{ column, record }">
-                <template v-if="column.key === 'status'">
-                    <div class="status"> 客服处理已受理 </div>
+                <template v-if="column.key === 'RefundType'">
+                    <div>{{
+                        record.RefundType == 1
+                            ? '邮政'
+                            : record.RefundType == 2
+                              ? '银行划账'
+                              : record.RefundType == 3
+                                ? '柜台提账'
+                                : '其他'
+                    }}</div>
+                </template>
+                <template v-if="column.key === 'Status'">
+                    <div :style="{ color: record.Status == '已受理' ? '#9a0000' : '' }">{{
+                        record.Status
+                    }}</div>
                 </template>
             </template>
         </a-table>
-        <CatePage></CatePage>
+        <CatePage :paginations="newQuery" @fetchList="getTableDataList"></CatePage>
     </div>
 </template>
 
@@ -172,29 +248,34 @@ const onFinish = (values) => {
         display: flex;
         gap: 10px;
         .left-user-info {
-            min-width: 334px;
             border-radius: 12px;
             background-color: #f7f7f7;
-            padding: 40px 20px 20px 40px;
+            padding: 40px 15px 13px 40px;
+            min-width: 334px;
             .flex-col;
-            gap: 10px;
             align-items: flex-start;
-            font-size: 16px;
+
             .title {
                 font-size: 18px;
+                font-family: 'MicrosoftYaHei';
+                color: rgb(82, 82, 82);
             }
 
             .num {
-                color: #9a0000;
                 font-size: 30px;
-                margin: 10px 0 20px;
+                margin: 18px 0 30px;
+                font-family: 'PingFang SC';
+                color: rgb(154, 0, 0);
+
                 span {
                     font-size: 16px;
                 }
             }
 
             p {
-                color: #6a6a6a;
+                margin-bottom: 14px;
+                color: rgb(74, 74, 74);
+                font-size: 16px;
             }
 
             .label {
@@ -202,11 +283,14 @@ const onFinish = (values) => {
             }
 
             .bi {
-                margin-top: 30px;
                 width: 100%;
                 .flex-row;
                 align-items: flex-start;
                 justify-content: space-between;
+
+                img {
+                    margin-top: 120px;
+                }
             }
         }
         .right-wrap {
@@ -229,6 +313,44 @@ const onFinish = (values) => {
             }
             .ant-form {
                 margin: 30px 0 0 15px;
+                .ant-input {
+                    width: 260px;
+                    border-width: 1px;
+                    border-style: solid;
+                    border-radius: 4px;
+                    border-color: rgb(218, 225, 232);
+                    height: 43px;
+                    background-color: rgb(255, 255, 255);
+                    font-size: 14px;
+                }
+                :deep(.ant-select-selection-item) {
+                    line-height: 43px;
+                    font-size: 14px;
+                    width: 260px;
+                }
+                :deep(.ant-select-selection-placeholder) {
+                    line-height: 43px;
+                }
+                :deep(.ant-select-selector) {
+                    font-size: 14px;
+
+                    .ant-select-selection-search-input {
+                        height: 43px;
+                        line-height: 43px;
+                        font-size: 14px;
+                        width: 260px;
+                    }
+                }
+                .ant-btn {
+                    border-radius: 4px;
+                    background-color: rgb(154, 0, 0);
+                    width: 125px;
+                    height: 45px;
+                    font-size: 18px;
+                    padding: 0;
+                    font-family: 'MicrosoftYaHei';
+                    color: rgb(255, 255, 255);
+                }
             }
         }
     }

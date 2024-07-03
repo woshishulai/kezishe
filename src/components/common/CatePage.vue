@@ -38,7 +38,7 @@ const onChange = () => {
             v-model:pageSize="pageSize"
             v-model:current="page"
             :page-size-options="pageSizeOptions"
-            :total="props.paginations.total"
+            :total="props.paginations.total || 1"
         />
     </div>
 </template>
@@ -70,7 +70,7 @@ const onChange = () => {
         .ant-pagination-options {
             .ant-select {
                 .ant-select-selector {
-                    height: 36px;
+                    height: 34px;
                     border: 1px solid #dbdbdb;
                     border-radius: 3px;
                     .ant-select-selection-search-input {

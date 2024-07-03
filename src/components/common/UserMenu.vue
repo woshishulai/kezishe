@@ -1,10 +1,8 @@
 <script setup>
 import { getImageUrl } from '@/utils';
-import { ref, h, watch, nextTick } from 'vue';
+import { ref, h, nextTick, watch, onUnmounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getMailApi } from '@/request/api';
-import { onMounted } from 'vue';
-import { onUnmounted } from 'vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -107,7 +105,7 @@ const list = ref([
         name: '物流',
         children: [
             {
-                router: 'logistics',
+                router: 'logistics/',
                 name: '未发货',
                 selectIcon: 'right.png'
             },
@@ -157,20 +155,27 @@ const list = ref([
         icon: 'jurassic_currency'
     }
 ]);
-const url = route.path.replace('/user/', '');
-
-list.value.forEach((item, index) => {
-    if (item.router === url) {
-        active.value = index;
-        sonActive.value = 0;
-    } else if (item.children && item.children.length) {
-        const childIndex = item.children.findIndex((child) => child.router === url);
-        if (childIndex !== -1) {
+const watchShow = ref(false);
+const changeActive = () => {
+    const url = route.path.replace('/user/', '');
+    list.value.forEach((item, index) => {
+        if (item.router === url) {
             active.value = index;
-            sonActive.value = childIndex;
+            sonActive.value = 0;
+        } else if (item.children && item.children.length) {
+            const childIndex = item.children.findIndex((child) => child.router === url);
+            if (childIndex !== -1) {
+                active.value = index;
+                sonActive.value = childIndex;
+            }
         }
+    });
+    if (!active.value) {
+        active.value = 3;
+        sonActive.value = 0;
     }
-});
+};
+changeActive();
 const getEmail = async () => {
     let res = await getMailApi({
         page: 1,
@@ -185,13 +190,24 @@ const getEmail = async () => {
         list.value[1].num = null;
     }
 };
+watch(
+    () => route.path,
+    () => {
+        if (watchShow.value == true) {
+            return;
+        }
+        changeActive();
+    }
+);
 
 const timer = ref(null);
 timer.value = setInterval(() => {
-    getEmail();
+    // getEmail();
 }, 5000);
 onUnmounted(() => {
+    clearInterval(timer.value);
     timer.value = null;
+    console.log('清楚了');
 });
 
 // const selectRouter = router.currentRoute._rawValue.fullPath;
@@ -252,26 +268,28 @@ onUnmounted(() => {
 // const menuItems = ref(generateMenuItems(userRoutes));
 
 const handleClick = (e, index, iIndex) => {
+    watchShow.value = true;
     active.value = index;
     sonActive.value = iIndex || 0;
     const url = `/user/${e}`;
     if (url === route.path) {
         router.replace({ path: url, query: { refresh: Math.random() } }).then(() => {
-            localStorage.removeItem('checkedStatus');
-            localStorage.removeItem('kuaidis');
-            localStorage.removeItem('zhifus');
-            localStorage.removeItem('baojias');
-            localStorage.removeItem('iptValues');
-            localStorage.removeItem('quans');
-            localStorage.removeItem('quanLists');
-            localStorage.removeItem('DelLists');
-            localStorage.removeItem('showModal');
-            localStorage.removeItem('showPaegs');
-            localStorage.removeItem('goodsList');
+            // localStorage.removeItem('checkedStatus');
+            // localStorage.removeItem('kuaidis');
+            // localStorage.removeItem('zhifus');
+            // localStorage.removeItem('baojias');
+            // localStorage.removeItem('iptValues');
+            // localStorage.removeItem('quans');
+            // localStorage.removeItem('quanLists');
+            // localStorage.removeItem('DelLists');
+            // localStorage.removeItem('showModal');
+            // localStorage.removeItem('showPaegs');
+            // localStorage.removeItem('goodsList');
         });
     } else {
         router.push(url);
     }
+    watchShow.value = false;
 };
 const showUserInfo = () => {
     router.push('/user/userinfo');

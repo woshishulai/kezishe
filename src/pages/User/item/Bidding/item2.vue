@@ -2,26 +2,15 @@
 import Header from './Header.vue';
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { getImageUrl } from '@/utils';
 import Tables from '../Financiallnfirmation/item/tables.vue';
-const allPrice = localStorage.getItem('allPrice');
 const router = useRouter();
 const route = useRoute();
+const allPrice = route.query.AllTotal;
 const props = defineProps({});
-const orderId = localStorage.getItem('orderId');
-const emits = defineEmits(['changeShowPage']);
+const orderId = route.query.orderId;
 const isDraweComponent = ref(false);
 const afterOpenChange = (bool) => {
     isDraweComponent.value = bool;
-    localStorage.removeItem('checkedStatus');
-    localStorage.removeItem('kuaidis');
-    localStorage.removeItem('zhifus');
-    localStorage.removeItem('baojias');
-    localStorage.removeItem('iptValues');
-    localStorage.removeItem('quans');
-    localStorage.removeItem('quanLists');
-    localStorage.removeItem('DelLists');
-    deletes();
 };
 onMounted(() => {});
 const jingMaiColumns = [
@@ -58,7 +47,7 @@ const changeAddPrice = () => {
     isDraweComponent.value = true;
 };
 const deletes = () => {
-    route.query.wuliu ? router.push('/user/logistics/') : emits('changeShowPage', 2);
+    router.back();
 };
 </script>
 
@@ -115,15 +104,17 @@ const deletes = () => {
             >
             <div class="add">
                 <div class="btns">
-                    <a-button type="primary" @click="deletes">返回修改</a-button>
+                    <a-button type="primary" @click="deletes">
+                        {{ route.query.wuliu ? '返回' : '返回修改' }}
+                    </a-button>
                     <a-button type="primary" @click="changeAddPrice">填写汇款告知单</a-button></div
                 >
                 <div class="text">
                     <p>应付金额</p>
                     <p class="price">
                         {{ allPrice }}
-                        元</p
-                    >
+                        <span> 元</span>
+                    </p>
                 </div>
             </div>
         </div>
@@ -172,8 +163,14 @@ const deletes = () => {
                     font-size: 20px;
                 }
                 .price {
-                    margin-top: 20px;
+                    margin-top: 4px;
                     color: #9a0000;
+                    font-size: 20px;
+                    font-weight: 500;
+                    span {
+                        color: #000;
+                        font-size: 14px;
+                    }
                 }
             }
         }

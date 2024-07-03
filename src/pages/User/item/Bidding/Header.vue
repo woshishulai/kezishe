@@ -52,7 +52,7 @@ onMounted(() => {});
             <div class="text-wrap">
                 <span class="active">确认支付方式</span>
                 <span :class="props?.num != 2 || props?.num != 3 ? 'active' : ''">支付确认</span>
-                <span :class="props?.num != 3 ? 'active' : ''">支付结果</span>
+                <span :class="props?.num == 3 ? 'active' : ''">支付结果</span>
             </div>
         </div>
     </div>
@@ -103,6 +103,7 @@ onMounted(() => {});
                 color: #b11503;
             }
             span {
+                color: rgb(131, 131, 131);
                 min-width: 110px;
                 text-align: center;
             }

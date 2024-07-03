@@ -63,13 +63,12 @@ const afterOpenChanges = (bool) => {
         <div class="left-user-info">
             <div class="title">余额(¥)</div>
             <div class="num">{{ infos?.Balance }} <span>元</span></div>
-            <p>竞买额度</p>
-            <p>¥{{ infos?.Quota }}</p>
-            <p>¥{{ infos.AvailableQuotas }}可用</p>
+
             <div class="bi">
                 <div>
-                    <p class="label">涌币</p>
-                    <p>0(赠送0)</p>
+                    <p>竞买额度</p>
+                    <p>¥{{ infos?.Quota }}</p>
+                    <p>¥{{ infos.AvailableQuotas }}可用</p>
                 </div>
                 <img :src="getImageUrl('user/caiwu/list1.png')" alt="" />
             </div>
@@ -152,29 +151,34 @@ const afterOpenChanges = (bool) => {
     background-color: #fff;
 
     .left-user-info {
-        min-width: 334px;
         border-radius: 12px;
         background-color: #f7f7f7;
-        padding: 40px 20px 20px 40px;
+        padding: 40px 15px 13px 40px;
+        min-width: 334px;
         .flex-col;
-        gap: 10px;
         align-items: flex-start;
-        font-size: 16px;
+
         .title {
             font-size: 18px;
+            font-family: 'MicrosoftYaHei';
+            color: rgb(82, 82, 82);
         }
 
         .num {
-            color: #9a0000;
             font-size: 30px;
-            margin: 10px 0 20px;
+            margin: 18px 0 30px;
+            font-family: 'PingFang SC';
+            color: rgb(154, 0, 0);
+
             span {
                 font-size: 16px;
             }
         }
 
         p {
-            color: #6a6a6a;
+            margin-bottom: 14px;
+            color: rgb(74, 74, 74);
+            font-size: 16px;
         }
 
         .label {
@@ -182,11 +186,14 @@ const afterOpenChanges = (bool) => {
         }
 
         .bi {
-            margin-top: 30px;
             width: 100%;
             .flex-row;
             align-items: flex-start;
             justify-content: space-between;
+
+            img {
+                margin-top: 120px;
+            }
         }
     }
 

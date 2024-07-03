@@ -1,9 +1,9 @@
 <script setup>
-import { ref, computed, reactive, onMounted, h } from 'vue';
+import { ref, computed, reactive, onMounted, h, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getImageUrl } from '@/utils';
-import { SearchOutlined } from '@ant-design/icons-vue';
 import { timeOptions, statusOptions, jingMaiColumns, pingTai } from '../../data.js';
+import { SearchOutlined } from '@ant-design/icons-vue';
 import {
     getJingMaiApi,
     getYiDeBiaoApi,
@@ -13,15 +13,15 @@ import {
     sumbitOrder,
     getJingMaiCateAPi
 } from '@/request/jingmai';
-import QuJian from './QuJian.vue';
-import Item from './Item.vue';
-import Item2 from './Item2.vue';
-import Item3 from './Item3.vue';
-import Item4 from './Item4.vue';
-import { info } from '@/hooks/antd/message';
-import { watch } from 'vue';
-const route = useRoute();
+const apiList = {
+    竞买中: getJingMaiApi,
+    已得标: getYiDeBiaoApi,
+    未得标: getWeiDeBiaoApi,
+    未支付: getWeiZhiFuApi,
+    不支付: getBuZhiFuApi
+};
 const loading = ref(false);
+const fetchData = ref(null);
 const jingMaiList = ref([
     {
         cate: '竞买中'
@@ -46,7 +46,43 @@ const jingMaiList = ref([
         cate: '已发货'
     }
 ]);
+const showModals = ref(null);
+const params = ref({
+    Title: '',
+    Status: '',
+    Times: '',
+    PageIndex: '',
+    PageSize: '',
+    total: 1
+});
+const getFetchData = async (page = 1, pageSize = 10) => {
+    loading.value = true;
+    params.value.PageIndex = page;
+    params.value.PageSize = pageSize;
+    try {
+        let res = await apiList[showModals.value?.params?.titleCate](params.value); // 调用函数来获取数据
+        if (res.Tag != 1) {
+            loading.value = false;
+            return;
+        }
+        params.value.total = res.Total;
+        // let index = jingMaiList.value.findIndex((item) => {
+        //     return item.cate == showModals.value?.params?.titleCate;
+        // });
 
+        // if (index == 3) {
+        //     jingMaiList.value[index].showText = '预约';
+        // }
+        fetchData.value = res.Data;
+    } catch (error) {}
+    loading.value = false;
+};
+const router = useRouter();
+const route = useRoute();
+const props = defineProps({});
+const checkList = ref({
+    DelList: []
+});
 onMounted(async () => {
     try {
         let res = await getJingMaiCateAPi();
@@ -63,96 +99,43 @@ onMounted(async () => {
         console.log(error);
     }
 });
-const router = useRouter();
-const showModals = ref(null);
-const props = defineProps({});
-const showPaegs = localStorage.getItem('showPaegs');
-const showComponent = ref(1);
-showPaegs && route.query.goodsList ? (showComponent.value = showPaegs) : (showComponent.value = 1);
-const AllTotal = ref(0);
-const changeShowPage = async (index, query) => {
-    if (query) {
-        try {
-            let res = await sumbitOrder(query);
-            if (res.Tag && !res.Tag == 1) {
-                return;
+//全选
+const all = ref(false);
+const getAll = () => {
+    if (!all.value) {
+        checkList.value.DelList = fetchData.value.map((item) => {
+            let query = {
+                Bn: item.Bn
+            };
+            if (showModals.value?.params?.titleCate == '未支付') {
+                return item;
             } else {
-                localStorage.setItem('orderId', res.Data.OrderNo);
-                AllTotal.value = res.Data.AllTotal;
-                localStorage.removeItem('checkedStatus');
-                localStorage.removeItem('kuaidis');
-                localStorage.removeItem('zhifus');
-                localStorage.removeItem('baojias');
-                localStorage.removeItem('iptValues');
-                localStorage.removeItem('goodsList');
-                localStorage.removeItem('quans');
-                localStorage.removeItem('quanLists');
-                localStorage.removeItem('DelLists');
-                showComponent.value = index;
-                if (showModals.value?.params?.titleCate) {
-                    Object.keys(params.value).forEach((item) => {
-                        params.value[item] = '';
-                    });
-                    params.value.total = 1;
-                    fetchData.value = [];
-                    checkList.value.DelList = [];
-                    getFetchData(1, 10);
-                }
+                return query;
             }
-        } catch (error) {
-            info('error', '请求错误');
-        }
+        });
+        all.value = true;
+        return;
+    } else {
+        checkList.value.DelList = [];
+        all.value = false;
         return;
     }
-    showComponent.value = index;
-    localStorage.setItem('showPaegs', index);
 };
-const params = ref({
-    Title: '',
-    Status: '',
-    Times: '',
-    PageIndex: '',
-    PageSize: '',
-    total: 1
-});
-const apiList = {
-    竞买中: getJingMaiApi,
-    已得标: getYiDeBiaoApi,
-    未得标: getWeiDeBiaoApi,
-    未支付: getWeiZhiFuApi,
-    不支付: getBuZhiFuApi
-};
-const fetchData = ref(null);
-const getFetchData = async (page = 1, pageSize = 10) => {
-    loading.value = true;
-    params.value.PageIndex = page;
-    params.value.PageSize = pageSize;
-
-    try {
-        let res = await apiList[showModals.value?.params?.titleCate](params.value); // 调用函数来获取数据
-        if (res.Tag != 1) {
-            loading.value = false;
-            return;
+//支付
+const zhiFu = () => {
+    if (checkList.value.DelList.length < 1) {
+        info('warning', '请先选择要支付的订单吧');
+        return;
+    }
+    const goodsList = JSON.stringify(checkList.value.DelList);
+    router.push({
+        path: '/user/zhifu',
+        query: {
+            titleCate: showModals.value?.params?.titleCate,
+            goodsList: goodsList
         }
-        params.total = res.Total;
-        console.log(params.total);
-        let index = jingMaiList.value.findIndex((item) => {
-            return item.cate == showModals.value?.params?.titleCate;
-        });
-
-        // jingMaiList.value.forEach((item) => {
-        //     item.num = '';
-        // });
-
-        // jingMaiList.value[index].num = res.Data.length;
-        if (index == 3) {
-            jingMaiList.value[index].showText = '预约';
-        }
-        fetchData.value = res.Data;
-    } catch (error) {}
-    loading.value = false;
+    });
 };
-
 watch(
     () => showModals.value?.params?.titleCate,
     () => {
@@ -165,31 +148,18 @@ watch(
             router.push({
                 path: '/user/my-bidding',
                 query: {
-                    ...router.currentRoute.value.query,
                     titleCate: showModals.value?.params?.titleCate
                 }
             });
             Object.keys(params.value).forEach((item) => {
                 params.value[item] = '';
             });
-            params.value.total = 1;
             fetchData.value = [];
             checkList.value.DelList = [];
             getFetchData(1, 10);
         }
     }
 );
-const showGoodsDetails = (i) => {
-    router.push({
-        path: '/jingmai/goods-details',
-        query: {
-            id: i.Gid
-        }
-    });
-};
-const checkList = ref({
-    DelList: []
-});
 //勾选框
 const showCheck = (e) => {
     if (getChecked(e.Bn)) {
@@ -217,12 +187,7 @@ function getChecked(Bn) {
 </script>
 
 <template>
-    <Item
-        :fetchData="checkList?.DelList"
-        @changeShowPage="changeShowPage"
-        v-show="route.query.show == 2"
-    ></Item>
-    <div class="my-bidding" v-show="showComponent == 1">
+    <div class="my-bidding">
         <div class="card-box">
             <div class="title"> 我的竞买 </div>
             <show-modal ref="showModals" :titleList="jingMaiList">
@@ -339,10 +304,6 @@ function getChecked(Bn) {
             <CatePage :paginations="params" @fetchList="getFetchData"></CatePage>
         </div>
     </div>
-    <Item2 @changeShowPage="changeShowPage" v-show="showComponent == 3"></Item2>
-    <Item3 @changeShowPage="changeShowPage" v-show="showComponent == 4"></Item3>
-    <!-- //余额支付的 -->
-    <Item4 @changeShowPage="changeShowPage" :AllTotal="AllTotal" v-if="showComponent == 5"></Item4>
 </template>
 
 <style scoped lang="less">

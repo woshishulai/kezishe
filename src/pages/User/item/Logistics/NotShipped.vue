@@ -49,37 +49,48 @@ const showCheck = (e) => {
         checkList.value.DelList.push(e);
     }
     console.log(checkList.value.DelList);
+    if (checkList.value.DelList.length == tableList.value.length) {
+        all.value = true;
+    } else {
+        all.value = false;
+    }
 };
 function getChecked(Bn) {
     const item = checkList.value.DelList.find((item) => item.Bn === Bn);
     return item !== undefined;
 }
+//全选
+const all = ref(false);
+const getAll = () => {
+    if (!all.value) {
+        checkList.value.DelList = tableList.value.map((item) => {
+            return item;
+        });
+        all.value = true;
+        return;
+    } else {
+        checkList.value.DelList = [];
+        all.value = false;
+        return;
+    }
+};
 const fahuo = () => {
     if (checkList.value.DelList.length < 1) {
         info('warning', '请先选择要发货的订单吧');
         return;
     }
-    localStorage.setItem('checkedStatus', 0);
-    localStorage.setItem('kuaidis', 0);
-    localStorage.setItem('zhifus', 0);
-    localStorage.setItem('baojias', true);
-    localStorage.setItem('iptValues', '');
-    localStorage.setItem('quanLists', '');
-    localStorage.setItem('DelLists', []);
-    localStorage.removeItem('allPrice');
-    localStorage.removeItem('orderId');
-    localStorage.setItem('showPaegs', 2);
     const goodsList = JSON.stringify(checkList.value.DelList);
-    localStorage.setItem('goodsList', goodsList);
     router.push({
-        path: '/user/my-bidding',
+        path: '/user/zhifu',
         query: {
-            wuliu: true
+            wuliu: true,
+            goodsList: goodsList
         }
     });
 };
 const removeCheckList = () => {
     checkList.value.DelList = [];
+    all.value = false;
 };
 onMounted(() => {
     getTableList();
@@ -124,7 +135,7 @@ const columns = [
         align: 'center'
     },
     {
-        title: '成交价/价格',
+        title: '成交价/价值',
         dataIndex: 'MakePrice',
         key: 'MakePrice',
         ellipsis: true,
@@ -153,22 +164,7 @@ const columns = [
         key: 'IsCret'
     }
 ];
-const data = reactive([]);
-for (let i = 0; i < 10; i++) {
-    data.push({
-        key: i,
-        code: '63932729',
-        name: '清朝瓷器',
-        cate: '竞买',
-        chengjiao: '3,960.00元',
-        cangchuqi: '剩余114天(免费)',
-        laoban: '中邮网',
-        time: '2023.10.02',
-        price: '1.00',
-        zhaopian: 'register/logo.png',
-        caozuo: '无'
-    });
-}
+
 const state = reactive({
     selectedRowKeys: [],
     // Check here to configure the default column
@@ -267,31 +263,38 @@ const value1 = ref('0');
                         </template>
                     </a-table>
                     <div class="add-array">
-                        <div>
-                            <span>
-                                <template>
-                                    {{
-                                        `总计 ${data.length} 项 已选 ${state.selectedRowKeys.length} 项`
-                                    }}
-                                </template>
-                            </span>
-                        </div>
-                        <span>
-                            <template>
-                                {{
-                                    `未发货总数 ${data.length} 项 已选 ${state.selectedRowKeys.length} 项`
-                                }}
-                            </template>
-                        </span>
+                        <a-checkbox
+                            @change="getAll()"
+                            style="margin-right: 15px"
+                            :checked="all"
+                        ></a-checkbox>
+                        <span class="all">全选</span>
+                        {{ `总计 ${tableList.length} 项 已选 ${checkList.DelList.length} 项` }}
                     </div>
                     <div class="add-array">
-                        <a-button type="primary" :loading="state.loading" @click="removeCheckList">
+                        <a-button
+                            type="primary"
+                            style="width: 170px; border-radius: 2px"
+                            :loading="state.loading"
+                            @click="removeCheckList"
+                        >
                             撤销所有已选
                         </a-button>
-                        <a-button type="primary" :loading="state.loading" @click="fahuo">
+                        <a-button
+                            type="primary"
+                            style="width: 170px; border-radius: 2px"
+                            :loading="state.loading"
+                            @click="fahuo"
+                        >
                             已选发货
                         </a-button>
-                        <a-button type="primary" :loading="state.loading"> 一键转卖 </a-button>
+                        <a-button
+                            type="primary"
+                            style="width: 170px; border-radius: 2px"
+                            :loading="state.loading"
+                        >
+                            一键转卖
+                        </a-button>
                     </div>
                     <p class="label"
                         >藏品暂不开放支付后退货退款流程。如有退货，请收货后联系客服021-23099900</p
@@ -308,6 +311,36 @@ const value1 = ref('0');
 
 <style scoped lang="less">
 .my-logistics {
+    .ant-input {
+        border-width: 1px;
+        border-style: solid;
+        border-radius: 4px;
+        border-color: rgb(218, 225, 232);
+        height: 43px;
+        background-color: rgb(255, 255, 255);
+        font-size: 14px;
+    }
+    :deep(.ant-select-selection-item) {
+        line-height: 43px;
+        font-size: 14px;
+    }
+    :deep(.ant-select-selection-placeholder) {
+        line-height: 43px;
+    }
+    :deep(.ant-select-selector) {
+        font-size: 14px;
+
+        .ant-select-selection-search-input {
+            height: 43px;
+            line-height: 43px;
+            font-size: 14px;
+            &:placeholder-shown {
+            }
+        }
+    }
+    :deep(.ant-btn) {
+        background-color: #85909b;
+    }
     .goods-info {
         display: flex;
         align-items: center;
@@ -344,10 +377,14 @@ const value1 = ref('0');
         }
 
         .add-array {
-            padding: 20px 40px 0 0;
+            padding: 20px 40px 0 17px;
             .flex-row;
             gap: 30px;
             justify-content: flex-start;
+            .all {
+                font-size: 16px;
+                margin-right: 70px;
+            }
         }
 
         .label {

@@ -55,3 +55,7 @@ export const getBuZhiFuApi = (params) =>
 
 //未支付提交订单
 export const sumbitOrder = (data) => instances.post(`Member/Pay/OrderSave`, data);
+
+//竞买状态分类
+export const getJingMaiCateAPi = (data) =>
+    instances.post(`Member/UserAuction/GoodsOrderTypeConfig`, data);
