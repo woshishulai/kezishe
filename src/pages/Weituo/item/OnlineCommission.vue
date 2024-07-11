@@ -106,7 +106,7 @@ const onFinish = async (values) => {
         if (res.Tag == 1) {
             formState.value = {};
             formState.value.remember == true;
-            info('status', res.Message);
+            info('status', '提交成功');
         }
     } else {
         openTitle.value = '请先登录在填写申请单';

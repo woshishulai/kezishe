@@ -86,7 +86,7 @@ const showStampGoods = (i) => {
             query: {
                 Id: i.Id,
                 Cate1: 2,
-                show: true
+                show: false
             }
         });
     }

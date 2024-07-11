@@ -8,6 +8,7 @@ import HotGoods from '../item/HotGoods.vue';
 import NewGoods from '../item/NewGoods.vue';
 import RightList from '../item/RightList.vue';
 import { goodsListAPi } from '@/request/jingmai';
+import { searchValue } from '@/request/api';
 import { info } from '@/hooks/antd/message';
 const router = useRouter();
 const route = useRoute();
@@ -15,13 +16,16 @@ const props = defineProps({});
 const postParams = ref({});
 const formState = ref({});
 const getGoodsList = async () => {
+    let res;
     try {
-        let res = await goodsListAPi(postParams.value);
+        if (route.query.KeyWd) {
+            res = await searchValue(postParams.value);
+        } else {
+            res = await goodsListAPi(postParams.value);
+        }
         formState.value = res.Data;
         console.log(formState.value, '专场item1');
-    } catch (error) {
-        info('error', error);
-    }
+    } catch (error) {}
 };
 
 const changeFormState = async (query, paginations) => {
@@ -39,7 +43,7 @@ const changeFormState = async (query, paginations) => {
             PageIndex: 1
         });
     }
-    if (!route.query.Id) {
+    if (!route.query.Id && !route.query.KeyWd) {
         return;
     }
     getGoodsList();

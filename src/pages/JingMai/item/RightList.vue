@@ -18,10 +18,21 @@ const props = defineProps({
 });
 //1 3 是邮票 24是竞买
 const showList = ref('');
-onMounted(() => {
-    showList.value = route.query.show ? 3 : 4;
-    console.log(showList.value);
-});
+// onMounted(() => {
+//     showList.value = route.query.show ? 3 : 4;
+//     console.log(showList.value);
+// });
+watch(
+    () => route.query,
+    () => {
+        showList.value = route.query.show ? 3 : 4;
+        console.log(showList.value);
+    },
+    {
+        deep: true,
+        immediate: true
+    }
+);
 const emits = defineEmits(['changeFormState']);
 const changeShowList = () => {
     showList.value =
@@ -94,14 +105,9 @@ const showGoodsDetails = (item) => {
                 v-for="(item, index) in props?.goodsList"
                 :key="index"
             >
-                <a-popover placement="rightBottom">
-                    <template #content>
-                        <img :src="item.CoverImg" alt="" />
-                    </template>
-                    <div class="top-img">
-                        <img :src="item.CoverImg" alt="" />
-                    </div>
-                </a-popover>
+                <div class="top-img">
+                    <img :src="item.CoverImg" alt="" />
+                </div>
                 <div class="text-wrap">
                     <h5>{{ item.Title }}</h5>
                     <p class="price">¥{{ item.BasePrice }}</p>
@@ -181,15 +187,15 @@ const showGoodsDetails = (item) => {
         justify-content: space-between;
         flex-direction: row;
         flex-wrap: wrap;
-        gap: 16px 0;
+        gap: 16px;
         &.active {
             gap: 16px 15px;
             justify-content: flex-start;
         }
         .goods-item {
             flex: 1;
-            // min-width: 23%;
             max-width: 24%;
+            min-width: 20%;
             background-color: #f4f4f4;
             padding: 20px 16px;
             cursor: pointer;
@@ -239,7 +245,7 @@ const showGoodsDetails = (item) => {
         justify-content: space-between;
         flex-direction: row;
         flex-wrap: wrap;
-        gap: 16px 0;
+        gap: 16px;
         &.active {
             gap: 16px 15px;
             justify-content: flex-start;
@@ -310,7 +316,7 @@ const showGoodsDetails = (item) => {
                 display: flex;
                 flex-direction: row;
                 align-items: center;
-                min-width: 225px;
+                width: 225px;
                 height: 225px;
                 background-color: #fff;
                 padding: 20px;

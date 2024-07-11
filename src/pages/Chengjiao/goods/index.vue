@@ -5,6 +5,7 @@ import LeftSelect from './LeftSeleft.vue';
 import { ref, computed, reactive, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { goodsListAPi } from '@/request/chengjiao/api';
+import { searchValue } from '@/request/api';
 const router = useRouter();
 const route = useRoute();
 const props = defineProps({});
@@ -12,8 +13,13 @@ onMounted(() => {});
 const formState = ref({});
 const postParams = ref({});
 const getGoodsList = async () => {
+    let res;
     try {
-        let res = await goodsListAPi(postParams.value);
+        if (route.query.KeyWd) {
+            res = await searchValue(postParams.value);
+        } else {
+            res = await goodsListAPi(postParams.value);
+        }
         formState.value = res.Data;
         console.log(formState.value, '成交');
     } catch (error) {
@@ -36,7 +42,7 @@ const changeFormState = async (query, paginations) => {
             PageIndex: 1
         });
     }
-    if (!route.query.Id) {
+    if (!route.query.Id && !route.query.KeyWd) {
         return;
     }
     getGoodsList();

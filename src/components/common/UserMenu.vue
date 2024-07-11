@@ -170,7 +170,7 @@ const changeActive = () => {
             }
         }
     });
-    if (!active.value) {
+    if (!active.value && active.value != 0) {
         active.value = 3;
         sonActive.value = 0;
     }
@@ -202,7 +202,7 @@ watch(
 
 const timer = ref(null);
 timer.value = setInterval(() => {
-    // getEmail();
+    getEmail();
 }, 5000);
 onUnmounted(() => {
     clearInterval(timer.value);

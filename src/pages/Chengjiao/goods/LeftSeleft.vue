@@ -33,12 +33,32 @@ const state = reactive({
 const activeKey = ref(['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11']);
 
 const changeParams = () => {
-    emits('changeFormState', state);
+    let query = { ...state };
+    let num = state.PriceRange;
+    let str;
+    if (num == 0) {
+        str = '0,N';
+    } else {
+        const index = cate5List.find((item) => {
+            return item.value == num;
+        });
+        let text = index.label;
+        str = text.replace('-', ',');
+    }
+    query.PriceRange = str;
+    if (route.query.KeyWd) {
+        query.AuctionStatuses = 0;
+        query.Grades = '';
+    }
+    emits('changeFormState', query);
 };
 watch(
     () => route.query,
     (newValue, oldValue) => {
         state.Lid = route.query.Id;
+        state.Stype = route.query.SType;
+        state.KeyWd = route.query.KeyWd;
+        state.Cate1 = route.query.Cate1 || 1;
     },
     { immediate: true, deep: true }
 );

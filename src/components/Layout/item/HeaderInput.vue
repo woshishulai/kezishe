@@ -20,15 +20,23 @@ const list = [
     }
 ];
 const onSearch = () => {
+    console.log(active.value);
     if (active.value == 0) {
         router.push({
             path: '/jingmai/show-stamp-goods',
             query: {
-                Id: '',
-                SType: 1,
-                Cate1: 2,
+                SType: active.value + 1,
                 show: false,
-                Kw: inputValue.value
+                KeyWd: inputValue.value
+            }
+        });
+    } else if (active.value == 2) {
+        router.push({
+            path: '/chengjiao/transaction-goods',
+            query: {
+                SType: active.value + 1,
+                show: false,
+                KeyWd: inputValue.value
             }
         });
     }
@@ -52,6 +60,7 @@ const cateInfo = (index) => {
                 <img :src="getImageUrl('login/red-down.png')" alt="" />
             </div>
         </div>
+        <!-- @keydown.enter="onSearch" -->
         <a-input-search
             v-model:value="inputValue"
             placeholder="请输入藏品名称和编号"

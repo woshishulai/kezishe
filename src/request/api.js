@@ -157,3 +157,9 @@ export const confirmOrder = async (params) =>
 
 //帮助中心
 export const getHelp = async (params) => instances.get(`Web/NewsHelp/HelperCategory`);
+
+// 搜索
+export const searchValue = async (params) =>
+    instance.post(
+        `Web/Search/List?Stype=${params.Stype}&KeyWd=${params.KeyWd}&AuctionStatuses=${params.AuctionStatuses}&CategoryIds=${params.CategoryIds}&Grades=${params.Grades}&Sorts=${params.Sort}&DateStart=${params.DateStart}&DateEnd=${params.DateEnd}&TimeRange=${params.TimeRange}&PriceRange=${params.PriceRange}&PageSize=${params.PageSize}&PageIndex=${params.PageIndex}`
+    );
